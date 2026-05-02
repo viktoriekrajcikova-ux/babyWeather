@@ -46,9 +46,9 @@ const Home = () => {
                                     {weatherForecast && <WeatherForecast weatherForecastHourly={weather.hourly.slice(0, 13)} onClickForecast={selectForecast}/>}
                                     <Weather
                                         onClickWeatherForecast={() => (setWeatherForecast(!weatherForecast))}
-                                        temperature={Math.round(weather.hourly[selectedWeatherIndex].temp - 275.15)}
+                                        temperature={Math.round(weather.hourly[selectedWeatherIndex].temp - 273.15)}
                                         describe={weather.hourly[selectedWeatherIndex].weather[0].description}
-                                        feelsLike={Math.round(weather.hourly[selectedWeatherIndex].feels_like - 275.15)}
+                                        feelsLike={Math.round(weather.hourly[selectedWeatherIndex].feels_like - 273.15)}
                                         timeForecast={selectedWeatherIndex > 0 && `Forecast for ${ new Date(weather.hourly[selectedWeatherIndex].dt * 1000).getHours()}:00`}
                                         icon={`https://openweathermap.org/img/wn/${weather.hourly[selectedWeatherIndex].weather[0].icon}@2x.png`}/>
                                     {selectedWeatherIndex > 0 && <div className="current-weather" onClick={() => setSelectedWeatherIndex(0)}><img src="assets/img/nounBack.png"/>Back to current weather</div>}
@@ -57,7 +57,7 @@ const Home = () => {
                             <Row className="justify-content-between">
                                 {children.map((child, key) => {
                                     const clothes = determinator.getSuitableClothes(
-                                        Math.round(weather.hourly[selectedWeatherIndex].temp - 275.15),
+                                        Math.round(weather.hourly[selectedWeatherIndex].temp - 273.15),
                                         child.age,
                                         child.sex
                                     )

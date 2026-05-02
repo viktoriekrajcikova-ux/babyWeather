@@ -1,7 +1,13 @@
+const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
+
+if (!apiKey) {
+    throw new Error("Missing VITE_OPENWEATHER_API_KEY env var");
+}
+
 class WeatherApiClient {
 
     async getData() {
-        const response = await fetch(`https://api.openweathermap.org/data/3.0/onecall?lat=49.3547&lon=17.8694&exclude=daily&appid=7fb42e5e75ac7e086e9a3d34d0f8f97c&lang=zh_cz`)
+        const response = await fetch(`https://api.openweathermap.org/data/3.0/onecall?lat=49.3547&lon=17.8694&exclude=daily&appid=${apiKey}&lang=cz`)
         return await response.json()
     }
 }

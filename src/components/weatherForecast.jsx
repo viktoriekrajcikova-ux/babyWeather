@@ -6,7 +6,7 @@ const weatherForecast = ({weatherForecastHourly, onClickForecast}) => {
         <ul className="weather-forecast">
             {weatherForecastHourly.map((weatherForecastHourlyItem, key) => <li key={key} onClick={() => onClickForecast(key)}>
                 <div><img src={`https://openweathermap.org/img/wn/${weatherForecastHourlyItem.weather[0].icon}@2x.png`}/></div>
-                {Math.round(weatherForecastHourlyItem.temp - 275.15)} °C
+                {Math.round(weatherForecastHourlyItem.temp - 273.15)} °C
                 {key === 0 ? <div>Now</div> : <div>{new Date(weatherForecastHourlyItem.dt * 1000).getHours()}:00</div>}
             </li>)}
         </ul>
