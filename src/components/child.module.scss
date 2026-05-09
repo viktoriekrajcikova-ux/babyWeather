@@ -1,0 +1,49 @@
+.child {
+  position: relative;
+  max-width: 48%;
+  border-radius: 3.75rem 0.75rem 3.75rem 3.75rem;
+  background-color: #86A8E7;
+  text-align: center;
+  padding: 0.625rem;
+  margin-bottom: 0.938rem;
+
+  button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: none;
+    border: none;
+    font-weight: bold;
+  }
+
+  button:hover {
+    text-decoration: underline;
+  }
+}
+
+.name {
+  margin-top: 0.625rem;
+  margin-bottom: 2.625rem;
+}
+
+.img {
+  width: 9.375rem;
+}
+
+.clothes {
+  padding-left: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+
+  li {
+    display: inline;
+    list-style-type: none;
+    padding-left: 0.313rem;
+    padding-right: 0.313rem;
+  }
+
+  img {
+    max-height: 3.75rem;
+  }
+}

@@ -1,9 +1,10 @@
 import React from 'react'
+import styles from './weatherForecast.module.scss'
 
 const weatherForecast = ({weatherForecastHourly, onClickForecast}) => {
     return <>
         <h2 className="text-center mt-5">12 hours ahead forecast</h2>
-        <ul className="weather-forecast">
+        <ul className={styles.list}>
             {weatherForecastHourly.map((weatherForecastHourlyItem, key) => <li key={key} onClick={() => onClickForecast(key)}>
                 <div><img src={`https://openweathermap.org/img/wn/${weatherForecastHourlyItem.weather[0].icon}@2x.png`}/></div>
                 {Math.round(weatherForecastHourlyItem.temp - 273.15)} °C

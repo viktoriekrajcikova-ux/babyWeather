@@ -6,6 +6,7 @@ import Row from 'react-bootstrap/Row';
 import {supabaseApi} from "../supabaseApiClient.jsx";
 import Message from "./message.jsx";
 import { useNavigate } from "react-router-dom";
+import styles from './addChildForm.module.scss'
 
 
 function AddChildForm() {
@@ -72,7 +73,7 @@ function AddChildForm() {
     return (
         <>
             { message && <Message id="message" text={message} variant={variant} /> }
-            <Form onSubmit={handleSubmit} className="add-child-form">
+            <Form onSubmit={handleSubmit} className={styles.form}>
                 <Row className="mb-3">
                     <Form.Group as={Col}>
                         <Form.Label>First name</Form.Label>
