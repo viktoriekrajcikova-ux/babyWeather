@@ -1,8 +1,10 @@
+@use '../assets/scss/variables' as *;
+
 .child {
   position: relative;
   max-width: 48%;
   border-radius: 3.75rem 0.75rem 3.75rem 3.75rem;
-  background-color: #86A8E7;
+  background-color: $color-primary-500;
   text-align: center;
   padding: 0.625rem;
   margin-bottom: 0.938rem;
@@ -13,7 +15,8 @@
     right: 0;
     background: none;
     border: none;
-    font-weight: bold;
+    font-weight: $font-weight-bold;
+    font-size: $font-size-small;
   }
 
   button:hover {
@@ -24,6 +27,9 @@
 .name {
   margin-top: 0.625rem;
   margin-bottom: 2.625rem;
+  font-size: $font-size-subtitle;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-tight;
 }
 
 .img {
@@ -45,5 +51,11 @@
 
   img {
     max-height: 3.75rem;
+  }
+
+  p {
+    font-size: $font-size-caption;
+    font-weight: $font-weight-semibold;
+    margin-bottom: 0;
   }
 }

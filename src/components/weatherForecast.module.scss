@@ -1,3 +1,5 @@
+@use '../assets/scss/variables' as *;
+
 .list {
   display: flex;
   overflow: auto;
@@ -9,12 +11,14 @@
     cursor: pointer;
     margin: 0.313rem;
     border-radius: 3.75rem;
-    background-color: #86A8E7;
+    background-color: $color-primary-500;
     text-align: center;
     padding: 0.625rem;
+    font-size: $font-size-small;
+    font-weight: $font-weight-semibold;
   }
 
   li:hover {
-    box-shadow: 0px 10px 15px -3px rgba(0,0,0,10%);
+    box-shadow: 0px 10px 15px -3px $color-shadow;
   }
 }

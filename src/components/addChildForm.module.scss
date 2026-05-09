@@ -1,6 +1,16 @@
+@use '../assets/scss/variables' as *;
+
 .form {
+  font-size: $font-size-body;
+
+  label {
+    font-size: $font-size-small;
+    font-weight: $font-weight-semibold;
+  }
+
   button {
     display: flex;
     margin-left: auto;
+    font-weight: $font-weight-bold;
   }
 }
