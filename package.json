@@ -11,12 +11,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^6.5.1",
-    "@fortawesome/free-solid-svg-icons": "^6.5.1",
-    "@fortawesome/react-fontawesome": "^0.2.0",
     "@supabase/supabase-js": "^2.39.8",
     "bootstrap": "^5.3.3",
     "install": "^0.13.0",
+    "lucide-react": "^1.14.0",
     "npm": "^10.5.0",
     "react": "^18.2.0",
     "react-bootstrap": "^2.10.1",

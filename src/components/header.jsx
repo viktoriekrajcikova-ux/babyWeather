@@ -2,6 +2,7 @@ import React from 'react'
 import {Container, Row} from "react-bootstrap";
 import Col from "react-bootstrap/Col";
 import styles from './header.module.scss'
+import { House, Settings } from 'lucide-react';
 
 const Header = () => {
     return <>
@@ -9,8 +10,8 @@ const Header = () => {
             <Container>
                 <Row>
                     <Col className={styles.wrapper}>
-                        <a href="/" alt="Home"><img src="assets/img/home.png"/>HOME</a>
-                        <a href="/settings" alt="Settings"><img src="assets/img/settings.png"/>SETTINGS</a>
+                        <a href="/" alt="Home"><House size={20} strokeWidth={2} />HOME</a>
+                        <a href="/settings" alt="Settings"><Settings size={20} strokeWidth={2} />SETTINGS</a>
                     </Col>
                 </Row>
             </Container>
