@@ -30,7 +30,7 @@ const Home = () => {
 
     const handleDeleteChild = async (id) => {
         await supabaseApi.deleteChild(id);
-        location.reload();
+        setChildren(prev => prev.filter(c => c.id !== id));
     }
 
     return (
