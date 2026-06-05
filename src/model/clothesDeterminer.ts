@@ -1,6 +1,16 @@
+export type ClothesItem = {
+    name: string
+    imageUrl: string
+    tempFrom: number | null
+    tempTo: number | null
+    ageFrom: number | null
+    ageTo: number | null
+    sex: 'male' | 'female' | null
+}
+
 class ClothesDeterminer {
 
-    clothes = [
+    clothes: ClothesItem[] = [
 
         // summer
         {name: 'shirt', imageUrl: 'assets/img/shirt.png', tempFrom: 20, tempTo: null, ageFrom: 1, ageTo: null, sex: null},
@@ -26,14 +36,13 @@ class ClothesDeterminer {
         {name: 'socks', imageUrl: 'assets/img/socks.png', tempFrom: null, tempTo: 17, ageFrom: null, ageTo: null, sex: null},
     ];
 
-    getSuitableClothes(temperature, age, sex) {
+    getSuitableClothes(temperature: number, age: number, sex: 'male' | 'female' | null): ClothesItem[] {
         return this.clothes.filter(function (clothesItem) {
-            return (clothesItem.tempFrom <= temperature || clothesItem.tempFrom === null) &&
-                (clothesItem.tempTo >= temperature || clothesItem.tempTo === null) &&
-                (clothesItem.ageFrom <= age || clothesItem.ageFrom === null) &&
-                (clothesItem.ageTo >= age ||  clothesItem.ageTo === null) &&
-                (clothesItem.sex === sex ||  clothesItem.sex === null)
-
+            return (clothesItem.tempFrom === null || clothesItem.tempFrom <= temperature) &&
+                (clothesItem.tempTo === null || clothesItem.tempTo >= temperature) &&
+                (clothesItem.ageFrom === null || clothesItem.ageFrom <= age) &&
+                (clothesItem.ageTo === null || clothesItem.ageTo >= age) &&
+                (clothesItem.sex === null || clothesItem.sex === sex)
         })
     }
 
