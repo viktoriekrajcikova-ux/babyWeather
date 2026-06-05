@@ -3,7 +3,7 @@ import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
-import {supabaseApi} from "../supabaseApiClient.jsx";
+import {supabaseApi} from "../supabaseApiClient";
 import Message from "./message.jsx";
 import { useNavigate } from "react-router-dom";
 import styles from './addChildForm.module.scss'

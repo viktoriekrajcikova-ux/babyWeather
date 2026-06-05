@@ -3,10 +3,10 @@ import {Container, Row, Col} from "react-bootstrap";
 import Header from "../components/header.jsx";
 import Child from "../components/child.jsx";
 import Weather from "../components/weather.jsx";
-import {weatherApi} from "../weatherApiClient.jsx";
+import {weatherApi} from "../weatherApiClient";
 import {determinator} from "../model/clothesDeterminer";
 import WeatherForecast from "../components/weatherForecast.jsx";
-import {supabaseApi} from "../supabaseApiClient.jsx";
+import {supabaseApi} from "../supabaseApiClient";
 
 
 const Home = () => {
