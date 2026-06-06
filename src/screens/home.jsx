@@ -1,35 +1,35 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState} from 'react'
 import {Container, Row, Col} from "react-bootstrap";
 import Header from "../components/header.jsx";
 import Child from "../components/child.jsx";
 import Weather from "../components/weather.jsx";
-import {weatherApi} from "../weatherApiClient";
 import {determinator} from "../model/clothesDeterminer";
 import WeatherForecast from "../components/weatherForecast.jsx";
 import {useChildren} from "../hooks/useChildren";
+import {useWeather} from "../hooks/useWeather";
 
 
 const Home = () => {
-    const [weather, setWeather] = useState(null);
+    const {weather, loading: weatherLoading, error: weatherError} = useWeather();
     const {children, error: childrenError, deleteChild} = useChildren();
     const [selectedWeatherIndex, setSelectedWeatherIndex] = useState(0)
     const [weatherForecast, setWeatherForecast] = useState(false);
-
-    useEffect(() => {
-        weatherApi.getData().then(data => setWeather(data))
-    }, [])
 
     const selectForecast = (index) => {
         setSelectedWeatherIndex(index);
         setWeatherForecast(false)
     };
 
+    if (weatherLoading) {
+        return <div>Loading</div>
+    }
+
+    if (weatherError || weather === null) {
+        return <div>{weatherError ?? 'Nepodařilo se načíst počasí'}</div>
+    }
+
     return (
         <>
-            {
-                weather === null
-                    ? <div>Loading</div>
-                    : <>
                         <Header />
                         <Container>
                             <Row>
@@ -57,8 +57,6 @@ const Home = () => {
                                 })}
                             </Row>
                         </Container>
-                    </>
-            }
         </>
     )
 }

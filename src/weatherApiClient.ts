@@ -24,6 +24,9 @@ class WeatherApiClient {
 
     async getData(): Promise<WeatherData> {
         const response = await fetch(`https://api.openweathermap.org/data/3.0/onecall?lat=49.3547&lon=17.8694&exclude=daily&appid=${apiKey}&lang=cz`)
+        if (!response.ok) {
+            throw new Error(`Weather API error: ${response.status}`)
+        }
         return await response.json() as WeatherData
     }
 }
