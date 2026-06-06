@@ -12,25 +12,30 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
 
 class supabaseApiClient {
 
-    async getChildren(): Promise<Tables<'children'>[] | null> {
-        const response = await supabase
+    async getChildren(): Promise<Tables<'children'>[]> {
+        const { data, error } = await supabase
             .from("children")
             .select();
 
-        return response.data
+        if (error) throw error;
+        return data ?? [];
     }
 
     async addChild(newChild: TablesInsert<'children'>) {
-        await supabase
+        const { error } = await supabase
             .from('children')
             .insert(newChild)
+
+        if (error) throw error;
     }
 
     async deleteChild(id: number) {
-        await supabase
+        const { error } = await supabase
             .from('children')
             .delete()
             .eq('id', id)
+
+        if (error) throw error;
     }
 }
 

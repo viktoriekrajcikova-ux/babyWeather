@@ -6,32 +6,23 @@ import Weather from "../components/weather.jsx";
 import {weatherApi} from "../weatherApiClient";
 import {determinator} from "../model/clothesDeterminer";
 import WeatherForecast from "../components/weatherForecast.jsx";
-import {supabaseApi} from "../supabaseApiClient";
+import {useChildren} from "../hooks/useChildren";
 
 
 const Home = () => {
     const [weather, setWeather] = useState(null);
-    const [children, setChildren] = useState([]);
+    const {children, error: childrenError, deleteChild} = useChildren();
     const [selectedWeatherIndex, setSelectedWeatherIndex] = useState(0)
     const [weatherForecast, setWeatherForecast] = useState(false);
 
     useEffect(() => {
-        const loadData = async () => {
-            weatherApi.getData().then(data => setWeather(data))
-            supabaseApi.getChildren().then(data => setChildren(data))
-        }
-        loadData()
+        weatherApi.getData().then(data => setWeather(data))
     }, [])
 
     const selectForecast = (index) => {
         setSelectedWeatherIndex(index);
         setWeatherForecast(false)
     };
-
-    const handleDeleteChild = async (id) => {
-        await supabaseApi.deleteChild(id);
-        setChildren(prev => prev.filter(c => c.id !== id));
-    }
 
     return (
         <>
@@ -55,13 +46,14 @@ const Home = () => {
                                 </Col>
                             </Row>
                             <Row className="justify-content-between">
+                                {childrenError && <Col xs={12}>{childrenError}</Col>}
                                 {children.map((child, key) => {
                                     const clothes = determinator.getSuitableClothes(
                                         Math.round(weather.hourly[selectedWeatherIndex].temp - 273.15),
                                         child.age,
                                         child.sex
                                     )
-                                    return <Child id={child.id} key={key} name={child.name} onClickDelete={handleDeleteChild} sex={child.sex} allClothes={clothes} />;
+                                    return <Child id={child.id} key={key} name={child.name} onClickDelete={deleteChild} sex={child.sex} allClothes={clothes} />;
                                 })}
                             </Row>
                         </Container>

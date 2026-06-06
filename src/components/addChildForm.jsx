@@ -3,7 +3,7 @@ import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
-import {supabaseApi} from "../supabaseApiClient";
+import {useChildren} from "../hooks/useChildren";
 import Message from "./message.jsx";
 import { useNavigate } from "react-router-dom";
 import styles from './addChildForm.module.scss'
@@ -17,6 +17,7 @@ function AddChildForm() {
     const [sex, setSex] = useState('')
     const [message, setMessage] = useState('')
     const [variant, setVariant] = useState('primary')
+    const {addChild} = useChildren();
     const navigate = useNavigate();
 
     const handleSubmit = async (event) => {
@@ -49,25 +50,13 @@ function AddChildForm() {
             age: +age
         }
 
-        supabaseApi.addChild(newChild)
-            .then(() => {
-                setVariant('success')
-                setMessage('Successfully saved')
-                setName('')
-                event.target.reset()
-                }
-            )
-            .catch(() => {
-                setVariant('danger')
-                setMessage('Something went wrong')
-            });
-
-        setTimeout(() => {
-            const message = document.getElementById("message")
-            message.style.display = 'none'
-            navigate("/");
-        }, 2000)
-
+        try {
+            await addChild(newChild)
+            navigate("/")
+        } catch {
+            setVariant('danger')
+            setMessage('Something went wrong')
+        }
     };
 
     return (
