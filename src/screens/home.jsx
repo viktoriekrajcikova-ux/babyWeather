@@ -28,6 +28,13 @@ const Home = () => {
         return <div>{weatherError ?? 'Nepodařilo se načíst počasí'}</div>
     }
 
+    const currentTemp = Math.round(weather.hourly[selectedWeatherIndex].temp - 273.15)
+
+    const childrenWithClothes = children.map(child => ({
+        ...child,
+        clothes: determinator.getSuitableClothes(currentTemp, child.age, child.sex),
+    }))
+
     return (
         <>
                         <Header />
@@ -37,7 +44,7 @@ const Home = () => {
                                     {weatherForecast && <WeatherForecast weatherForecastHourly={weather.hourly.slice(0, 13)} onClickForecast={selectForecast}/>}
                                     <Weather
                                         onClickWeatherForecast={() => (setWeatherForecast(!weatherForecast))}
-                                        temperature={Math.round(weather.hourly[selectedWeatherIndex].temp - 273.15)}
+                                        temperature={currentTemp}
                                         describe={weather.hourly[selectedWeatherIndex].weather[0].description}
                                         feelsLike={Math.round(weather.hourly[selectedWeatherIndex].feels_like - 273.15)}
                                         timeForecast={selectedWeatherIndex > 0 && `Forecast for ${ new Date(weather.hourly[selectedWeatherIndex].dt * 1000).getHours()}:00`}
@@ -47,14 +54,9 @@ const Home = () => {
                             </Row>
                             <Row className="justify-content-between">
                                 {childrenError && <Col xs={12}>{childrenError}</Col>}
-                                {children.map((child, key) => {
-                                    const clothes = determinator.getSuitableClothes(
-                                        Math.round(weather.hourly[selectedWeatherIndex].temp - 273.15),
-                                        child.age,
-                                        child.sex
-                                    )
-                                    return <Child id={child.id} key={key} name={child.name} onClickDelete={deleteChild} sex={child.sex} allClothes={clothes} />;
-                                })}
+                                {childrenWithClothes.map(child => (
+                                    <Child id={child.id} key={child.id} name={child.name} onClickDelete={deleteChild} sex={child.sex} allClothes={child.clothes} />
+                                ))}
                             </Row>
                         </Container>
         </>
