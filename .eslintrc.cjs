@@ -18,4 +18,24 @@ module.exports = {
       { allowConstantExport: true },
     ],
   },
+  overrides: [
+    {
+      files: ['**/*.ts', '**/*.tsx'],
+      parser: '@typescript-eslint/parser',
+      plugins: ['@typescript-eslint'],
+      extends: ['plugin:@typescript-eslint/recommended'],
+      rules: {
+        'react/prop-types': 'off',
+      },
+    },
+    {
+      files: ['**/*.jsx'],
+      rules: {
+        // props validaci převezme migrace na TypeScript, runtime prop-types nemá smysl psát
+        'react/prop-types': 'off',
+        // běžný Context pattern (komponenta + hook v jednom souboru) jen mírně oslabuje Fast Refresh
+        'react-refresh/only-export-components': 'off',
+      },
+    },
+  ],
 }

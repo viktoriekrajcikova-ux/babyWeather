@@ -1,4 +1,3 @@
-import React from 'react'
 import AddChildForm from "../components/addChildForm.jsx";
 import Header from "../components/header.jsx";
 import {Container} from "react-bootstrap";

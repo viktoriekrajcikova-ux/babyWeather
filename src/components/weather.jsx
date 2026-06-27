@@ -1,4 +1,3 @@
-import React from 'react'
 import styles from './weather.module.scss'
 
 const Weather = ({temperature, feelsLike, icon, describe, onClickWeatherForecast, timeForecast}) => {

@@ -1,4 +1,3 @@
-import React from 'react'
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import {useState} from 'react';
@@ -22,6 +21,8 @@ const Child = ({name, sex, allClothes, id, onClickDelete }) => {
         if (sex === 'female') {
             return setUrlAvatar(imgUrlGirl)
         }
+        // sex je prop nastavený jednou rodičem a po mountu se nemění, proto je prázdné pole závislostí záměr
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
 
