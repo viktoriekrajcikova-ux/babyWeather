@@ -14,7 +14,7 @@ const Home = () => {
     const [selectedWeatherIndex, setSelectedWeatherIndex] = useState(0)
     const [weatherForecast, setWeatherForecast] = useState(false);
 
-    const selectForecast = (index) => {
+    const selectForecast = (index: number)=> {
         setSelectedWeatherIndex(index);
         setWeatherForecast(false)
     };
@@ -29,10 +29,15 @@ const Home = () => {
 
     const currentTemp = Math.round(weather.hourly[selectedWeatherIndex].temp - 273.15)
 
-    const childrenWithClothes = children.map(child => ({
-        ...child,
-        clothes: determinator.getSuitableClothes(currentTemp, child.age, child.sex),
-    }))
+    const childrenWithClothes = children.map((child) => {
+        const sex = child.sex as 'male' | 'female' | null;
+        return {
+            ...child,
+            name: child.name ?? '',
+            sex,
+            clothes: determinator.getSuitableClothes(currentTemp, child.age, sex),
+        };
+    });
 
     return (
         <>
