@@ -4,7 +4,7 @@ import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import {useChildren} from "../hooks/useChildren";
-import Message from "./message.jsx";
+import Message from "./message";
 import { useNavigate } from "react-router-dom";
 import styles from './addChildForm.module.scss'
 

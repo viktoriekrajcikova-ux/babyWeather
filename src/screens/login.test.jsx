@@ -6,13 +6,12 @@ import Login from './login'
 const mockNavigate = vi.fn()
 const mockSignIn = vi.fn()
 
-// fejk za react-router – Login z něj bere jen useNavigate.
 vi.mock('react-router-dom', () => ({
     useNavigate: () => mockNavigate,
 }))
 
-// fejk za náš AuthContext – signIn nepůjde na Supabase.
-vi.mock('../context/AuthContext', () => ({
+
+vi.mock('../hooks/useAuth', () => ({
     useAuth: () => ({ signIn: mockSignIn, signUp: vi.fn() }),
 }))
 
@@ -42,7 +41,7 @@ describe('Login', () => {
         await user.type(screen.getByPlaceholderText('Email'), 'a@b.cz')
         await user.type(screen.getByPlaceholderText('Password'), 'spatne')
         await user.click(screen.getByRole('button', { name: 'Sign In' }))
-        
+
         expect(await screen.findByText('Špatné heslo')).toBeInTheDocument()
         expect(mockNavigate).not.toHaveBeenCalled()
 })})
