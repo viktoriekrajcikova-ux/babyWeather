@@ -1,5 +1,5 @@
-import AddChildForm from "../components/addChildForm.jsx";
-import Header from "../components/header.jsx";
+import AddChildForm from "../components/addChildForm";
+import Header from "../components/header";
 import {Container} from "react-bootstrap";
 
 const SettingsScreen = () => {

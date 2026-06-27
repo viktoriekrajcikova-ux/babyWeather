@@ -3,10 +3,10 @@ import {
   Route,
   Routes
 } from 'react-router-dom';
-import Home from "./screens/home.jsx";
+import Home from "./screens/home";
 import Settings from "./screens/settings";
-import Login from "./screens/login.jsx";
-import ProtectedRoute from "./components/protectedRoute.jsx";
+import Login from "./screens/login";
+import ProtectedRoute from "./components/protectedRoute";
 
 const App = () => {
   return (

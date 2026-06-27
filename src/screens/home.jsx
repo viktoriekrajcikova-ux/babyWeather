@@ -1,13 +1,12 @@
 import {useState} from 'react'
 import {Container, Row, Col} from "react-bootstrap";
-import Header from "../components/header.jsx";
-import Child from "../components/child.jsx";
-import Weather from "../components/weather.jsx";
+import Header from "../components/header";
+import Child from "../components/child";
+import Weather from "../components/weather";
 import {determinator} from "../model/clothesDeterminer";
-import WeatherForecast from "../components/weatherForecast.jsx";
+import WeatherForecast from "../components/weatherForecast";
 import {useChildren} from "../hooks/useChildren";
 import {useWeather} from "../hooks/useWeather";
-
 
 const Home = () => {
     const {weather, loading: weatherLoading, error: weatherError} = useWeather();
