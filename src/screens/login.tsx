@@ -1,3 +1,4 @@
+import type { FormEvent } from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
@@ -5,17 +6,17 @@ import { useAuth } from '../hooks/useAuth';
   const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<string | null>(null);
     const { signIn, signUp } = useAuth();
     const navigate = useNavigate();
 
-    const handleSignIn = async (e) => {
+    const handleSignIn = async (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       setError(null);
       try { await signIn(email, password);
         navigate('/');
       } catch (error) {
-        setError(error.message);
+        setError(error instanceof Error ? error.message : 'Something went wrong');
       }
     };
 
@@ -24,7 +25,7 @@ import { useAuth } from '../hooks/useAuth';
         try { await signUp(email, password);
           navigate('/');
         } catch (error) {
-          setError(error.message);
+          setError(error instanceof Error ? error.message : 'Something went wrong');
         }
     };
 
