@@ -1,5 +1,6 @@
 import styles from './weatherForecast.module.scss'
 import type { HourlyWeather } from '../weatherApiClient';
+import { kelvinToCelsius } from '../model/temperature';
 
 interface WeatherForecastProps {
     weatherForecastHourly: HourlyWeather[];
@@ -12,7 +13,7 @@ const weatherForecast = ({ weatherForecastHourly, onClickForecast }: WeatherFore
         <ul className={styles.list}>
             {weatherForecastHourly.map((weatherForecastHourlyItem, key) => <li key={key} onClick={() => onClickForecast(key)}>
                 <div><img src={`https://openweathermap.org/img/wn/${weatherForecastHourlyItem.weather[0].icon}@2x.png`}/></div>
-                {Math.round(weatherForecastHourlyItem.temp - 273.15)} °C
+                {Math.round(kelvinToCelsius(weatherForecastHourlyItem.temp))} °C
                 {key === 0 ? <div>Now</div> : <div>{new Date(weatherForecastHourlyItem.dt * 1000).getHours()}:00</div>}
             </li>)}
         </ul>

@@ -7,6 +7,7 @@ import {determinator} from "../model/clothesDeterminer";
 import WeatherForecast from "../components/weatherForecast";
 import {useChildren} from "../hooks/useChildren";
 import {useWeather} from "../hooks/useWeather";
+import { kelvinToCelsius } from '../model/temperature';
 
 const Home = () => {
     const {weather, loading: weatherLoading, error: weatherError} = useWeather();
@@ -27,17 +28,12 @@ const Home = () => {
         return <div>{weatherError ?? 'Nepodařilo se načíst počasí'}</div>
     }
 
-    const currentTemp = Math.round(weather.hourly[selectedWeatherIndex].temp - 273.15)
+    const currentTemp = Math.round(kelvinToCelsius(weather.hourly[selectedWeatherIndex].temp))
 
-    const childrenWithClothes = children.map((child) => {
-        const sex = child.sex as 'male' | 'female' | null;
-        return {
-            ...child,
-            name: child.name ?? '',
-            sex,
-            clothes: determinator.getSuitableClothes(currentTemp, child.age, sex),
-        };
-    });
+    const childrenWithClothes = children.map((child) => ({
+        ...child,
+        clothes: determinator.getSuitableClothes(currentTemp, child.age, child.sex),
+    }));
 
     return (
         <>
@@ -50,7 +46,7 @@ const Home = () => {
                                         onClickWeatherForecast={() => (setWeatherForecast(!weatherForecast))}
                                         temperature={currentTemp}
                                         describe={weather.hourly[selectedWeatherIndex].weather[0].description}
-                                        feelsLike={Math.round(weather.hourly[selectedWeatherIndex].feels_like - 273.15)}
+                                        feelsLike={Math.round(kelvinToCelsius(weather.hourly[selectedWeatherIndex].feels_like))}
                                         timeForecast={selectedWeatherIndex > 0 && `Forecast for ${ new Date(weather.hourly[selectedWeatherIndex].dt * 1000).getHours()}:00`}
                                         icon={`https://openweathermap.org/img/wn/${weather.hourly[selectedWeatherIndex].weather[0].icon}@2x.png`}/>
                                     {selectedWeatherIndex > 0 && <div className="current-weather" onClick={() => setSelectedWeatherIndex(0)}><img src="assets/img/nounBack.png"/>Back to current weather</div>}

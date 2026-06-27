@@ -1,3 +1,4 @@
+import type { Sex } from '../model/child';
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import styles from './child.module.scss'
@@ -9,7 +10,7 @@ const imgUrlBoy = 'assets/img/boy.png';
 
 interface ChildProps {
     name: string;
-    sex: 'male' | 'female' | null;
+    sex: Sex | null;
     allClothes: ClothesItem[];
     id: number;
     onClickDelete: (id: number) => void;

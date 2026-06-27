@@ -1,8 +1,20 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabaseApi } from '../supabaseApiClient';
 import type { Tables, TablesInsert } from '../types/database';
+import type { Child, Sex } from '../model/child';
 
-type Child = Tables<'children'>;
+function toSex(value: string | null): Sex | null {
+    return value === 'male' || value === 'female' ? value : null;
+}
+
+function toChild(row: Tables<'children'>): Child {
+    return {
+        id: row.id,
+        name: row.name ?? '',
+        age: row.age,
+        sex: toSex(row.sex),
+    };
+}
 
 export function useChildren() {
     const [children, setChildren] = useState<Child[]>([]);
@@ -14,7 +26,7 @@ export function useChildren() {
         setError(null);
         try {
             const data = await supabaseApi.getChildren();
-            setChildren(data);
+            setChildren(data.map(toChild));
         } catch {
             setError('Nepodařilo se načíst děti');
         } finally {

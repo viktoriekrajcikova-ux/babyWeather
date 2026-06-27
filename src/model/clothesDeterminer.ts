@@ -1,3 +1,5 @@
+import type { Sex } from './child';
+
 export type ClothesItem = {
     name: string
     imageUrl: string
@@ -5,7 +7,7 @@ export type ClothesItem = {
     tempTo: number | null
     ageFrom: number | null
     ageTo: number | null
-    sex: 'male' | 'female' | null
+    sex: Sex | null
 }
 
 class ClothesDeterminer {
@@ -36,7 +38,7 @@ class ClothesDeterminer {
         {name: 'socks', imageUrl: 'assets/img/socks.png', tempFrom: null, tempTo: 17, ageFrom: null, ageTo: null, sex: null},
     ];
 
-    getSuitableClothes(temperature: number, age: number, sex: 'male' | 'female' | null): ClothesItem[] {
+    getSuitableClothes(temperature: number, age: number, sex: Sex | null): ClothesItem[] {
         return this.clothes.filter(function (clothesItem) {
             return (clothesItem.tempFrom === null || clothesItem.tempFrom <= temperature) &&
                 (clothesItem.tempTo === null || clothesItem.tempTo >= temperature) &&
