@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  quality:
+    name: Lint, typecheck & test
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1) Checkout repozitáře
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      # 2) Setup Node.js a cache npm
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # 3) Instalace závislostí
+      - name: Install dependencies
+        run: npm ci
+
+      # 4) Lint, typecheck a testy
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm run test:run
