@@ -1,6 +1,15 @@
 import styles from './weather.module.scss'
 
-const Weather = ({temperature, feelsLike, icon, describe, onClickWeatherForecast, timeForecast}) => {
+interface WeatherProps {
+    temperature: number;
+    feelsLike: number;
+    icon: string;
+    describe: string;
+    onClickWeatherForecast: () => void;
+    timeForecast: string | false;
+}
+
+const Weather = ({temperature, feelsLike, icon, describe, onClickWeatherForecast, timeForecast}: WeatherProps) => {
 
     return <div className={styles.weather} onClick={onClickWeatherForecast}>
                 <p className={styles.forecastTime}>{timeForecast}</p>

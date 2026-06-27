@@ -1,6 +1,12 @@
 import styles from './weatherForecast.module.scss'
+import type { HourlyWeather } from '../weatherApiClient';
 
-const weatherForecast = ({weatherForecastHourly, onClickForecast}) => {
+interface WeatherForecastProps {
+    weatherForecastHourly: HourlyWeather[];
+    onClickForecast: (index: number) => void;
+}
+
+const weatherForecast = ({ weatherForecastHourly, onClickForecast }: WeatherForecastProps) => {
     return <>
         <h2 className="text-center mt-5">12 hours ahead forecast</h2>
         <ul className={styles.list}>
