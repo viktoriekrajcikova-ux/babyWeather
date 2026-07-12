@@ -1,17 +1,19 @@
-import {useState} from 'react'
-import {Container, Row, Col} from "react-bootstrap";
+import { useState } from 'react'
+import { Container, Row, Col } from "react-bootstrap";
 import Header from "../components/header";
 import Child from "../components/child";
 import Weather from "../components/weather";
-import {determinator} from "../model/clothesDeterminer";
+import { determinator } from "../model/clothesDeterminer";
 import WeatherForecast from "../components/weatherForecast";
-import {useChildren} from "../hooks/useChildren";
-import {useWeather} from "../hooks/useWeather";
+import { useChildren } from "../hooks/useChildren";
+import { useWeather } from "../hooks/useWeather";
 import { kelvinToCelsius } from '../model/temperature';
+import { useLocation } from '../hooks/useLocation';
+import LocationSearch from "../components/locationSearch";
 
 const Home = () => {
-    // TODO A4: souřadnice zatím natvrdo, nahradím výběrem lokality
-    const {weather, loading: weatherLoading, error: weatherError} = useWeather({ lat: 49.3547, lon: 17.8694 });
+    const { coords, searchLocation, loading: locationLoading, error: locationError } = useLocation();
+    const {weather, loading: weatherLoading, error: weatherError} = useWeather(coords);
     const {children, error: childrenError, deleteChild} = useChildren();
     const [selectedWeatherIndex, setSelectedWeatherIndex] = useState(0)
     const [weatherForecast, setWeatherForecast] = useState(false);
@@ -40,6 +42,11 @@ const Home = () => {
         <>
                         <Header />
                         <Container>
+                            <Row>
+                                <Col xs={12}>
+                                    <LocationSearch onSearch={searchLocation} loading={locationLoading} error={locationError} />
+                                </Col>
+                            </Row>
                             <Row>
                                 <Col xs={12}>
                                     {weatherForecast && <WeatherForecast weatherForecastHourly={weather.hourly.slice(0, 13)} onClickForecast={selectForecast}/>}
