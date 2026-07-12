@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { weatherApi } from '../weatherApiClient';
 import type { WeatherData } from '../weatherApiClient';
 
-export function useWeather() {
+export function useWeather(coords: { lat: number, lon: number }) {
     const [weather, setWeather] = useState<WeatherData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -14,7 +14,7 @@ export function useWeather() {
             setLoading(true);
             setError(null);
             try {
-                const data = await weatherApi.getData();
+                const data = await weatherApi.getData(coords.lat, coords.lon);
                 if (!cancelled) setWeather(data);
             } catch {
                 if (!cancelled) setError('Nepodařilo se načíst počasí');
@@ -25,7 +25,7 @@ export function useWeather() {
 
         load();
         return () => { cancelled = true; };
-    }, []);
+    }, [coords.lat, coords.lon]);
 
     return { weather, loading, error };
 }

@@ -10,7 +10,8 @@ import {useWeather} from "../hooks/useWeather";
 import { kelvinToCelsius } from '../model/temperature';
 
 const Home = () => {
-    const {weather, loading: weatherLoading, error: weatherError} = useWeather();
+    // TODO A4: souřadnice zatím natvrdo, nahradím výběrem lokality
+    const {weather, loading: weatherLoading, error: weatherError} = useWeather({ lat: 49.3547, lon: 17.8694 });
     const {children, error: childrenError, deleteChild} = useChildren();
     const [selectedWeatherIndex, setSelectedWeatherIndex] = useState(0)
     const [weatherForecast, setWeatherForecast] = useState(false);
