@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabaseApi } from '../supabaseApiClient';
-import type { Tables, TablesInsert } from '../types/database';
+import type { TablesInsert, Tables } from '../types/database';
 import type { Child, Sex } from '../model/child';
 
 function toSex(value: string | null): Sex | null {
@@ -17,41 +17,45 @@ function toChild(row: Tables<'children'>): Child {
 }
 
 export function useChildren() {
-    const [children, setChildren] = useState<Child[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const queryClient = useQueryClient();
 
-    const loadChildren = useCallback(async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            const data = await supabaseApi.getChildren();
-            setChildren(data.map(toChild));
-        } catch {
-            setError('Nepodařilo se načíst děti');
-        } finally {
-            setLoading(false);
-        }
-    }, []);
+    const { data, isPending, error } = useQuery({
+        queryKey: ['children'],
+        queryFn: async () => {
+            const rows = await supabaseApi.getChildren();
+            return rows.map(toChild);
+        },
+    });
 
-    useEffect(() => {
-        loadChildren();
-    }, [loadChildren]);
+    const deleteMutation = useMutation({
+        mutationFn: (id: number) => supabaseApi.deleteChild(id),
+        onMutate: async (id: number) => {
+            await queryClient.cancelQueries({ queryKey: ['children'] });
+            const previousChildren = queryClient.getQueryData<Child[]>(['children']);
+            queryClient.setQueryData<Child[]>(['children'], (old = []) =>
+                old.filter(c => c.id !== id)
+            );
+            return { previousChildren };
+        },
+        onError: (_err, _id, context) => {
+            queryClient.setQueryData(['children'], context?.previousChildren);
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries({ queryKey: ['children'] });
+        },
+    });
 
-    const addChild = useCallback(async (newChild: TablesInsert<'children'>) => {
-        await supabaseApi.addChild(newChild);
-        await loadChildren();
-    }, [loadChildren]);
+    const addMutation = useMutation({
+        mutationFn: (newChild: TablesInsert<'children'>) => supabaseApi.addChild(newChild),
+        onSettled: () => {
+            queryClient.invalidateQueries({ queryKey: ['children'] });
+        },
+    });
 
-    const deleteChild = useCallback(async (id: number) => {
-        setChildren(prev => prev.filter(c => c.id !== id));
-        try {
-            await supabaseApi.deleteChild(id);
-        } catch {
-            setError('Nepodařilo se smazat dítě');
-            await loadChildren();
-        }
-    }, [loadChildren]);
-
-    return { children, loading, error, addChild, deleteChild, reload: loadChildren };
-}
+    return {
+        children: data ?? [],
+        loading: isPending,
+        error: error ? 'Nepodařilo se načíst děti' : null,
+        addChild: addMutation.mutateAsync,
+        deleteChild: deleteMutation.mutate,
+    };}
