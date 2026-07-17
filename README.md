@@ -14,6 +14,7 @@ TypeScript codebase.
 **Authentication** — email/password sign-up & sign-in via Supabase Auth
 **Child profiles** — add, list and remove children (data scoped per user)
 **Live weather** — current conditions and forecast from the OpenWeather API
+**Location search** — search any city; the selected location is remembered across visits
 **Clothing advice** — recommends what to dress the child in, based on temperature
 **Protected routes** — app content is only accessible when logged in
 
@@ -26,6 +27,7 @@ TypeScript codebase.
 | Routing         | React Router 6                                   |
 | Backend / Auth  | Supabase (Postgres + Auth + Row Level Security) |
 | Weather data    | OpenWeather One Call API 3.0                    |
+| Server state    | TanStack Query (React Query) v5                 |
 | Styling         | SCSS Modules + Bootstrap / react-bootstrap      |
 | Testing         | Vitest + React Testing Library                  |
 | CI              | GitHub Actions (lint + typecheck + tests)       |
@@ -36,14 +38,16 @@ TypeScript codebase.
 The codebase separates concerns into clear layers, which keeps business logic
 testable and UI components thin:
 
-**API clients** (`src/weatherApiClient.ts`, `src/supabaseApiClient.ts`) —
-  isolate all external calls. The rest of the app never talks to Supabase or
-  OpenWeather directly.
+**API clients** (`src/weatherApiClient.ts`, `src/supabaseApiClient.ts`,
+  `src/geocodingApiClient.ts`) — isolate all external calls. The rest of the
+  app never talks to Supabase, OpenWeather or the geocoding API directly.
 **Domain logic** (`src/model/clothesDeterminer.ts`) — the clothing
   recommendation is a pure function, fully unit-tested and independent of React.
 **Data hooks** (`src/hooks/useWeather.ts`, `src/hooks/useChildren.ts`) —
-  encapsulate data fetching with loading & error states.
-**Auth context** (`src/context/AuthContext.jsx`) — provides the session and
+  wrap TanStack Query, so fetching, caching and loading/error states live in
+  one place. `useChildren` also performs an optimistic delete with rollback
+  on failure.
+**Auth context** (`src/context/AuthContext.tsx`) — provides the session and
   auth actions to the whole app.
 **Row Level Security** (`supabase/migrations/`) — children are protected at
   the database level, so a user can only ever read or write their own rows.
@@ -96,9 +100,15 @@ The app will be available at the URL Vite prints (default `http://localhost:5173
 
 ## Testing
 
-Tests use **Vitest** and **React Testing Library**. The suite covers the pure
-domain logic (`clothesDeterminer`) and integration of the login flow. Run them
-with:
+Tests use **Vitest** and **React Testing Library**, across three levels:
+
+- **Unit** — pure domain logic (`clothesDeterminer`, `temperature`), no mocks.
+- **Hook** — `useChildren` via `renderHook`, including the optimistic delete
+  and its rollback, with the network client mocked.
+- **Integration** — the whole `Home` screen (`home.test.tsx`) rendered with
+  only the network clients mocked, plus the login flow.
+
+Run them with:
 
 ```bash
 npm run test:run
