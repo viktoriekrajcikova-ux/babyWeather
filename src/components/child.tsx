@@ -24,11 +24,11 @@ const Child = ({ name, sex, allClothes, id, onClickDelete }: ChildProps) => {
     return <>
             <Col xs={12} md={5} className={styles.child} id={String(id)}>
                 <button onClick={() => onClickDelete(id)}><X size={20} strokeWidth={2} /></button>
-                <Image className={styles.img} src={urlAvatar} roundedCircle />
+                <Image className={styles.img} src={urlAvatar} alt="" roundedCircle />
                 <h2 className={styles.name}>{name}</h2>
                 <ul className={styles.clothes}>
                     { allClothes.map( (clothes, key) => <li key={key}>
-                        <img src={clothes.imageUrl}/>
+                        <img src={clothes.imageUrl} alt=""/>
                         <p>{clothes.name}</p>
                     </li> )}
                 </ul>

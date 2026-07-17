@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Container, Row, Col } from "react-bootstrap";
+import { ArrowLeft } from 'lucide-react';
 import Header from "../components/header";
 import Child from "../components/child";
 import Weather from "../components/weather";
@@ -57,7 +58,12 @@ const Home = () => {
                                         feelsLike={Math.round(kelvinToCelsius(weather.hourly[selectedWeatherIndex].feels_like))}
                                         timeForecast={selectedWeatherIndex > 0 && `Forecast for ${ new Date(weather.hourly[selectedWeatherIndex].dt * 1000).getHours()}:00`}
                                         icon={`https://openweathermap.org/img/wn/${weather.hourly[selectedWeatherIndex].weather[0].icon}@2x.png`}/>
-                                    {selectedWeatherIndex > 0 && <div className="current-weather" onClick={() => setSelectedWeatherIndex(0)}><img src="assets/img/nounBack.png"/>Back to current weather</div>}
+                                    {selectedWeatherIndex > 0 && (
+                                        <button className="current-weather" onClick={() => setSelectedWeatherIndex(0)}>
+                                            <ArrowLeft size={16} strokeWidth={2} />
+                                            Back to current weather
+                                        </button>
+                                    )}
                                 </Col>
                             </Row>
                             <Row className="justify-content-between">

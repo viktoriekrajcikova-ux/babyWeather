@@ -11,9 +11,20 @@ interface WeatherProps {
 
 const Weather = ({temperature, feelsLike, icon, describe, onClickWeatherForecast, timeForecast}: WeatherProps) => {
 
-    return <div className={styles.weather} onClick={onClickWeatherForecast}>
+    return <div
+                className={styles.weather}
+                role="button"
+                tabIndex={0}
+                onClick={onClickWeatherForecast}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        onClickWeatherForecast();
+                    }
+                }}
+            >
                 <p className={styles.forecastTime}>{timeForecast}</p>
-                <img src={icon} />
+                <img src={icon} alt="" />
                 <h1>{temperature} °C</h1>
                 <div>
                     <div>Feels like {feelsLike} °C</div>
