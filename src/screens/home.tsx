@@ -29,7 +29,7 @@ const Home = () => {
     }
 
     if (weatherError || weather === null) {
-        return <div>{weatherError ?? 'Nepodařilo se načíst počasí'}</div>
+        return <div>{weatherError ?? 'Could not load weather'}</div>
     }
 
     const currentTemp = Math.round(kelvinToCelsius(weather.hourly[selectedWeatherIndex].temp))
@@ -53,6 +53,7 @@ const Home = () => {
                                     {weatherForecast && <WeatherForecast weatherForecastHourly={weather.hourly.slice(0, 13)} onClickForecast={selectForecast}/>}
                                     <Weather
                                         onClickWeatherForecast={() => (setWeatherForecast(!weatherForecast))}
+                                        forecastOpen={weatherForecast}
                                         temperature={currentTemp}
                                         describe={weather.hourly[selectedWeatherIndex].weather[0].description}
                                         feelsLike={Math.round(kelvinToCelsius(weather.hourly[selectedWeatherIndex].feels_like))}

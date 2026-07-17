@@ -6,23 +6,13 @@ interface WeatherProps {
     icon: string;
     describe: string;
     onClickWeatherForecast: () => void;
+    forecastOpen: boolean;
     timeForecast: string | false;
 }
 
-const Weather = ({temperature, feelsLike, icon, describe, onClickWeatherForecast, timeForecast}: WeatherProps) => {
+const Weather = ({temperature, feelsLike, icon, describe, onClickWeatherForecast, forecastOpen, timeForecast}: WeatherProps) => {
 
-    return <div
-                className={styles.weather}
-                role="button"
-                tabIndex={0}
-                onClick={onClickWeatherForecast}
-                onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        onClickWeatherForecast();
-                    }
-                }}
-            >
+    return <div className={styles.weather}>
                 <p className={styles.forecastTime}>{timeForecast}</p>
                 <img src={icon} alt="" />
                 <h1>{temperature} °C</h1>
@@ -30,6 +20,14 @@ const Weather = ({temperature, feelsLike, icon, describe, onClickWeatherForecast
                     <div>Feels like {feelsLike} °C</div>
                     <div>{describe}</div>
                 </div>
+                <button
+                    type="button"
+                    className={styles.forecastToggle}
+                    onClick={onClickWeatherForecast}
+                    aria-expanded={forecastOpen}
+                >
+                    {forecastOpen ? 'Hide hourly forecast' : 'Show hourly forecast'}
+                </button>
             </div>
 }
 

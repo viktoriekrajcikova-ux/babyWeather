@@ -28,7 +28,7 @@ export function useLocation() {
             setCoords(newCoords);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(newCoords));
         } catch {
-            setError('Nepodařilo se najít lokalitu');
+            setError('Could not find that location');
         } finally {
             setLoading(false);
         }

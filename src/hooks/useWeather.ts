@@ -12,6 +12,6 @@ export function useWeather(coords: { lat: number, lon: number }) {
     return {
         weather: data ?? null,
         loading: isPending,
-        error: error ? 'Nepodařilo se načíst počasí' : null,
+        error: error ? 'Could not load weather' : null,
     };
 }

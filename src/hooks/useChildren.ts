@@ -55,7 +55,7 @@ export function useChildren() {
     return {
         children: data ?? [],
         loading: isPending,
-        error: error ? 'Nepodařilo se načíst děti' : null,
+        error: error ? 'Could not load children' : null,
         addChild: addMutation.mutateAsync,
         deleteChild: deleteMutation.mutate,
     };}

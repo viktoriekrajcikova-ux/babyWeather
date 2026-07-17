@@ -15,11 +15,11 @@ const LocationSearch = ({ onSearch, loading, error }: LocationSearchProps) => {
                 type="text"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
-                placeholder="Zadej město"
-                aria-label="Město"
+                placeholder="Enter a city"
+                aria-label="City"
             />
             <button type="submit" disabled={loading}>
-                {loading ? 'Hledám…' : 'Najít'}
+                {loading ? 'Searching…' : 'Search'}
             </button>
             {error && <div role="alert">{error}</div>}
         </form>

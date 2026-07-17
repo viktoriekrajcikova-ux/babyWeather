@@ -1,1 +1,8 @@
-{ "extends": ["stylelint-config-standard"] }
+{
+  "extends": ["stylelint-config-standard-scss"],
+  "rules": {
+    "selector-class-pattern": null,
+    "scss/dollar-variable-empty-line-before": null,
+    "value-keyword-case": ["lower", { "ignoreKeywords": ["BlinkMacSystemFont"] }]
+  }
+}

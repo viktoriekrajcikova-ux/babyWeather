@@ -90,7 +90,7 @@ describe('Home (integrační test)', () => {
 
         render(<Home />, { wrapper: createWrapper() });
 
-        expect(await screen.findByText('Nepodařilo se načíst počasí')).toBeInTheDocument();
+        expect(await screen.findByText('Could not load weather')).toBeInTheDocument();
         expect(screen.queryByText('Ema')).not.toBeInTheDocument();
     });
 });
