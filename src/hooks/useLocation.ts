@@ -13,7 +13,7 @@ function readStoredCoords(): { lat: number; lon: number } {
         return DEFAULT_COORDS;
     }
 }
-
+// TODO: zmenit na Yoda? knihovna
 export function useLocation() {
     const [coords, setCoords] = useState<{ lat: number, lon: number }>(readStoredCoords);
     const [loading, setLoading] = useState(false);
