@@ -1,7 +1,7 @@
 import {Container, Row, Col} from "react-bootstrap";
 import { Link } from 'react-router-dom';
 import styles from './header.module.scss';
-import { House, Settings, LogOut } from 'lucide-react';
+import { House, ChartColumn, Settings, LogOut } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
 const Header = () => {
@@ -20,8 +20,10 @@ const Header = () => {
                 <Row>
                     <Col className={styles.wrapper}>
                         <Link to="/"><House size={20} strokeWidth={2} />HOME</Link>
+                        <Link to="/overview"><ChartColumn size={20} strokeWidth={2} />OVERVIEW</Link>
                         <Link to="/settings"><Settings size={20} strokeWidth={2} />SETTINGS</Link>
-                        <button onClick={handleSignOut} className={styles.signout}>
+                        <span className={styles.divider} aria-hidden="true" />
+                        <button type="button" onClick={handleSignOut} className={styles.logout}>
                             <LogOut size={20} strokeWidth={2} />LOGOUT
                         </button>
                     </Col>

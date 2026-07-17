@@ -15,10 +15,10 @@ const Weather = ({temperature, feelsLike, icon, describe, onClickWeatherForecast
     return <div className={styles.weather}>
                 <p className={styles.forecastTime}>{timeForecast}</p>
                 <img src={icon} alt="" />
-                <h1>{temperature} °C</h1>
+                <p className={styles.temp}>{temperature} °C</p>
                 <div>
-                    <div>Feels like {feelsLike} °C</div>
-                    <div>{describe}</div>
+                    <div className={styles.feels}>Feels like {feelsLike} °C</div>
+                    <div className={styles.desc}>{describe}</div>
                 </div>
                 <button
                     type="button"

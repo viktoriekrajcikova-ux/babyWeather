@@ -2,31 +2,41 @@
 
 .child {
   position: relative;
-  max-width: 48%;
-  border-radius: 3.75rem 0.75rem 3.75rem 3.75rem;
+  padding: 1.5rem;
   background-color: $color-surface;
+  border-radius: 3.75rem 0.75rem 3.75rem 3.75rem;
+  box-shadow: 0 10px 15px -3px $color-shadow;
   text-align: center;
-  padding: 0.625rem;
-  margin-bottom: 0.938rem;
+}
 
-  button {
-    position: absolute;
-    top: 0;
-    right: 0;
-    background: none;
-    border: none;
-    font-weight: $font-weight-bold;
-    font-size: $font-size-small;
+.delete {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  background: none;
+  border: none;
+  border-radius: 50%;
+  color: $color-neutral-500;
+  cursor: pointer;
+
+  &:hover {
+    background: $color-bg;
+    color: $color-accent-500;
   }
 
-  button:hover {
-    text-decoration: underline;
+  &:focus-visible {
+    outline: 3px solid $color-primary-700;
+    outline-offset: 2px;
   }
 }
 
 .name {
-  margin-top: 0.625rem;
-  margin-bottom: 2.625rem;
+  margin-top: 0.75rem;
+  margin-bottom: 1.25rem;
   font-size: $font-size-subtitle;
   font-weight: $font-weight-bold;
   line-height: $line-height-tight;

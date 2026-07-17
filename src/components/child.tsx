@@ -22,8 +22,15 @@ const Child = ({ name, sex, allClothes, id, onClickDelete }: ChildProps) => {
     const urlAvatar = sex === 'male' ? imgUrlBoy : sex === 'female' ? imgUrlGirl : '';
 
     return <>
-            <Col xs={12} md={5} className={styles.child} id={String(id)}>
-                <button onClick={() => onClickDelete(id)}><X size={20} strokeWidth={2} /></button>
+            <Col xs={12} md={6} className={styles.child} id={String(id)}>
+                <button
+                    type="button"
+                    className={styles.delete}
+                    aria-label={`Remove ${name}`}
+                    onClick={() => onClickDelete(id)}
+                >
+                    <X size={20} strokeWidth={2} />
+                </button>
                 <Image className={styles.img} src={urlAvatar} alt="" roundedCircle />
                 <h2 className={styles.name}>{name}</h2>
                 <ul className={styles.clothes}>

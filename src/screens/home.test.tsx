@@ -82,6 +82,17 @@ describe('Home (integrační test)', () => {
         expect(screen.queryByText('shirt')).not.toBeInTheDocument();
     });
 
+    it('delete tlačítko má přístupný název "Remove {name}"', async () => {
+        vi.mocked(weatherApi.getData).mockResolvedValue(weatherAt20C);
+        vi.mocked(supabaseApi.getChildren).mockResolvedValue([
+            row({ id: 1, name: 'Ema', age: 2, sex: 'female' }),
+        ]);
+
+        render(<Home />, { wrapper: createWrapper() });
+
+        expect(await screen.findByRole('button', { name: 'Remove Ema' })).toBeInTheDocument();
+    });
+
         it('při chybě počasí zobrazí chybu a nerenderuje děti', async () => {
         vi.mocked(weatherApi.getData).mockRejectedValue(new Error('500'));
         vi.mocked(supabaseApi.getChildren).mockResolvedValue([
