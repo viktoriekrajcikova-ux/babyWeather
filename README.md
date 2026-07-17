@@ -52,6 +52,9 @@ testable and UI components thin:
 **Row Level Security** (`supabase/migrations/`) — children are protected at
   the database level, so a user can only ever read or write their own rows.
 
+The reasoning behind the notable technical choices is recorded in
+[`docs/DECISIONS.md`](docs/DECISIONS.md).
+
 ## Getting started
 
 ### Prerequisites
