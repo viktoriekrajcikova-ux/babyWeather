@@ -2,7 +2,7 @@ import { Container } from "react-bootstrap";
 import { Link } from 'react-router-dom';
 import { Baby } from 'lucide-react';
 import Header from "../components/header";
-import { determinator } from "../model/clothesDeterminer";
+import { getOutfit } from "../model/clothesDeterminer";
 import type { ClothesItem } from "../model/clothesDeterminer";
 import { useChildren } from "../hooks/useChildren";
 import { useWeather } from "../hooks/useWeather";
@@ -34,9 +34,11 @@ function formatNames(children: Child[]): string {
 }
 
 
-function packForToday(child: Child, dayMin: number, dayMax: number): ClothesItem[] {
-    const atMin = determinator.getSuitableClothes(dayMin, child.age, child.sex);
-    const atMax = determinator.getSuitableClothes(dayMax, child.age, child.sex);
+// Přes den se počasí mění, tak sbalím, co dítě potřebuje pro nejchladnější
+// i nejteplejší chvíli (teplé vrstvy na ráno, lehčí na odpoledne).
+function packForToday(child: Child, feelsMin: number, feelsMax: number): ClothesItem[] {
+    const atMin = getOutfit(feelsMin, child.age, child.sex);
+    const atMax = getOutfit(feelsMax, child.age, child.sex);
     const byName = new Map<string, ClothesItem>();
     for (const item of [...atMin, ...atMax]) {
         if (!byName.has(item.name)) {
@@ -107,6 +109,11 @@ const OverviewContent = ({ hourly, kids, childrenError }: OverviewContentProps) 
     const dayMin = Math.min(...temps);
     const dayMax = Math.max(...temps);
 
+    // oblečení plánuju podle pocitové teploty
+    const feels = today.map(h => toCelsius(h.feels_like));
+    const feelsMin = Math.min(...feels);
+    const feelsMax = Math.max(...feels);
+
     const nowTemp = toCelsius(hourly[0].temp);
     const nowDescription = hourly[0].weather[0]?.description ?? '';
 
@@ -115,7 +122,7 @@ const OverviewContent = ({ hourly, kids, childrenError }: OverviewContentProps) 
     today[0]);
     const feelsLikeColdest = toCelsius(coldest.feels_like);
 
-    // graf: normalizace na okno min–max, s podlahou pro čitelnost
+    // graf: normalizace na okno min–max
     const chartTemps = chartHours.map(h => toCelsius(h.temp));
     const chartMin = Math.min(...chartTemps);
     const chartMax = Math.max(...chartTemps);
@@ -193,7 +200,7 @@ const OverviewContent = ({ hourly, kids, childrenError }: OverviewContentProps) 
             ) : (
                 <div className={styles.plan}>
                     {kids.map(child => {
-                        const clothes = packForToday(child, dayMin, dayMax);
+                        const clothes = packForToday(child, feelsMin, feelsMax);
                         const avatar =
                             child.sex === 'male' ? boyAvatar :
                             child.sex === 'female' ? girlAvatar : '';

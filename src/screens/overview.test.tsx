@@ -15,7 +15,7 @@ vi.mock('../supabaseApiClient', () => ({
 vi.mock('../geocodingApiClient', () => ({
     geocodingApi: { geocode: vi.fn() },
 }));
-// Header = auth + router; nechceme řešit v tomto testu
+
 vi.mock('../components/header', () => ({ default: () => null }));
 
 import Overview from './overview';
@@ -34,7 +34,7 @@ const hour = (index: number, celsius: number) => ({
     weather: [{ description: 'clouds', icon: '04d' }],
 });
 
-// den 14–16 °C: přechodné oblečení; min 14° přidá navíc tights (tempTo 15)
+// Den 14–16 °C, pocitově 13–15 °C: přechodová bunda i mírný outfit s mikinou.
 function makeWeather(): WeatherData {
     const hourly = Array.from({ length: 24 }, (_, i) => hour(i, 15));
     hourly[0] = hour(0, 15); // Now
@@ -71,15 +71,24 @@ describe('Overview (integrační test)', () => {
 
         render(<Overview />, { wrapper: createWrapper() });
 
-        // KPI + dítě (jméno je i v dlaždici Kids, proto cílíme na nadpis karty)
+        
         expect(await screen.findByRole('heading', { level: 3, name: 'Ema' })).toBeInTheDocument();
         expect(screen.getByText('Today')).toBeInTheDocument();
 
-        // agregace přes den: min 14° přidá tights, které při 16° nevyjdou
-        expect(screen.getByText('tights')).toBeInTheDocument();
-        // sjednocení podle názvu: sweater vyjde při 14° i 16°, ale jen jednou
-        expect(screen.getAllByText('sweater')).toHaveLength(1);
-        // rozhodně žádné letní tričko (tempFrom 20)
+        // Pocitových 13 °C vyžaduje dvě vrstvy na nohou a přechodovou bundu.
+        expect(screen.getByText('thin sweatpants')).toBeInTheDocument();
+        expect(screen.getByText('insulated pants')).toBeInTheDocument();
+        expect(screen.getByText('transition jacket')).toBeInTheDocument();
+        // Pocitových 15 °C přidá teplé tepláky a mikinu místo bundy.
+        expect(screen.getByText('warm sweatpants')).toBeInTheDocument();
+        expect(screen.getByText('sweater')).toBeInTheDocument();
+        // Společné kusy z obou teplot se zobrazí pouze jednou.
+        expect(screen.getAllByText('long shirt')).toHaveLength(1);
+        expect(screen.getAllByText('shoes')).toHaveLength(1);
+        expect(screen.getAllByText('hat')).toHaveLength(1);
+        expect(screen.queryByText('tights')).not.toBeInTheDocument();
+        expect(screen.queryByText('socks')).not.toBeInTheDocument();
+        // žádné letní tričko (tempFrom 20)
         expect(screen.queryByText('shirt')).not.toBeInTheDocument();
     });
 

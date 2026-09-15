@@ -4,7 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import Header from "../components/header";
 import Child from "../components/child";
 import Weather from "../components/weather";
-import { determinator } from "../model/clothesDeterminer";
+import { getOutfit } from "../model/clothesDeterminer";
 import WeatherForecast from "../components/weatherForecast";
 import { useChildren } from "../hooks/useChildren";
 import { useWeather } from "../hooks/useWeather";
@@ -63,10 +63,11 @@ const HomeContent = ({ weather, kids, childrenError, onDeleteChild }: HomeConten
     };
 
     const currentTemp = Math.round(kelvinToCelsius(weather.hourly[selectedWeatherIndex].temp))
+    const currentFeelsLike = Math.round(kelvinToCelsius(weather.hourly[selectedWeatherIndex].feels_like))
 
     const childrenWithClothes = kids.map((child) => ({
         ...child,
-        clothes: determinator.getSuitableClothes(currentTemp, child.age, child.sex),
+        clothes: getOutfit(currentFeelsLike, child.age, child.sex),
     }));
 
     return (
