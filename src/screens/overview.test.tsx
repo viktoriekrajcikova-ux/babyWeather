@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import type { Tables } from '../types/database';
 import type { WeatherData } from '../weatherApiClient';
+import { AuthContext, type AuthContextValue } from '../context/AuthContext';
 
 vi.mock('../weatherApiClient', () => ({
     weatherApi: { getData: vi.fn() },
@@ -44,6 +45,24 @@ function makeWeather(): WeatherData {
 }
 
 function createWrapper() {
+    const auth: AuthContextValue = {
+        session: {
+            access_token: 'test-access-token',
+            refresh_token: 'test-refresh-token',
+            expires_in: 3600,
+            token_type: 'bearer',
+            user: {
+                id: 'u',
+                app_metadata: {},
+                user_metadata: {},
+                aud: 'authenticated',
+                created_at: '2026-01-01T00:00:00.000Z',
+            },
+        },
+        signIn: vi.fn(),
+        signUp: vi.fn(),
+        signOut: vi.fn(),
+    };
     const queryClient = new QueryClient({
         defaultOptions: {
             queries: { retry: false },
@@ -52,7 +71,9 @@ function createWrapper() {
     });
     const Wrapper = ({ children }: { children: ReactNode }) => (
         <QueryClientProvider client={queryClient}>
-            <MemoryRouter>{children}</MemoryRouter>
+            <AuthContext.Provider value={auth}>
+                <MemoryRouter>{children}</MemoryRouter>
+            </AuthContext.Provider>
         </QueryClientProvider>
     );
     return Wrapper;
