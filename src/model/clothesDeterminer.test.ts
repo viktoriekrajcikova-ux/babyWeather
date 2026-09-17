@@ -164,7 +164,7 @@ describe('getOutfit', () => {
             const result = getOutfit(temperature, age, sex)
             const pieces = result.map(item => `${item.slot}:${item.layer}:${item.name}`)
 
-            // Přesná množina zachytí chybějící kusy i nechtěné vrstvy či ponožky.
+            
             expect(pieces.sort()).toEqual([
                 'head:base:hat',
                 'torso:base:long shirt',

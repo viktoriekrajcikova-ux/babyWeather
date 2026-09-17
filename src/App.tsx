@@ -8,13 +8,9 @@ import Overview from "./screens/overview";
 import Settings from "./screens/settings";
 import Login from "./screens/login";
 import ProtectedRoute from "./components/protectedRoute";
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-
-const queryClient = new QueryClient();
 
 const App = () => {
   return (
-    <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
             <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
@@ -23,7 +19,6 @@ const App = () => {
             <Route path="login" element={<Login />} />
         </Routes>
       </BrowserRouter>
-    </QueryClientProvider>
   )
 }
 

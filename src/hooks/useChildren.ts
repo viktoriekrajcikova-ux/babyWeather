@@ -33,28 +33,54 @@ export function useChildren() {
     const deleteMutation = useMutation({
         mutationFn: (id: number) => supabaseApi.deleteChild(id),
         onMutate: async (id: number) => {
+            const originalQuery = queryClient.getQueryCache().find({
+                queryKey: childrenQueryKey,
+                exact: true,
+            });
             await queryClient.cancelQueries({ queryKey: childrenQueryKey });
+            const currentQuery = queryClient.getQueryCache().find({
+                queryKey: childrenQueryKey,
+                exact: true,
+            });
+            if (!currentQuery || currentQuery !== originalQuery) return;
             const previousChildren = queryClient.getQueryData<Child[]>(childrenQueryKey);
             queryClient.setQueryData<Child[]>(childrenQueryKey, (old = []) =>
                 old.filter(c => c.id !== id)
             );
-            return { previousChildren, queryKey: childrenQueryKey };
+            return { previousChildren, queryKey: childrenQueryKey, originalQuery };
         },
         onError: (_err, _id, context) => {
             if (!context) return;
+            const currentQuery = queryClient.getQueryCache().find({
+                queryKey: context.queryKey,
+                exact: true,
+            });
+            if (!context.originalQuery) return;
+            if (currentQuery !== context.originalQuery) return;
             queryClient.setQueryData(context.queryKey, context.previousChildren);
         },
         onSettled: (_data, _error, _id, context) => {
             if (!context) return;
+            const currentQuery = queryClient.getQueryCache().find({
+                queryKey: context.queryKey,
+                exact: true,
+            });
+            if (!context.originalQuery) return;
+            if (currentQuery !== context.originalQuery) return;
             queryClient.invalidateQueries({ queryKey: context.queryKey });
         },
     });
 
     const addMutation = useMutation({
-        onMutate: () => ({ queryKey: childrenQueryKey }),
+        onMutate: () => ({ queryKey: childrenQueryKey, originalQuery: queryClient.getQueryCache().find({ queryKey: childrenQueryKey, exact: true }) }),
         mutationFn: (newChild: TablesInsert<'children'>) => supabaseApi.addChild(newChild),
         onSettled: (_data, _error, _newChild, context) => {
-            if (!context) return;
+            if (!context || !context.originalQuery) return;
+            const currentQuery = queryClient.getQueryCache().find({
+                queryKey: context.queryKey,
+                exact: true,
+            });
+            if (currentQuery !== context.originalQuery) return;
             queryClient.invalidateQueries({ queryKey: context.queryKey });
         },
     });
