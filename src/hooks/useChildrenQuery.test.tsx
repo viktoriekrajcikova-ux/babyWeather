@@ -65,7 +65,8 @@ describe('useChildrenQuery', () => {
             session: createSession('u'),
             signIn: vi.fn(),
             signUp: vi.fn(),
-            signOut: vi.fn()
+            signOut: vi.fn(),
+            getAuthGeneration: () => 0,
          });
     });
 
@@ -181,6 +182,7 @@ describe('useChildrenQuery', () => {
             signIn: vi.fn(),
             signUp: vi.fn(),
             signOut: vi.fn(),
+            getAuthGeneration: () => 0,
         });
         rerender();
         expect(result.current.children).toBeUndefined();
@@ -190,6 +192,7 @@ describe('useChildrenQuery', () => {
             signIn: vi.fn(),
             signUp: vi.fn(),
             signOut: vi.fn(),
+            getAuthGeneration: () => 0,
         });
         rerender();
         await waitFor(() => expect(result.current.children).toEqual(childrenB));
@@ -213,6 +216,7 @@ describe('useChildrenQuery', () => {
             signIn: vi.fn(),
             signUp: vi.fn(),
             signOut: vi.fn(),
+            getAuthGeneration: () => 0,
         });
 
         const { result } = renderHook(() => useChildrenQuery(), { wrapper: createWrapper() });
@@ -223,7 +227,7 @@ describe('useChildrenQuery', () => {
 
     it('bez přihlášení nenačítá děti', () => {
         vi.mocked(supabaseApi.getChildren).mockResolvedValue([]);
-        vi.mocked(useAuth).mockReturnValue({ session: null, signIn: vi.fn(), signUp: vi.fn(), signOut: vi.fn() });
+        vi.mocked(useAuth).mockReturnValue({ session: null, signIn: vi.fn(), signUp: vi.fn(), signOut: vi.fn(), getAuthGeneration: () => 0 });
         renderHook(() => useChildrenQuery(), { wrapper: createWrapper() });
 
         expect(supabaseApi.getChildren).not.toHaveBeenCalled();
@@ -259,6 +263,7 @@ describe('useChildrenQuery', () => {
             signIn: vi.fn(),
             signUp: vi.fn(),
             signOut: vi.fn(),
+            getAuthGeneration: () => 0,
         });
         rerender();
         expect(result.current.data).toBeUndefined();
@@ -268,6 +273,7 @@ describe('useChildrenQuery', () => {
             signIn: vi.fn(),
             signUp: vi.fn(),
             signOut: vi.fn(),
+            getAuthGeneration: () => 0,
         });
         rerender();
         await waitFor(() => expect(result.current.data).toEqual(childrenB));
@@ -303,7 +309,7 @@ describe('useChildrenQuery', () => {
             ])
         });
 
-        vi.mocked(useAuth).mockReturnValue({ session: null, signIn: vi.fn(), signUp: vi.fn(), signOut: vi.fn() });
+        vi.mocked(useAuth).mockReturnValue({ session: null, signIn: vi.fn(), signUp: vi.fn(), signOut: vi.fn(), getAuthGeneration: () => 0 });
         rerender();
         expect(result.current.data).toBeUndefined();
 
@@ -312,7 +318,7 @@ describe('useChildrenQuery', () => {
             new Promise<Tables<'children'>[]>(resolve => {
             resolveChildrenB = resolve;
 })); 
-        vi.mocked(useAuth).mockReturnValue({ session: createSession('user-B'), signIn: vi.fn(), signUp: vi.fn(), signOut: vi.fn() });
+        vi.mocked(useAuth).mockReturnValue({ session: createSession('user-B'), signIn: vi.fn(), signUp: vi.fn(), signOut: vi.fn(), getAuthGeneration: () => 0 });
         rerender();
         expect(result.current.data).toBeUndefined();
 

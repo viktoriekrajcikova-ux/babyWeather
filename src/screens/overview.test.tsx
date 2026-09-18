@@ -62,6 +62,7 @@ function createWrapper() {
         signIn: vi.fn(),
         signUp: vi.fn(),
         signOut: vi.fn(),
+        getAuthGeneration: () => 0,
     };
     const queryClient = new QueryClient({
         defaultOptions: {

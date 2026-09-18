@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '../supabaseApiClient';
@@ -9,6 +9,7 @@ export interface AuthContextValue {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  getAuthGeneration: () => number;
 }
 
 export const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -16,6 +17,8 @@ export const AuthContext = createContext<AuthContextValue | undefined>(undefined
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const queryClient = useQueryClient();
   const [session, setSession] = useState<Session | null | undefined>(undefined);
+  const authGeneration = useRef(0);
+   const getAuthGeneration = () => authGeneration.current;
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -27,6 +30,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
         if (_event === 'SIGNED_OUT') {
+          authGeneration.current += 1;
           queryClient.removeQueries({ queryKey: ['children'] });
       }
     });
@@ -50,7 +54,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ session, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ session, signIn, signUp, signOut, getAuthGeneration }}>
       {children}
     </AuthContext.Provider>
   );

@@ -38,6 +38,7 @@ describe('useAddChild', () => {
             signIn: vi.fn(),
             signUp: vi.fn(),
             signOut: vi.fn(),
+            getAuthGeneration: () => 0,
         });
         const queryClient = new QueryClient({
             defaultOptions: {
@@ -80,7 +81,6 @@ describe('useAddChild', () => {
             expect(queryClient.getQueryState(queryKey)).toBeUndefined();
             expect(supabaseApi.getChildren).not.toHaveBeenCalled();
 
-            // Seznam se připojí během ukládání a načte ještě původní data.
             const list = renderHook(() => useChildrenQuery(), { wrapper: Wrapper });
             unmountList = list.unmount;
             await waitFor(() => expect(list.result.current.data).toEqual([existingChild]));

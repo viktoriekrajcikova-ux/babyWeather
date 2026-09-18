@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, waitFor, act } from '@testing-library/react';
+import { renderHook, waitFor, act, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import type { Session } from '@supabase/supabase-js';
@@ -324,6 +324,116 @@ describe('AuthProvider', () => {
       if (nextUserId === 'user-B') {
         expect(queryClient.getQueryState(['children', 'user-A'])).toBeUndefined();
       }
+    } finally {
+      unmount();
+      finishAdd();
+      await addOperation;
+      queryClient.clear();
+    }
+  });
+
+  it('přidávání bez původního seznamu neobnoví seznam po novém přihlášení stejného účtu', async () => {
+    const sessionA: Session = {
+      access_token: 'test-access-token',
+      refresh_token: 'test-refresh-token',
+      expires_in: 3600,
+      token_type: 'bearer',
+      user: {
+        id: 'user-A',
+        app_metadata: {},
+        user_metadata: {},
+        aud: 'authenticated',
+        created_at: '2026-01-01T00:00:00.000Z',
+      },
+    };
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false, staleTime: Infinity },
+        mutations: { retry: false },
+      },
+    });
+    const queryKey = ['children', 'user-A'];
+    const freshChildren = [{ id: 2, name: 'Max', age: 4, sex: 'male' }];
+    const newChild = { name: 'Anna', age: 1, sex: 'female', user_id: 'user-A' };
+    let finishAdd!: () => void;
+    const pendingAdd = new Promise<void>(resolve => {
+      finishAdd = resolve;
+    });
+    vi.mocked(supabase.auth.getSession).mockResolvedValue({
+      data: { session: sessionA },
+      error: null,
+    });
+    vi.mocked(supabaseApi.addChild).mockReset().mockReturnValueOnce(pendingAdd);
+    vi.mocked(supabaseApi.getChildren).mockReset()
+      // Nechtěný refetch nesmí stihnout skrýt příznak invalidace.
+      .mockReturnValue(new Promise(() => {}))
+      .mockResolvedValueOnce([
+        { ...freshChildren[0], user_id: 'user-A', created_at: '' },
+      ]);
+
+    let showList = false;
+    const ChildrenList = () => {
+      const { data } = useChildrenQuery();
+      return <div data-testid="children-list">{JSON.stringify(data)}</div>;
+    };
+    const Wrapper = ({ children }: { children: ReactNode }) => (
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          {children}
+          {showList && <ChildrenList />}
+        </AuthProvider>
+      </QueryClientProvider>
+    );
+    const { result, rerender, unmount } = renderHook(() => ({
+      auth: useAuth(),
+      add: useAddChild(),
+    }), { wrapper: Wrapper });
+    let addOperation: Promise<void> | undefined;
+
+    try {
+      await waitFor(() => expect(result.current.auth.session?.user.id).toBe('user-A'));
+      expect(queryClient.getQueryState(queryKey)).toBeUndefined();
+      act(() => {
+        addOperation = result.current.add.addChild(newChild);
+      });
+      await waitFor(() => expect(supabaseApi.addChild).toHaveBeenCalledWith(newChild));
+      expect(supabaseApi.getChildren).not.toHaveBeenCalled();
+      expect(queryClient.isMutating()).toBe(1);
+
+      const onAuthStateChange = vi.mocked(supabase.auth.onAuthStateChange).mock.calls[0][0];
+      await act(async () => {
+        await onAuthStateChange('SIGNED_OUT', null);
+      });
+      expect(result.current.auth.session).toBeNull();
+      expect(queryClient.getQueryState(queryKey)).toBeUndefined();
+      await act(async () => {
+        await onAuthStateChange('SIGNED_IN', {
+          ...sessionA,
+          access_token: 'test-access-token-new-session',
+        });
+      });
+      expect(result.current.auth.session?.user.id).toBe('user-A');
+
+      // Seznam vznikne až v novém přihlášení, stále ve stejném provideru.
+      showList = true;
+      rerender();
+      await waitFor(() => {
+        expect(screen.getByTestId('children-list')).toHaveTextContent(JSON.stringify(freshChildren));
+      });
+      expect(supabaseApi.getChildren).toHaveBeenCalledTimes(1);
+      expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBe(false);
+      expect(queryClient.isMutating()).toBe(1);
+
+      await act(async () => {
+        finishAdd();
+        await addOperation;
+      });
+      await waitFor(() => expect(queryClient.isMutating()).toBe(0));
+
+      expect(supabaseApi.getChildren).toHaveBeenCalledTimes(1);
+      expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBe(false);
+      expect(queryClient.getQueryData(queryKey)).toEqual(freshChildren);
+      expect(screen.getByTestId('children-list')).toHaveTextContent(JSON.stringify(freshChildren));
     } finally {
       unmount();
       finishAdd();
