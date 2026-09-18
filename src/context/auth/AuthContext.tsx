@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '../../supabaseApiClient';
 import { useQueryClient } from '@tanstack/react-query';
+import { ChildrenKeys } from '../../hooks/api/childrenQueryKeys';
 
 export interface AuthContextValue {
   session: Session | null | undefined;
@@ -18,24 +19,40 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const queryClient = useQueryClient();
   const [session, setSession] = useState<Session | null | undefined>(undefined);
   const authGeneration = useRef(0);
-   const getAuthGeneration = () => authGeneration.current;
+  const getAuthGeneration = () => authGeneration.current;
+  const previousUserId = useRef<string | null>(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
+    let active = true;
+    let authEventReceived = false;
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } =    supabase.auth.onAuthStateChange((event, nextSession) => {
+    if (!active) return;
+    authEventReceived = true;
+     const nextUserId = nextSession?.user.id ?? null;
+     const identityChanged = previousUserId.current !== nextUserId;
+
+     if (event === 'SIGNED_OUT' || identityChanged) {
+       authGeneration.current += 1;
+       queryClient.removeQueries({ queryKey: ChildrenKeys.all });
+     }
+
+     previousUserId.current = nextUserId;
+     setSession(nextSession);
+   });
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!active || authEventReceived) return;
+      previousUserId.current = session?.user.id ?? null;
       setSession(session);
-        if (_event === 'SIGNED_OUT') {
-          authGeneration.current += 1;
-          queryClient.removeQueries({ queryKey: ['children'] });
-      }
     });
 
-    return () => subscription.unsubscribe();
+   return () => {
+     active = false;
+     subscription.unsubscribe();
+   };
   }, [queryClient]);
 
   const signIn = async (email: string, password: string) => {

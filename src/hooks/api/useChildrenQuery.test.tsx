@@ -8,6 +8,7 @@ import { supabaseApi } from '../../supabaseApiClient';
 import type { Child } from '../../model/child/child';
 import { useAuth } from './useAuth';
 import type { Session } from '@supabase/supabase-js';
+import { ChildrenKeys } from './childrenQueryKeys';
 
 function row(overrides: Partial<Child>): Child {
     return { id: 0, name: '', age: 0, sex: null, ...overrides };
@@ -61,6 +62,7 @@ describe('useChildrenQuery', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         vi.mocked(supabaseApi.getChildren).mockReset();
+        vi.mocked(supabaseApi.deleteChild).mockReset();
         vi.mocked(useAuth).mockReturnValue({ 
             session: createSession('u'),
             signIn: vi.fn(),
@@ -116,98 +118,61 @@ describe('useChildrenQuery', () => {
     });
 
      it('při chybě vrátí smazané dítě zpět (rollback)', async () => {
-        vi.mocked(supabaseApi.getChildren).mockResolvedValue([
-            row({ id: 1, name: 'Ema', age: 2, sex: 'female' }),
-            row({ id: 2, name: 'Max', age: 4, sex: 'male' }),
-        ]);
-        vi.mocked(supabaseApi.deleteChild).mockRejectedValue(new Error('fail'));
-
-        const { result } = renderHook(() => ({
-            children: useChildrenQuery().data,
-            deleteChild: useDeleteChild().deleteChild,
-        }), { wrapper: createWrapper() });
-        await waitFor(() => expect(result.current.children).toHaveLength(2));
-
-        act(() => {
-            result.current.deleteChild(1);
-        });
-
-        await waitFor(() =>
-            expect(result.current.children).toEqual([
-                { id: 1, name: 'Ema', age: 2, sex: 'female' },
-                { id: 2, name: 'Max', age: 4, sex: 'male' },
-            ]),
-        );
-    });
-
-    it('při chybě mazání po přepnutí účtu obnoví pouze cache původního účtu', async () => {
         const queryClient = new QueryClient({
             defaultOptions: {
-                queries: { retry: false },
+                queries: { retry: false, staleTime: Infinity },
                 mutations: { retry: false },
             },
         });
-        const childrenA = [{ id: 1, name: 'Ema', age: 2, sex: 'female' }];
-        const childrenB = [{ id: 2, name: 'Max', age: 4, sex: 'male' }];
+        const children: Child[] = [
+            row({ id: 1, name: 'Ema', age: 2, sex: 'female' }),
+            row({ id: 2, name: 'Max', age: 4, sex: 'male' }),
+        ];
+        
+        vi.mocked(supabaseApi.getChildren)
+            .mockResolvedValueOnce(children)
+            .mockReturnValue(new Promise(() => {}));
         let rejectDelete!: (error: Error) => void;
         const pendingDelete = new Promise<void>((_resolve, reject) => {
             rejectDelete = reject;
         });
         vi.mocked(supabaseApi.deleteChild).mockReturnValueOnce(pendingDelete);
-        vi.mocked(supabaseApi.getChildren)
-            .mockResolvedValueOnce([
-                row({ id: 1, name: 'Ema', age: 2, sex: 'female' }),
-            ])
-            .mockResolvedValueOnce([
-                row({ id: 2, name: 'Max', age: 4, sex: 'male' }),
-            ]);
 
-        const { result, rerender } = renderHook(() => ({
+        const { result, unmount } = renderHook(() => ({
             children: useChildrenQuery().data,
             deleteChild: useDeleteChild().deleteChild,
         }), { wrapper: createWrapper(queryClient) });
-        await waitFor(() => expect(result.current.children).toEqual(childrenA));
 
-        act(() => {
-            result.current.deleteChild(1);
-        });
-        await waitFor(() => {
-            expect(supabaseApi.deleteChild).toHaveBeenCalledWith(1);
-            expect(result.current.children).toEqual([]);
-        });
-        expect(queryClient.getQueryData(['children', 'u'])).toEqual([]);
+        try {
+            await waitFor(() => expect(result.current.children).toEqual(children));
+            act(() => {
+                result.current.deleteChild(1);
+            });
+            await waitFor(() => {
+                expect(supabaseApi.deleteChild).toHaveBeenCalledWith(1);
+                expect(result.current.children).toEqual([children[1]]);
+            });
+            expect(queryClient.getQueryData(ChildrenKeys.list())).toEqual([children[1]]);
+            expect(queryClient.isMutating()).toBe(1);
 
-        vi.mocked(useAuth).mockReturnValue({
-            session: null,
-            signIn: vi.fn(),
-            signUp: vi.fn(),
-            signOut: vi.fn(),
-            getAuthGeneration: () => 0,
-        });
-        rerender();
-        expect(result.current.children).toBeUndefined();
-
-        vi.mocked(useAuth).mockReturnValue({
-            session: createSession('user-B'),
-            signIn: vi.fn(),
-            signUp: vi.fn(),
-            signOut: vi.fn(),
-            getAuthGeneration: () => 0,
-        });
-        rerender();
-        await waitFor(() => expect(result.current.children).toEqual(childrenB));
-
-        // Chyba A přijde teprve ve chvíli, kdy B už vidí svoje děti.
-        await act(async () => {
-            rejectDelete(new Error('delete failed'));
+            await act(async () => {
+                rejectDelete(new Error('fail'));
+                await pendingDelete.catch(() => {});
+            });
+            await waitFor(() => expect(queryClient.isMutating()).toBe(0));
+            expect(queryClient.getQueryData(ChildrenKeys.list())).toEqual(children);
+            await waitFor(() => expect(result.current.children).toEqual(children));
+        } finally {
+            unmount();
+            rejectDelete(new Error('cleanup'));
             await pendingDelete.catch(() => {});
-        });
-        await waitFor(() => expect(queryClient.isMutating()).toBe(0));
-
-        expect(queryClient.getQueryData(['children', 'u'])).toEqual(childrenA);
-        expect(queryClient.getQueryData(['children', 'user-B'])).toEqual(childrenB);
-        expect(result.current.children).toEqual(childrenB);
+            await waitFor(() => expect(queryClient.isMutating()).toBe(0));
+            queryClient.clear();
+        }
     });
+
+    // Přepínání účtů, opožděné odpovědi a rollback po odhlášení ověřuje
+    // AuthContext.test.tsx se skutečným AuthProviderem a ProtectedRoute.
 
     it('během načítání autentizace nenačítá děti', () => {
         vi.mocked(supabaseApi.getChildren).mockResolvedValue([]);
@@ -234,105 +199,5 @@ describe('useChildrenQuery', () => {
 
     });
 
-    it('opožděná odpověď předchozího účtu nepřepíše děti aktuálního účtu', async () => {
-        const queryClient = new QueryClient({
-            defaultOptions: {
-                queries: { retry: false },
-            },
-        });
-        let resolveChildrenA!: (rows: Child[]) => void;
-        const pendingChildrenA = new Promise<Child[]>(resolve => {
-            resolveChildrenA = resolve;
-        });
-        const childrenB = [{ id: 2, name: 'Max', age: 4, sex: 'male' }];
 
-        vi.mocked(supabaseApi.getChildren)
-            .mockReturnValueOnce(pendingChildrenA)
-            .mockResolvedValueOnce([
-                row({ id: 2, name: 'Max', age: 4, sex: 'male' }),
-            ]);
-
-        const { result, rerender } = renderHook(() => useChildrenQuery(), {
-            wrapper: createWrapper(queryClient),
-        });
-        await waitFor(() => expect(supabaseApi.getChildren).toHaveBeenCalledTimes(1));
-        expect(result.current.data).toBeUndefined();
-
-        vi.mocked(useAuth).mockReturnValue({
-            session: null,
-            signIn: vi.fn(),
-            signUp: vi.fn(),
-            signOut: vi.fn(),
-            getAuthGeneration: () => 0,
-        });
-        rerender();
-        expect(result.current.data).toBeUndefined();
-
-        vi.mocked(useAuth).mockReturnValue({
-            session: createSession('user-B'),
-            signIn: vi.fn(),
-            signUp: vi.fn(),
-            signOut: vi.fn(),
-            getAuthGeneration: () => 0,
-        });
-        rerender();
-        await waitFor(() => expect(result.current.data).toEqual(childrenB));
-        expect(supabaseApi.getChildren).toHaveBeenCalledTimes(2);
-
-        await act(async () => {
-            resolveChildrenA([
-                row({ id: 1, name: 'Ema', age: 2, sex: 'female' }),
-            ]);
-            await pendingChildrenA;
-        });
-
-        expect(queryClient.getQueryData(['children', 'user-B'])).toEqual(childrenB);
-        expect(result.current.data).toEqual(childrenB);
-    });
-
-    it('při přepnutí účtu nezobrazí děti předchozího uživatele', async () => {
-        const queryClient = new QueryClient({
-            defaultOptions: {
-                queries: { retry: false },
-            }
-        });
-
-        vi.mocked(supabaseApi.getChildren).mockResolvedValue([
-            row({ id: 1, name: 'Ema', age: 2, sex: 'female' }),
-        ]);
-        
-        const { result, rerender } = renderHook(() => useChildrenQuery(), { wrapper:createWrapper(queryClient) });
-
-        await waitFor(() => {
-           expect(result.current.data).toEqual([
-                { id: 1, name: 'Ema', age: 2, sex: 'female' },
-            ])
-        });
-
-        vi.mocked(useAuth).mockReturnValue({ session: null, signIn: vi.fn(), signUp: vi.fn(), signOut: vi.fn(), getAuthGeneration: () => 0 });
-        rerender();
-        expect(result.current.data).toBeUndefined();
-
-        let resolveChildrenB!: (rows: Child[]) => void;
-        vi.mocked(supabaseApi.getChildren).mockReturnValue(  
-            new Promise<Child[]>(resolve => {
-            resolveChildrenB = resolve;
-})); 
-        vi.mocked(useAuth).mockReturnValue({ session: createSession('user-B'), signIn: vi.fn(), signUp: vi.fn(), signOut: vi.fn(), getAuthGeneration: () => 0 });
-        rerender();
-        expect(result.current.data).toBeUndefined();
-
-        await act(async () => {
-            resolveChildrenB([
-               row({ id: 2, name: 'Max', age: 4, sex: 'male' })
-            ]);
-        });
-
-        await waitFor(() => {
-            expect(result.current.data).toEqual([
-                { id: 2, name: 'Max', age: 4, sex: 'male' }
-            ])
-        })
-
-    });
 });

@@ -5,8 +5,7 @@ import type { ReactNode } from 'react';
 import { useAddChild } from './useAddChild';
 import { useChildrenQuery } from './useChildrenQuery';
 import { useAuth } from './useAuth';
-import { supabaseApi } from '../../supabaseApiClient';
-import { childrenQueryKey } from './childrenQueryKeys';
+import { supabaseApi } from '../../supabaseApiClient';import { ChildrenKeys } from './childrenQueryKeys';
 import type { Child } from '../../model/child/child';
 
 vi.mock('../../supabaseApiClient', () => ({
@@ -50,7 +49,7 @@ describe('useAddChild', () => {
         const Wrapper = ({ children }: { children: ReactNode }) => (
             <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
         );
-        const queryKey = childrenQueryKey('user-A');
+        const queryKey = ChildrenKeys.list();
         const existingChild: Child = { id: 1, name: 'Ema', age: 2, sex: 'female' };
         const addedChild: Child = { id: 2, name: 'Anna', age: 1, sex: 'female' };
         const newChild = { name: 'Anna', age: 1, sex: 'female' };
@@ -68,7 +67,6 @@ describe('useAddChild', () => {
                 addedChild,
             ]);
 
-        // Formulář používá pouze mutaci; seznam zatím neexistuje.
         const add = renderHook(() => useAddChild(), { wrapper: Wrapper });
         let addOperation: Promise<void> | undefined;
         let unmountList: (() => void) | undefined;

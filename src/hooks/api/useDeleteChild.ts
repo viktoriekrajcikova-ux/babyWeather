@@ -1,13 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabaseApi } from '../../supabaseApiClient';
 import type { Child } from '../../model/child/child';
-import { useAuth } from './useAuth';
-import { childrenQueryKey } from './childrenQueryKeys';
+import { ChildrenKeys } from './childrenQueryKeys';
 
 export function useDeleteChild() {
     const queryClient = useQueryClient();
-    const { session } = useAuth();
-    const queryKey = childrenQueryKey(session?.user.id);
+    const queryKey = ChildrenKeys.list();
 
     const deleteMutation = useMutation({
         mutationFn: (id: number) => supabaseApi.deleteChild(id),

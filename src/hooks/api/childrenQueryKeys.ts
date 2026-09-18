@@ -1,5 +1,5 @@
 
-export function childrenQueryKey(userId: string | undefined) {
-    // read only
-    return ['children', userId] as const;
-}
+export const ChildrenKeys = {
+    all: ['children'] as const,
+    list: () => [...ChildrenKeys.all, 'list'] as const,
+};

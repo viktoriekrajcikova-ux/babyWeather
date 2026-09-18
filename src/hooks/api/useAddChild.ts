@@ -2,12 +2,12 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabaseApi } from '../../supabaseApiClient';
 import type { TablesInsert } from '../../types/database';
 import { useAuth } from './useAuth';
-import { childrenQueryKey } from './childrenQueryKeys';
+import { ChildrenKeys } from './childrenQueryKeys';
 
     export function useAddChild() {
         const queryClient = useQueryClient();
-        const { session, getAuthGeneration } = useAuth();
-        const queryKey = childrenQueryKey(session?.user.id);
+        const { getAuthGeneration } = useAuth();
+        const queryKey = ChildrenKeys.list();
 
         const addMutation = useMutation({
             onMutate: () => ({ queryKey: queryKey,  authGeneration: getAuthGeneration() }),
