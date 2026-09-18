@@ -3,11 +3,11 @@ import {
   Route,
   Routes
 } from 'react-router-dom';
-import Home from "./screens/home";
-import Overview from "./screens/overview";
-import Settings from "./screens/settings";
-import Login from "./screens/login";
-import ProtectedRoute from "./components/protectedRoute";
+import Home from "./screens/home/home";
+import Overview from "./screens/overview/overview";
+import Settings from "./screens/settings/settings";
+import Login from "./screens/login/login";
+import ProtectedRoute from "./components/route/protectedRoute";
 
 const App = () => {
   return (

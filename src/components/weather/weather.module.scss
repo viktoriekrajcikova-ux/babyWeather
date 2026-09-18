@@ -1,0 +1,68 @@
+@use '../../assets/scss/variables' as *;
+
+.weather {
+  max-width: 20rem;
+  margin: 0 auto 1.5rem;
+  padding: 1.5rem;
+  text-align: center;
+  background-color: $color-surface;
+  border-radius: 2rem;
+  box-shadow: 0 10px 15px -3px $color-shadow;
+
+  img {
+    width: 6rem;
+    height: 6rem;
+  }
+}
+
+.temp {
+  margin: 0.25rem 0;
+  font-size: $font-size-hero;
+  font-weight: $font-weight-extrabold;
+  line-height: $line-height-tight;
+  letter-spacing: -0.02em;
+}
+
+.feels {
+  color: $color-neutral-500;
+  font-size: $font-size-small;
+  font-weight: $font-weight-semibold;
+}
+
+.desc {
+  font-weight: $font-weight-semibold;
+  text-transform: capitalize;
+}
+
+.forecastToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 1rem auto 0;
+  padding: 0.45rem 1rem;
+  background: none;
+  border: 1px solid $color-neutral-500;
+  border-radius: 1.25rem;
+  font-family: inherit;
+  font-size: $font-size-small;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: 0 10px 15px -3px $color-shadow;
+  }
+
+  &:focus-visible {
+    outline: 3px solid $color-primary-700;
+    outline-offset: 2px;
+  }
+}
+
+.forecastTime {
+  margin-bottom: 0;
+  color: $color-neutral-500;
+  font-size: $font-size-caption;
+  font-weight: $font-weight-bold;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}

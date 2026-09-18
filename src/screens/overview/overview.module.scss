@@ -1,0 +1,351 @@
+@use '../../assets/scss/variables' as *;
+
+$breakpoint-md: 48rem;
+
+.pageHead {
+  margin: 2.5rem 0 1.75rem;
+
+  h1 {
+    margin: 0;
+  }
+
+  p {
+    margin: 0.35rem 0 0;
+    color: $color-neutral-500;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.sectionTitle {
+  margin: 2.5rem 0 1rem;
+}
+
+/* ---- KPI tiles ---- */
+.tiles {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, 1fr);
+
+  @media (min-width: $breakpoint-md) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-height: 6.5rem;
+  padding: 1.1rem 1.25rem;
+  background: $color-surface;
+  border-radius: 1.5rem;
+  box-shadow: 0 10px 15px -3px $color-shadow;
+}
+
+.label {
+  font-size: $font-size-caption;
+  font-weight: $font-weight-bold;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: $color-neutral-500;
+}
+
+.value {
+  font-size: $font-size-display;
+  font-weight: $font-weight-extrabold;
+  line-height: $line-height-tight;
+  letter-spacing: -0.02em;
+}
+
+.unit {
+  font-size: $font-size-title;
+}
+
+.sub {
+  font-size: $font-size-small;
+  font-weight: $font-weight-semibold;
+  color: $color-neutral-500;
+}
+
+.accent .value {
+  color: $color-accent-500;
+}
+
+/* ---- Card (chart + empty state) ---- */
+.card {
+  padding: 1.5rem;
+  background: $color-surface;
+  border-radius: 2rem;
+  box-shadow: 0 10px 15px -3px $color-shadow;
+}
+
+.chartNote {
+  margin: 0 0 1.25rem;
+  color: $color-neutral-500;
+  font-size: $font-size-small;
+  font-weight: $font-weight-semibold;
+}
+
+/* ---- Temperature outlook (bar chart, bez knihovny) ---- */
+.chart {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  align-items: end;
+  gap: 0.5rem;
+  height: 11rem;
+  padding-bottom: 0.25rem;
+  overflow-x: auto;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  height: 100%;
+  min-width: 2.25rem;
+}
+
+.temp {
+  font-size: $font-size-caption;
+  font-weight: $font-weight-bold;
+  font-variant-numeric: tabular-nums;
+}
+
+.bar {
+  width: 100%;
+  max-width: 1.75rem;
+  background: $color-primary-500;
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.barNow {
+  background: $color-accent-500;
+}
+
+.hour {
+  font-size: $font-size-caption;
+  font-weight: $font-weight-semibold;
+  color: $color-neutral-500;
+  font-variant-numeric: tabular-nums;
+}
+
+.colNow .hour {
+  color: $color-accent-500;
+  font-weight: $font-weight-bold;
+}
+
+.legend {
+  display: flex;
+  gap: 1.25rem;
+  margin-top: 1rem;
+  font-size: $font-size-caption;
+  font-weight: $font-weight-semibold;
+  color: $color-neutral-500;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+}
+
+.swatch {
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 0.25rem;
+}
+
+.swatchNow {
+  background: $color-accent-500;
+}
+
+.swatchForecast {
+  background: $color-primary-500;
+}
+
+/* ---- What to pack today ---- */
+.plan {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: 1fr;
+
+  @media (min-width: $breakpoint-md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.childCard {
+  padding: 1.5rem;
+  background: $color-surface;
+  border-radius: 3.75rem 0.75rem 3.75rem 3.75rem;
+  box-shadow: 0 10px 15px -3px $color-shadow;
+}
+
+.childHead {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 0.35rem;
+
+  h3 {
+    margin: 0;
+  }
+}
+
+.avatar {
+  flex: none;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  object-fit: cover;
+  background: $color-bg;
+}
+
+.meta {
+  font-size: $font-size-small;
+  font-weight: $font-weight-semibold;
+  color: $color-neutral-500;
+}
+
+.planHint {
+  margin: 0.25rem 0 1rem;
+  font-size: $font-size-small;
+  font-weight: $font-weight-semibold;
+  color: $color-neutral-500;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.75rem 0.4rem 0.5rem;
+  background: $color-bg;
+  border-radius: 1.25rem;
+  font-size: $font-size-small;
+  font-weight: $font-weight-semibold;
+}
+
+.thumb {
+  display: grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  background: $color-surface;
+  border: 1px solid $color-neutral-200;
+  border-radius: 0.5rem;
+
+  img {
+    max-width: 1.2rem;
+    max-height: 1.2rem;
+  }
+}
+
+/* ---- States ---- */
+.alert {
+  padding: 0.75rem 1rem;
+  background: $color-surface;
+  border: 1px solid $color-accent-500;
+  border-left-width: 4px;
+  border-radius: 0.9rem;
+  box-shadow: 0 10px 15px -3px $color-shadow;
+  font-size: $font-size-small;
+  font-weight: $font-weight-semibold;
+}
+
+.empty {
+  text-align: center;
+
+  p {
+    margin: 0.75rem 0 1.25rem;
+    color: $color-neutral-500;
+    font-size: $font-size-small;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.emptyIcon {
+  color: $color-neutral-500;
+}
+
+.button {
+  display: inline-block;
+  padding: 0.55rem 1.1rem;
+  background: $color-primary-500;
+  color: $color-surface;
+  border-radius: 1.25rem;
+  font-size: $font-size-small;
+  font-weight: $font-weight-bold;
+  text-decoration: none;
+
+  &:hover {
+    box-shadow: 0 10px 15px -3px $color-shadow;
+  }
+
+  &:focus-visible {
+    outline: 3px solid $color-primary-700;
+    outline-offset: 2px;
+  }
+}
+
+/* ---- Loading skeleton ---- */
+.skeleton {
+  background: $color-neutral-200;
+  border-radius: 0.75rem;
+
+  @media (prefers-reduced-motion: no-preference) {
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+}
+
+.skeletonTile {
+  min-height: 6.5rem;
+  border-radius: 1.5rem;
+}
+
+.skeletonCard {
+  margin-top: 2.5rem;
+}
+
+.skeletonLine {
+  height: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.skeletonChart {
+  height: 11rem;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.45;
+  }
+}
