@@ -7,6 +7,7 @@ import { useChildrenQuery } from './useChildrenQuery';
 import { useAuth } from './useAuth';
 import { supabaseApi } from '../../supabaseApiClient';
 import { childrenQueryKey } from './childrenQueryKeys';
+import type { Child } from '../../model/child/child';
 
 vi.mock('../../supabaseApiClient', () => ({
     supabaseApi: {
@@ -50,8 +51,8 @@ describe('useAddChild', () => {
             <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
         );
         const queryKey = childrenQueryKey('user-A');
-        const existingChild = { id: 1, name: 'Ema', age: 2, sex: 'female' };
-        const addedChild = { id: 2, name: 'Anna', age: 1, sex: 'female' };
+        const existingChild: Child = { id: 1, name: 'Ema', age: 2, sex: 'female' };
+        const addedChild: Child = { id: 2, name: 'Anna', age: 1, sex: 'female' };
         const newChild = { name: 'Anna', age: 1, sex: 'female' };
         let finishAdd!: () => void;
         const pendingAdd = new Promise<void>(resolve => {
@@ -60,11 +61,11 @@ describe('useAddChild', () => {
         vi.mocked(supabaseApi.addChild).mockReset().mockReturnValueOnce(pendingAdd);
         vi.mocked(supabaseApi.getChildren).mockReset()
             .mockResolvedValueOnce([
-                { ...existingChild, user_id: 'user-A', created_at: '' },
+                existingChild,
             ])
             .mockResolvedValue([
-                { ...existingChild, user_id: 'user-A', created_at: '' },
-                { ...addedChild, user_id: 'user-A', created_at: '' },
+                existingChild,
+                addedChild,
             ]);
 
         // Formulář používá pouze mutaci; seznam zatím neexistuje.

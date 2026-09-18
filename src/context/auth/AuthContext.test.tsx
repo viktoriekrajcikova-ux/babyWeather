@@ -9,6 +9,7 @@ import { supabase, supabaseApi } from '../../supabaseApiClient';
 import { useChildrenQuery } from '../../hooks/api/useChildrenQuery';
 import { useAddChild } from '../../hooks/api/useAddChild';
 import { useDeleteChild } from '../../hooks/api/useDeleteChild';
+import type { Child } from '../../model/child/child';
 
 vi.mock('../../supabaseApiClient', () => ({
   supabaseApi: {
@@ -69,7 +70,7 @@ describe('AuthProvider', () => {
       // Případný refetch nesmí okamžitou odpovědí zamaskovat chybný rollback.
       .mockReturnValue(new Promise(() => {}))
       .mockResolvedValueOnce([
-        { id: 1, name: 'Ema', age: 2, sex: 'female', user_id: 'user-A', created_at: '' },
+        { id: 1, name: 'Ema', age: 2, sex: 'female' },
       ]);
     vi.mocked(supabaseApi.deleteChild).mockReturnValueOnce(pendingDelete);
 
@@ -107,7 +108,7 @@ describe('AuthProvider', () => {
 
       if (signInAgain) {
         vi.mocked(supabaseApi.getChildren).mockResolvedValueOnce([
-          { id: 1, name: 'Ema aktualizovaná', age: 3, sex: 'female', user_id: 'user-A', created_at: '' },
+          { id: 1, name: 'Ema aktualizovaná', age: 3, sex: 'female' },
         ]);
         await act(async () => {
           await onAuthStateChange('SIGNED_IN', {
@@ -178,7 +179,7 @@ describe('AuthProvider', () => {
       error: null,
     });
     vi.mocked(supabaseApi.getChildren).mockResolvedValue([
-      { id: 1, name: 'Ema', age: 2, sex: 'female', user_id: 'user-A', created_at: '' },
+      { id: 1, name: 'Ema', age: 2, sex: 'female' },
     ]);
     vi.mocked(supabaseApi.deleteChild).mockResolvedValueOnce(undefined);
 
@@ -250,8 +251,8 @@ describe('AuthProvider', () => {
         mutations: { retry: false },
       },
     });
-    const childrenA = [{ id: 1, name: 'Ema', age: 2, sex: 'female' }];
-    const freshChildren = [{ id: 2, name: 'Max', age: 4, sex: 'male' }];
+    const childrenA: Child[] = [{ id: 1, name: 'Ema', age: 2, sex: 'female' }];
+    const freshChildren: Child[] = [{ id: 2, name: 'Max', age: 4, sex: 'male' }];
     const newChild = { name: 'Anna', age: 1, sex: 'female', user_id: 'user-A' };
     let finishAdd!: () => void;
     const pendingAdd = new Promise<void>(resolve => {
@@ -265,7 +266,7 @@ describe('AuthProvider', () => {
       // Refetch zůstane čekat, aby nesmazal příznak invalidace před kontrolou.
       .mockReturnValue(new Promise(() => {}))
       .mockResolvedValueOnce([
-        { ...childrenA[0], user_id: 'user-A', created_at: '' },
+        childrenA[0],
       ]);
     vi.mocked(supabaseApi.addChild).mockReturnValueOnce(pendingAdd);
     const Wrapper = ({ children }: { children: ReactNode }) => (
@@ -295,7 +296,7 @@ describe('AuthProvider', () => {
         });
         expect(queryClient.getQueryState(['children', 'user-A'])).toBeUndefined();
         vi.mocked(supabaseApi.getChildren).mockResolvedValueOnce([
-          { ...freshChildren[0], user_id: nextUserId, created_at: '' },
+          freshChildren[0],
         ]);
         await act(async () => {
           await onAuthStateChange('SIGNED_IN', {
@@ -353,7 +354,7 @@ describe('AuthProvider', () => {
       },
     });
     const queryKey = ['children', 'user-A'];
-    const freshChildren = [{ id: 2, name: 'Max', age: 4, sex: 'male' }];
+    const freshChildren: Child[] = [{ id: 2, name: 'Max', age: 4, sex: 'male' }];
     const newChild = { name: 'Anna', age: 1, sex: 'female', user_id: 'user-A' };
     let finishAdd!: () => void;
     const pendingAdd = new Promise<void>(resolve => {
@@ -368,7 +369,7 @@ describe('AuthProvider', () => {
       // Nechtěný refetch nesmí stihnout skrýt příznak invalidace.
       .mockReturnValue(new Promise(() => {}))
       .mockResolvedValueOnce([
-        { ...freshChildren[0], user_id: 'user-A', created_at: '' },
+        freshChildren[0],
       ]);
 
     let showList = false;

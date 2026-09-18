@@ -5,12 +5,12 @@ import type { ReactNode } from 'react';
 import { useChildrenQuery } from './useChildrenQuery';
 import { useDeleteChild } from './useDeleteChild';
 import { supabaseApi } from '../../supabaseApiClient';
-import type { Tables } from '../../types/database';
+import type { Child } from '../../model/child/child';
 import { useAuth } from './useAuth';
 import type { Session } from '@supabase/supabase-js';
 
-function row(overrides: Partial<Tables<'children'>>): Tables<'children'> {
-    return { id: 0, name: '', age: 0, sex: null, created_at: '', user_id: 'u', ...overrides };
+function row(overrides: Partial<Child>): Child {
+    return { id: 0, name: '', age: 0, sex: null, ...overrides };
 }
 
 // mock celého klienta — jinak by import spadl
@@ -70,10 +70,10 @@ describe('useChildrenQuery', () => {
          });
     });
 
-    it('načte děti a narovná sex na hranici', async () => {
+    it('načte děti', async () => {
         vi.mocked(supabaseApi.getChildren).mockResolvedValue([
-            row({ id: 1, name: 'Ema', age: 2, sex: 'female' }),
-            row({ id: 2, name: 'Max', age: 4, sex: 'nesmysl' }),
+            { id: 1, name: 'Ema', age: 2, sex: 'female' },
+            { id: 2, name: 'Max', age: 4, sex: null },
         ]);
 
         const { result } = renderHook(() => useChildrenQuery(), { wrapper: createWrapper() });
@@ -86,7 +86,7 @@ describe('useChildrenQuery', () => {
 
         expect(result.current.data).toEqual([
             { id: 1, name: 'Ema', age: 2, sex: 'female' },
-            { id: 2, name: 'Max', age: 4, sex: null }, // 'nesmysl' → null
+            { id: 2, name: 'Max', age: 4, sex: null },
         ]);
     });
 
@@ -159,7 +159,7 @@ describe('useChildrenQuery', () => {
                 row({ id: 1, name: 'Ema', age: 2, sex: 'female' }),
             ])
             .mockResolvedValueOnce([
-                row({ id: 2, name: 'Max', age: 4, sex: 'male', user_id: 'user-B' }),
+                row({ id: 2, name: 'Max', age: 4, sex: 'male' }),
             ]);
 
         const { result, rerender } = renderHook(() => ({
@@ -240,8 +240,8 @@ describe('useChildrenQuery', () => {
                 queries: { retry: false },
             },
         });
-        let resolveChildrenA!: (rows: Tables<'children'>[]) => void;
-        const pendingChildrenA = new Promise<Tables<'children'>[]>(resolve => {
+        let resolveChildrenA!: (rows: Child[]) => void;
+        const pendingChildrenA = new Promise<Child[]>(resolve => {
             resolveChildrenA = resolve;
         });
         const childrenB = [{ id: 2, name: 'Max', age: 4, sex: 'male' }];
@@ -249,7 +249,7 @@ describe('useChildrenQuery', () => {
         vi.mocked(supabaseApi.getChildren)
             .mockReturnValueOnce(pendingChildrenA)
             .mockResolvedValueOnce([
-                row({ id: 2, name: 'Max', age: 4, sex: 'male', user_id: 'user-B' }),
+                row({ id: 2, name: 'Max', age: 4, sex: 'male' }),
             ]);
 
         const { result, rerender } = renderHook(() => useChildrenQuery(), {
@@ -281,7 +281,7 @@ describe('useChildrenQuery', () => {
 
         await act(async () => {
             resolveChildrenA([
-                row({ id: 1, name: 'Ema', age: 2, sex: 'female', user_id: 'u' }),
+                row({ id: 1, name: 'Ema', age: 2, sex: 'female' }),
             ]);
             await pendingChildrenA;
         });
@@ -313,9 +313,9 @@ describe('useChildrenQuery', () => {
         rerender();
         expect(result.current.data).toBeUndefined();
 
-        let resolveChildrenB!: (rows: Tables<'children'>[]) => void;
+        let resolveChildrenB!: (rows: Child[]) => void;
         vi.mocked(supabaseApi.getChildren).mockReturnValue(  
-            new Promise<Tables<'children'>[]>(resolve => {
+            new Promise<Child[]>(resolve => {
             resolveChildrenB = resolve;
 })); 
         vi.mocked(useAuth).mockReturnValue({ session: createSession('user-B'), signIn: vi.fn(), signUp: vi.fn(), signOut: vi.fn(), getAuthGeneration: () => 0 });
@@ -324,7 +324,7 @@ describe('useChildrenQuery', () => {
 
         await act(async () => {
             resolveChildrenB([
-               row({ id: 2, name: 'Max', age: 4, sex: 'male', user_id: 'user-B' })
+               row({ id: 2, name: 'Max', age: 4, sex: 'male' })
             ]);
         });
 

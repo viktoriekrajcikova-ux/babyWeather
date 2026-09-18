@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
-import type { Tables } from '../../types/database';
+import type { Child } from '../../model/child/child';
 import type { WeatherData } from '../../weatherApiClient';
 import { AuthContext, type AuthContextValue } from '../../context/auth/AuthContext';
 
@@ -23,8 +23,8 @@ import Overview from './overview';
 import { weatherApi } from '../../weatherApiClient';
 import { supabaseApi } from '../../supabaseApiClient';
 
-function row(overrides: Partial<Tables<'children'>>): Tables<'children'> {
-    return { id: 0, name: '', age: 0, sex: null, created_at: '', user_id: 'u', ...overrides };
+function row(overrides: Partial<Child>): Child {
+    return { id: 0, name: '', age: 0, sex: null, ...overrides };
 }
 
 const kelvin = (celsius: number) => celsius + 273.15;
