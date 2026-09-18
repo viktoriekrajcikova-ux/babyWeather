@@ -4,7 +4,7 @@ import { Baby } from 'lucide-react';
 import Header from "../components/header";
 import { getOutfit } from "../model/clothesDeterminer";
 import type { ClothesItem } from "../model/clothesDeterminer";
-import { useChildren } from "../hooks/useChildren";
+import { useChildrenQuery } from "../hooks/useChildrenQuery";
 import { useWeather } from "../hooks/useWeather";
 import { useLocation } from "../hooks/useLocation";
 import { kelvinToCelsius } from "../model/temperature";
@@ -66,7 +66,7 @@ const Skeleton = () => (
 const Overview = () => {
     const { coords } = useLocation();
     const { weather, loading: weatherLoading, error: weatherError } = useWeather(coords);
-    const { children, loading: childrenLoading, error: childrenError } = useChildren();
+    const { data: children, isPending: childrenLoading, isError: childrenError } = useChildrenQuery();
 
     return (
         <>
@@ -86,8 +86,8 @@ const Overview = () => {
                 ) : (
                     <OverviewContent
                         hourly={weather.hourly}
-                        kids={children}
-                        childrenError={childrenError}
+                        kids={children ?? []}
+                        childrenError={childrenError ? 'Could not load children. Check your connection and try again.' : null}
                     />
                 )}
             </Container>

@@ -6,7 +6,9 @@ import type { Session } from '@supabase/supabase-js';
 import { AuthProvider } from './AuthContext';
 import { useAuth } from '../hooks/useAuth';
 import { supabase, supabaseApi } from '../supabaseApiClient';
-import { useChildren } from '../hooks/useChildren';
+import { useChildrenQuery } from '../hooks/useChildrenQuery';
+import { useAddChild } from '../hooks/useAddChild';
+import { useDeleteChild } from '../hooks/useDeleteChild';
 
 vi.mock('../supabaseApiClient', () => ({
   supabaseApi: {
@@ -78,19 +80,20 @@ describe('AuthProvider', () => {
     );
     const { result, unmount } = renderHook(() => ({
       auth: useAuth(),
-      children: useChildren(),
+      children: useChildrenQuery(),
+      remove: useDeleteChild(),
     }), { wrapper: Wrapper });
 
     try {
-      await waitFor(() => expect(result.current.children.children).toEqual(childrenA));
+      await waitFor(() => expect(result.current.children.data).toEqual(childrenA));
       expect(queryClient.getQueryData(childrenKey)).toEqual(childrenA);
 
       act(() => {
-        result.current.children.deleteChild(1);
+        result.current.remove.deleteChild(1);
       });
       await waitFor(() => {
         expect(supabaseApi.deleteChild).toHaveBeenCalledWith(1);
-        expect(result.current.children.children).toEqual([]);
+        expect(result.current.children.data).toEqual([]);
       });
       expect(queryClient.getQueryData(childrenKey)).toEqual([]);
       expect(queryClient.isMutating()).toBe(1);
@@ -112,7 +115,7 @@ describe('AuthProvider', () => {
             access_token: 'test-access-token-new-session',
           });
         });
-        await waitFor(() => expect(result.current.children.children).toEqual(freshChildrenA));
+        await waitFor(() => expect(result.current.children.data).toEqual(freshChildrenA));
         expect(queryClient.getQueryData(childrenKey)).toEqual(freshChildrenA);
         expect(queryClient.isMutating()).toBe(1);
       }
@@ -125,10 +128,10 @@ describe('AuthProvider', () => {
       await waitFor(() => expect(queryClient.isMutating()).toBe(0));
       if (signInAgain) {
         expect(queryClient.getQueryData(childrenKey)).toEqual(freshChildrenA);
-        await waitFor(() => expect(result.current.children.children).toEqual(freshChildrenA));
+        await waitFor(() => expect(result.current.children.data).toEqual(freshChildrenA));
       } else {
         expect(queryClient.getQueryState(childrenKey)).toBeUndefined();
-        expect(result.current.children.children).toEqual([]);
+        expect(result.current.children.data).toBeUndefined();
       }
     } finally {
       unmount();
@@ -186,13 +189,14 @@ describe('AuthProvider', () => {
     );
     const { result, unmount } = renderHook(() => ({
       auth: useAuth(),
-      children: useChildren(),
+      children: useChildrenQuery(),
+      remove: useDeleteChild(),
     }), { wrapper: Wrapper });
 
     try {
-      await waitFor(() => expect(result.current.children.children).toEqual(childrenA));
+      await waitFor(() => expect(result.current.children.data).toEqual(childrenA));
       act(() => {
-        result.current.children.deleteChild(1);
+        result.current.remove.deleteChild(1);
       });
       await waitFor(() => expect(cancelQueries).toHaveBeenCalledWith({ queryKey: childrenKey }));
       expect(queryClient.isMutating()).toBe(1);
@@ -212,7 +216,7 @@ describe('AuthProvider', () => {
       });
       await waitFor(() => expect(queryClient.isMutating()).toBe(0));
       expect(queryClient.getQueryState(childrenKey)).toBeUndefined();
-      expect(result.current.children.children).toEqual([]);
+      expect(result.current.children.data).toBeUndefined();
     } finally {
       unmount();
       finishCancellation();
@@ -271,14 +275,15 @@ describe('AuthProvider', () => {
     );
     const { result, unmount } = renderHook(() => ({
       auth: useAuth(),
-      children: useChildren(),
+      children: useChildrenQuery(),
+      add: useAddChild(),
     }), { wrapper: Wrapper });
     let addOperation: Promise<void> | undefined;
 
     try {
-      await waitFor(() => expect(result.current.children.children).toEqual(childrenA));
+      await waitFor(() => expect(result.current.children.data).toEqual(childrenA));
       act(() => {
-        addOperation = result.current.children.addChild(newChild);
+        addOperation = result.current.add.addChild(newChild);
       });
       await waitFor(() => expect(supabaseApi.addChild).toHaveBeenCalledWith(newChild));
       expect(queryClient.isMutating()).toBe(1);
@@ -299,7 +304,7 @@ describe('AuthProvider', () => {
             user: { ...sessionA.user, id: nextUserId },
           });
         });
-        await waitFor(() => expect(result.current.children.children).toEqual(freshChildren));
+        await waitFor(() => expect(result.current.children.data).toEqual(freshChildren));
       }
 
       const currentKey = ['children', nextUserId ?? 'user-A'];
@@ -315,7 +320,7 @@ describe('AuthProvider', () => {
         callsBeforeCompletion + (nextUserId === null ? 1 : 0),
       );
       expect(queryClient.getQueryData(currentKey)).toEqual(nextUserId ? freshChildren : childrenA);
-      expect(result.current.children.children).toEqual(nextUserId ? freshChildren : childrenA);
+      expect(result.current.children.data).toEqual(nextUserId ? freshChildren : childrenA);
       if (nextUserId === 'user-B') {
         expect(queryClient.getQueryState(['children', 'user-A'])).toBeUndefined();
       }

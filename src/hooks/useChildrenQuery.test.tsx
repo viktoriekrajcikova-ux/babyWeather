@@ -2,7 +2,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
-import { useChildren } from './useChildren';
+import { useChildrenQuery } from './useChildrenQuery';
+import { useDeleteChild } from './useDeleteChild';
 import { supabaseApi } from '../supabaseApiClient';
 import type { Tables } from '../types/database';
 import { useAuth } from './useAuth';
@@ -56,9 +57,10 @@ function createSession(userId: string): Session {
     };
 }
 
-describe('useChildren', () => {
+describe('useChildrenQuery', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        vi.mocked(supabaseApi.getChildren).mockReset();
         vi.mocked(useAuth).mockReturnValue({ 
             session: createSession('u'),
             signIn: vi.fn(),
@@ -73,15 +75,15 @@ describe('useChildren', () => {
             row({ id: 2, name: 'Max', age: 4, sex: 'nesmysl' }),
         ]);
 
-        const { result } = renderHook(() => useChildren(), { wrapper: createWrapper() });
+        const { result } = renderHook(() => useChildrenQuery(), { wrapper: createWrapper() });
 
         
-        expect(result.current.loading).toBe(true);
+        expect(result.current.isLoading).toBe(true);
 
         
-        await waitFor(() => expect(result.current.loading).toBe(false));
+        await waitFor(() => expect(result.current.isFetching).toBe(false));
 
-        expect(result.current.children).toEqual([
+        expect(result.current.data).toEqual([
             { id: 1, name: 'Ema', age: 2, sex: 'female' },
             { id: 2, name: 'Max', age: 4, sex: null }, // 'nesmysl' → null
         ]);
@@ -95,7 +97,10 @@ describe('useChildren', () => {
         // delete request — server ještě neodpověděl
         vi.mocked(supabaseApi.deleteChild).mockReturnValue(new Promise(() => {}));
 
-        const { result } = renderHook(() => useChildren(), { wrapper: createWrapper() });
+        const { result } = renderHook(() => ({
+            children: useChildrenQuery().data,
+            deleteChild: useDeleteChild().deleteChild,
+        }), { wrapper: createWrapper() });
         await waitFor(() => expect(result.current.children).toHaveLength(2));
 
         act(() => {
@@ -116,7 +121,10 @@ describe('useChildren', () => {
         ]);
         vi.mocked(supabaseApi.deleteChild).mockRejectedValue(new Error('fail'));
 
-        const { result } = renderHook(() => useChildren(), { wrapper: createWrapper() });
+        const { result } = renderHook(() => ({
+            children: useChildrenQuery().data,
+            deleteChild: useDeleteChild().deleteChild,
+        }), { wrapper: createWrapper() });
         await waitFor(() => expect(result.current.children).toHaveLength(2));
 
         act(() => {
@@ -153,9 +161,10 @@ describe('useChildren', () => {
                 row({ id: 2, name: 'Max', age: 4, sex: 'male', user_id: 'user-B' }),
             ]);
 
-        const { result, rerender } = renderHook(() => useChildren(), {
-            wrapper: createWrapper(queryClient),
-        });
+        const { result, rerender } = renderHook(() => ({
+            children: useChildrenQuery().data,
+            deleteChild: useDeleteChild().deleteChild,
+        }), { wrapper: createWrapper(queryClient) });
         await waitFor(() => expect(result.current.children).toEqual(childrenA));
 
         act(() => {
@@ -174,7 +183,7 @@ describe('useChildren', () => {
             signOut: vi.fn(),
         });
         rerender();
-        expect(result.current.children).toEqual([]);
+        expect(result.current.children).toBeUndefined();
 
         vi.mocked(useAuth).mockReturnValue({
             session: createSession('user-B'),
@@ -206,16 +215,16 @@ describe('useChildren', () => {
             signOut: vi.fn(),
         });
 
-        const { result } = renderHook(() => useChildren(), { wrapper: createWrapper() });
+        const { result } = renderHook(() => useChildrenQuery(), { wrapper: createWrapper() });
 
         expect(supabaseApi.getChildren).not.toHaveBeenCalled();
-        expect(result.current.children).toEqual([]);
+        expect(result.current.data).toBeUndefined();
     });
 
     it('bez přihlášení nenačítá děti', () => {
         vi.mocked(supabaseApi.getChildren).mockResolvedValue([]);
         vi.mocked(useAuth).mockReturnValue({ session: null, signIn: vi.fn(), signUp: vi.fn(), signOut: vi.fn() });
-        renderHook(() => useChildren(), { wrapper: createWrapper() });
+        renderHook(() => useChildrenQuery(), { wrapper: createWrapper() });
 
         expect(supabaseApi.getChildren).not.toHaveBeenCalled();
 
@@ -239,11 +248,11 @@ describe('useChildren', () => {
                 row({ id: 2, name: 'Max', age: 4, sex: 'male', user_id: 'user-B' }),
             ]);
 
-        const { result, rerender } = renderHook(() => useChildren(), {
+        const { result, rerender } = renderHook(() => useChildrenQuery(), {
             wrapper: createWrapper(queryClient),
         });
         await waitFor(() => expect(supabaseApi.getChildren).toHaveBeenCalledTimes(1));
-        expect(result.current.children).toEqual([]);
+        expect(result.current.data).toBeUndefined();
 
         vi.mocked(useAuth).mockReturnValue({
             session: null,
@@ -252,7 +261,7 @@ describe('useChildren', () => {
             signOut: vi.fn(),
         });
         rerender();
-        expect(result.current.children).toEqual([]);
+        expect(result.current.data).toBeUndefined();
 
         vi.mocked(useAuth).mockReturnValue({
             session: createSession('user-B'),
@@ -261,7 +270,7 @@ describe('useChildren', () => {
             signOut: vi.fn(),
         });
         rerender();
-        await waitFor(() => expect(result.current.children).toEqual(childrenB));
+        await waitFor(() => expect(result.current.data).toEqual(childrenB));
         expect(supabaseApi.getChildren).toHaveBeenCalledTimes(2);
 
         await act(async () => {
@@ -272,7 +281,7 @@ describe('useChildren', () => {
         });
 
         expect(queryClient.getQueryData(['children', 'user-B'])).toEqual(childrenB);
-        expect(result.current.children).toEqual(childrenB);
+        expect(result.current.data).toEqual(childrenB);
     });
 
     it('při přepnutí účtu nezobrazí děti předchozího uživatele', async () => {
@@ -286,17 +295,17 @@ describe('useChildren', () => {
             row({ id: 1, name: 'Ema', age: 2, sex: 'female' }),
         ]);
         
-        const { result, rerender } = renderHook(() => useChildren(), { wrapper:createWrapper(queryClient) });
+        const { result, rerender } = renderHook(() => useChildrenQuery(), { wrapper:createWrapper(queryClient) });
 
         await waitFor(() => {
-           expect(result.current.children).toEqual([
+           expect(result.current.data).toEqual([
                 { id: 1, name: 'Ema', age: 2, sex: 'female' },
             ])
         });
 
         vi.mocked(useAuth).mockReturnValue({ session: null, signIn: vi.fn(), signUp: vi.fn(), signOut: vi.fn() });
         rerender();
-        expect(result.current.children).toEqual([])
+        expect(result.current.data).toBeUndefined();
 
         let resolveChildrenB!: (rows: Tables<'children'>[]) => void;
         vi.mocked(supabaseApi.getChildren).mockReturnValue(  
@@ -305,7 +314,7 @@ describe('useChildren', () => {
 })); 
         vi.mocked(useAuth).mockReturnValue({ session: createSession('user-B'), signIn: vi.fn(), signUp: vi.fn(), signOut: vi.fn() });
         rerender();
-        expect(result.current.children).toEqual([])
+        expect(result.current.data).toBeUndefined();
 
         await act(async () => {
             resolveChildrenB([
@@ -314,7 +323,7 @@ describe('useChildren', () => {
         });
 
         await waitFor(() => {
-            expect(result.current.children).toEqual([
+            expect(result.current.data).toEqual([
                 { id: 2, name: 'Max', age: 4, sex: 'male' }
             ])
         })

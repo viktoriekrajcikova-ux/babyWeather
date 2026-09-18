@@ -114,6 +114,18 @@ describe('Home (integrační test)', () => {
         expect(await screen.findByRole('button', { name: 'Remove Ema' })).toBeInTheDocument();
     });
 
+    it('při chybě načítání dětí zobrazí upozornění a ponechá počasí', async () => {
+        vi.mocked(weatherApi.getData).mockResolvedValue(weatherAt20C);
+        vi.mocked(supabaseApi.getChildren).mockRejectedValue(new Error('children request failed'));
+
+        render(<Home />, { wrapper: createWrapper() });
+
+        expect(await screen.findByText('jasno')).toBeVisible();
+        expect(await screen.findByRole('alert')).toHaveTextContent('Could not load children');
+        expect(screen.getByRole('alert')).toBeVisible();
+        expect(screen.getByText('jasno')).toBeVisible();
+    });
+
         it('při chybě počasí zobrazí chybu a nerenderuje děti', async () => {
         vi.mocked(weatherApi.getData).mockRejectedValue(new Error('500'));
         vi.mocked(supabaseApi.getChildren).mockResolvedValue([

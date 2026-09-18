@@ -6,7 +6,8 @@ import Child from "../components/child";
 import Weather from "../components/weather";
 import { getOutfit } from "../model/clothesDeterminer";
 import WeatherForecast from "../components/weatherForecast";
-import { useChildren } from "../hooks/useChildren";
+import { useChildrenQuery } from "../hooks/useChildrenQuery";
+import { useDeleteChild } from "../hooks/useDeleteChild";
 import { useWeather } from "../hooks/useWeather";
 import { kelvinToCelsius } from '../model/temperature';
 import { useLocation } from '../hooks/useLocation';
@@ -18,7 +19,8 @@ import styles from "./home.module.scss";
 const Home = () => {
     const { coords, searchLocation, loading: locationLoading, error: locationError } = useLocation();
     const { weather, loading: weatherLoading, error: weatherError } = useWeather(coords);
-    const { children, error: childrenError, deleteChild } = useChildren();
+    const { data: children, isError } = useChildrenQuery();
+    const { deleteChild } = useDeleteChild();
 
     return (
         <>
@@ -36,8 +38,8 @@ const Home = () => {
                 ) : (
                     <HomeContent
                         weather={weather}
-                        kids={children}
-                        childrenError={childrenError}
+                        kids={children ?? []}
+                        childrenError={isError ? 'Could not load children' : null}
                         onDeleteChild={deleteChild}
                     />
                 )}
@@ -53,7 +55,7 @@ interface HomeContentProps {
     onDeleteChild: (id: number) => void;
 }
 
-const HomeContent = ({ weather, kids, childrenError, onDeleteChild }: HomeContentProps) => {
+const HomeContent = ({ weather, childrenError, kids, onDeleteChild }: HomeContentProps) => {
     const [selectedWeatherIndex, setSelectedWeatherIndex] = useState(0)
     const [weatherForecast, setWeatherForecast] = useState(false);
 

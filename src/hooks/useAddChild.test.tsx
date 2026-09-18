@@ -1,0 +1,109 @@
+import { describe, it, expect, vi } from 'vitest';
+import { renderHook, waitFor, act } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import type { ReactNode } from 'react';
+import { useAddChild } from './useAddChild';
+import { useChildrenQuery } from './useChildrenQuery';
+import { useAuth } from './useAuth';
+import { supabaseApi } from '../supabaseApiClient';
+import { childrenQueryKey } from './childrenQueryKeys';
+
+vi.mock('../supabaseApiClient', () => ({
+    supabaseApi: {
+        getChildren: vi.fn(),
+        addChild: vi.fn(),
+    },
+}));
+
+vi.mock('./useAuth', () => ({
+    useAuth: vi.fn(),
+}));
+
+describe('useAddChild', () => {
+    it('po přidání obnoví seznam připojený až během ukládání', async () => {
+        vi.mocked(useAuth).mockReturnValue({
+            session: {
+                access_token: 'test-access-token',
+                refresh_token: 'test-refresh-token',
+                expires_in: 3600,
+                token_type: 'bearer',
+                user: {
+                    id: 'user-A',
+                    app_metadata: {},
+                    user_metadata: {},
+                    aud: 'authenticated',
+                    created_at: '2026-01-01T00:00:00.000Z',
+                },
+            },
+            signIn: vi.fn(),
+            signUp: vi.fn(),
+            signOut: vi.fn(),
+        });
+        const queryClient = new QueryClient({
+            defaultOptions: {
+                queries: { retry: false, staleTime: Infinity },
+                mutations: { retry: false },
+            },
+        });
+        const Wrapper = ({ children }: { children: ReactNode }) => (
+            <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+        );
+        const queryKey = childrenQueryKey('user-A');
+        const existingChild = { id: 1, name: 'Ema', age: 2, sex: 'female' };
+        const addedChild = { id: 2, name: 'Anna', age: 1, sex: 'female' };
+        const newChild = { name: 'Anna', age: 1, sex: 'female' };
+        let finishAdd!: () => void;
+        const pendingAdd = new Promise<void>(resolve => {
+            finishAdd = resolve;
+        });
+        vi.mocked(supabaseApi.addChild).mockReset().mockReturnValueOnce(pendingAdd);
+        vi.mocked(supabaseApi.getChildren).mockReset()
+            .mockResolvedValueOnce([
+                { ...existingChild, user_id: 'user-A', created_at: '' },
+            ])
+            .mockResolvedValue([
+                { ...existingChild, user_id: 'user-A', created_at: '' },
+                { ...addedChild, user_id: 'user-A', created_at: '' },
+            ]);
+
+        // Formulář používá pouze mutaci; seznam zatím neexistuje.
+        const add = renderHook(() => useAddChild(), { wrapper: Wrapper });
+        let addOperation: Promise<void> | undefined;
+        let unmountList: (() => void) | undefined;
+
+        try {
+            expect(queryClient.getQueryState(queryKey)).toBeUndefined();
+            act(() => {
+                addOperation = add.result.current.addChild(newChild);
+            });
+            await waitFor(() => expect(supabaseApi.addChild).toHaveBeenCalledWith(newChild));
+            expect(queryClient.getQueryState(queryKey)).toBeUndefined();
+            expect(supabaseApi.getChildren).not.toHaveBeenCalled();
+
+            // Seznam se připojí během ukládání a načte ještě původní data.
+            const list = renderHook(() => useChildrenQuery(), { wrapper: Wrapper });
+            unmountList = list.unmount;
+            await waitFor(() => expect(list.result.current.data).toEqual([existingChild]));
+            expect(supabaseApi.getChildren).toHaveBeenCalledTimes(1);
+            expect(queryClient.isMutating()).toBe(1);
+
+            await act(async () => {
+                finishAdd();
+                await addOperation;
+            });
+            await waitFor(() => expect(queryClient.isMutating()).toBe(0));
+
+            await waitFor(() => {
+                expect(list.result.current.data).toEqual([existingChild, addedChild]);
+            });
+            expect(supabaseApi.getChildren).toHaveBeenCalledTimes(2);
+            expect(queryClient.getQueryData(queryKey)).toEqual([existingChild, addedChild]);
+        } finally {
+            unmountList?.();
+            add.unmount();
+            finishAdd();
+            await addOperation;
+            queryClient.clear();
+        }
+    });
+});
