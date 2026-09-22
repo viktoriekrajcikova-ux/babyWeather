@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { redis } from './redis';
+import { redis } from './redis.js';
 
 const resultSchema = z.object({
     name: z.string().trim().min(1),

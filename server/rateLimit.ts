@@ -1,5 +1,5 @@
 import { Ratelimit } from '@upstash/ratelimit';
-import { redis } from './redis';
+import { redis } from './redis.js';
 
 export const weatherRateLimit = new Ratelimit({
     redis,

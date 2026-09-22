@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { redis } from './redis';
-import { mapOpenMeteoWeather } from './weatherMapping';
+import { redis } from './redis.js';
+import { mapOpenMeteoWeather } from './weatherMapping.js';
 
 const weatherSchema = z.object({
     hourly: z.array(z.object({

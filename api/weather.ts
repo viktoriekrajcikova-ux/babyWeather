@@ -1,6 +1,6 @@
-import { supabaseServer } from '../server/supabase';
-import { getWeather } from '../server/weather';
-import { weatherRateLimit } from '../server/rateLimit';
+import { supabaseServer } from '../server/supabase.js';
+import { getWeather } from '../server/weather.js';
+import { weatherRateLimit } from '../server/rateLimit.js';
 
 export default {
     async fetch(request: Request) {

@@ -1,7 +1,7 @@
-import { supabaseServer } from '../server/supabase';
+import { supabaseServer } from '../server/supabase.js';
 import { z } from 'zod';
-import { getGeocoding } from '../server/geocoding';
-import { geocodingRateLimit } from '../server/geocodingRateLimit';
+import { getGeocoding } from '../server/geocoding.js';
+import { geocodingRateLimit } from '../server/geocodingRateLimit.js';
 
 const citySchema = z.string().refine(value => !/\p{Cc}/u.test(value)).transform(value => value.trim()).pipe(z.string().min(2).max(100));
 
