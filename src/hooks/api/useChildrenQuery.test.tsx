@@ -171,33 +171,5 @@ describe('useChildrenQuery', () => {
         }
     });
 
-    // Přepínání účtů, opožděné odpovědi a rollback po odhlášení ověřuje
-    // AuthContext.test.tsx se skutečným AuthProviderem a ProtectedRoute.
-
-    it('během načítání autentizace nenačítá děti', () => {
-        vi.mocked(supabaseApi.getChildren).mockResolvedValue([]);
-        vi.mocked(useAuth).mockReturnValue({
-            session: undefined,
-            signIn: vi.fn(),
-            signUp: vi.fn(),
-            signOut: vi.fn(),
-            getAuthGeneration: () => 0,
-        });
-
-        const { result } = renderHook(() => useChildrenQuery(), { wrapper: createWrapper() });
-
-        expect(supabaseApi.getChildren).not.toHaveBeenCalled();
-        expect(result.current.data).toBeUndefined();
-    });
-
-    it('bez přihlášení nenačítá děti', () => {
-        vi.mocked(supabaseApi.getChildren).mockResolvedValue([]);
-        vi.mocked(useAuth).mockReturnValue({ session: null, signIn: vi.fn(), signUp: vi.fn(), signOut: vi.fn(), getAuthGeneration: () => 0 });
-        renderHook(() => useChildrenQuery(), { wrapper: createWrapper() });
-
-        expect(supabaseApi.getChildren).not.toHaveBeenCalled();
-
-    });
-
 
 });

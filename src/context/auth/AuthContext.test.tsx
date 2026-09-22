@@ -125,6 +125,36 @@ describe('AuthProvider se sdílenou cache dětí', () => {
     vi.restoreAllMocks();
   });
 
+  it('ProtectedRoute během načítání autentizace nenačítá děti a po přihlášení je načte', async () => {
+    const lookup = deferred<Awaited<ReturnType<typeof supabase.auth.getSession>>>();
+    vi.mocked(supabase.auth.getSession).mockReturnValueOnce(lookup.promise);
+    const { client } = setup();
+
+    expect(auth().id).toBe('čeká');
+    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.queryByTestId('private-content')).not.toBeInTheDocument();
+    expect(supabaseApi.getChildren).not.toHaveBeenCalled();
+    expect(client.getQueryState(key)).toBeUndefined();
+
+    await act(async () => {
+      lookup.resolve({ data: { session: sessionA }, error: null });
+      await lookup.promise;
+    });
+    await waitFor(() => expectList(childrenA));
+    expect(supabaseApi.getChildren).toHaveBeenCalledTimes(1);
+  });
+
+  it('ProtectedRoute bez přihlášení nepřipojí soukromou obrazovku a nenačítá děti', async () => {
+    vi.mocked(supabase.auth.getSession).mockResolvedValueOnce({ data: { session: null }, error: null });
+    const { client } = setup();
+
+    await waitFor(() => expect(auth().id).toBeNull());
+    expect(screen.queryByTestId('private-content')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('children-list')).not.toBeInTheDocument();
+    expect(supabaseApi.getChildren).not.toHaveBeenCalled();
+    expect(client.getQueryState(key)).toBeUndefined();
+  });
+
   it.each([
     { name: 'přímé přepnutí A → B', logout: false, next: sessionB, expected: childrenB },
     { name: 'A → odhlášení → B', logout: true, next: sessionB, expected: childrenB },

@@ -13,7 +13,7 @@ TypeScript codebase.
 
 **Authentication** - email/password sign-up & sign-in via Supabase Auth
 **Child profiles** - add, list and remove children (data scoped per user)
-**Live weather** - current conditions and forecast from the OpenWeather API
+**Live weather** - hourly forecast from Open-Meteo through authenticated server endpoints
 **Location search** - search any city; the selected location is remembered across visits
 **Clothing advice** - recommends what to dress the child in, based on temperature
 **Protected routes** - app content is only accessible when logged in
@@ -26,7 +26,8 @@ TypeScript codebase.
 | Build tool      | Vite 5                                           |
 | Routing         | React Router 6                                   |
 | Backend / Auth  | Supabase (Postgres + Auth + Row Level Security) |
-| Weather data    | OpenWeather One Call API 3.0                    |
+| Weather data    | Open-Meteo (non-commercial public API, no API key) |
+| API / cache     | Vercel Functions + Upstash Redis                |
 | Server state    | TanStack Query (React Query) v5                 |
 | Styling         | SCSS Modules + Bootstrap / react-bootstrap      |
 | Testing         | Vitest + React Testing Library                  |
@@ -40,7 +41,10 @@ testable and UI components thin:
 
 **API clients** (`src/weatherApiClient.ts`, `src/supabaseApiClient.ts`,
   `src/geocodingApiClient.ts`) - isolate all external calls. The rest of the
-  app never talks to Supabase, OpenWeather or the geocoding API directly.
+  app calls same-origin weather/geocoding endpoints with its Supabase access token.
+  `api/` authenticates requests and limits usage; `server/` validates and caches
+  Open-Meteo responses. The existing UI weather contract uses kelvins and Unix
+  seconds; the server adapts Open-Meteo Celsius values before returning data.
 **Domain logic** (`src/model/clothesDeterminer.ts`) - the clothing
   recommendation is a pure function, fully unit-tested and independent of React.
 **Data hooks** (`src/hooks/useWeather.ts`, `src/hooks/useChildren.ts`) -
@@ -55,13 +59,18 @@ testable and UI components thin:
 The reasoning behind the notable technical choices is recorded in
 [`docs/DECISIONS.md`](docs/DECISIONS.md).
 
+The prioritized code-review backlog for interview preparation is in
+[`docs/INTERVIEW_READINESS.md`](docs/INTERVIEW_READINESS.md), including acceptance
+criteria and the verification baseline. Start there when continuing this work.
+
 ## Getting started
 
 ### Prerequisites
 
 - Node.js 22+
 - A [Supabase](https://supabase.com) project
-- An [OpenWeather](https://openweathermap.org/api) API key (One Call API 3.0)
+- An [Upstash Redis](https://upstash.com/) database (REST URL and write-capable REST token)
+- No weather API key or payment card is required for Open-Meteo's non-commercial public API
 
 ### Setup
 
@@ -69,25 +78,34 @@ The reasoning behind the notable technical choices is recorded in
 # 1. Install dependencies
 npm install
 
-# 2. Create your environment file
-cp .env.example .env
+# 2. Create a git-ignored .env.local file locally using the names below
 ```
 
-Then fill in `.env` with your own credentials:
+Set these variables locally and in Vercel project settings. Keep server credentials
+out of `VITE_*` variables. Never commit the actual values:
 
 ```env
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key
-VITE_OPENWEATHER_API_KEY=your-openweather-key
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key
+UPSTASH_REDIS_REST_URL=https://your-database.upstash.io
+UPSTASH_REDIS_REST_TOKEN=your-write-capable-rest-token
 ```
 
 ### Run
 
 ```bash
-npm run dev
+npx vercel dev
 ```
 
-The app will be available at the URL Vite prints (default `http://localhost:5173`).
+Use the URL printed by Vercel CLI. The first run may ask you to authenticate and
+link the Vercel project; do that interactively, not by sharing tokens in chat.
+`npm run dev` runs only Vite, and `npm run preview` serves only the static build:
+neither serves the `/api/weather` and `/api/geocoding` functions.
+
+See [the Open-Meteo setup and review checklist](docs/OPEN_METEO_SETUP.md) for
+request flow, test boundaries, service limits and deployment verification.
 
 ## Scripts
 
