@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import Header from "../../components/header/header";
 import Child from "../../components/child/child";
 import Weather from "../../components/weather/weather";
+import DataAttribution from '../../components/weather/dataAttribution';
 import { getOutfit } from "../../model/clothesDeterminer/clothesDeterminer";
 import WeatherForecast from "../../components/weather/weatherForecast";
 import { useChildrenQuery } from "../../hooks/api/useChildrenQuery";
@@ -43,6 +44,7 @@ const Home = () => {
                         onDeleteChild={deleteChild}
                     />
                 )}
+                <DataAttribution />
             </Container>
         </>
     )
@@ -84,7 +86,7 @@ const HomeContent = ({ weather, childrenError, kids, onDeleteChild }: HomeConten
                         describe={weather.hourly[selectedWeatherIndex].weather[0].description}
                         feelsLike={Math.round(kelvinToCelsius(weather.hourly[selectedWeatherIndex].feels_like))}
                         timeForecast={selectedWeatherIndex > 0 && `Forecast for ${ new Date(weather.hourly[selectedWeatherIndex].dt * 1000).getHours()}:00`}
-                        icon={`https://openweathermap.org/img/wn/${weather.hourly[selectedWeatherIndex].weather[0].icon}@2x.png`}/>
+                        icon={weather.hourly[selectedWeatherIndex].weather[0].icon}/>
                     {selectedWeatherIndex > 0 && (
                         <button type="button" className="current-weather" onClick={() => setSelectedWeatherIndex(0)}>
                             <ArrowLeft size={16} strokeWidth={2} />

@@ -1,0 +1,6 @@
+# Tests are exercised locally/CI, not deployed as API functions.
+api/**/*.test.ts
+server/**/*.test.ts
+# Never upload local credentials through CLI deployment.
+.env
+.env.*

@@ -83,6 +83,8 @@ describe('Home (integrační test)', () => {
 
         expect(await screen.findByText('Ema')).toBeInTheDocument();
         expect(screen.getByText('Max')).toBeInTheDocument();
+        expect(screen.getByRole('link', { name: 'Open-Meteo' })).toBeVisible();
+        expect(screen.getByRole('link', { name: 'GeoNames' })).toHaveAttribute('href', 'https://www.geonames.org/');
     });
 
     it('teplota z počasí protéká přes Kelvin→°C až do rady na oblečení', async () => {

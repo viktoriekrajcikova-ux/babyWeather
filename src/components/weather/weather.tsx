@@ -1,4 +1,5 @@
 import styles from './weather.module.scss'
+import WeatherIcon from './weatherIcon';
 
 interface WeatherProps {
     temperature: number;
@@ -14,7 +15,7 @@ const Weather = ({temperature, feelsLike, icon, describe, onClickWeatherForecast
 
     return <div className={styles.weather}>
                 <p className={styles.forecastTime}>{timeForecast}</p>
-                <img src={icon} alt="" />
+                <WeatherIcon icon={icon} description={describe} size={96} />
                 <p className={styles.temp}>{temperature} °C</p>
                 <div>
                     <div className={styles.feels}>Feels like {feelsLike} °C</div>

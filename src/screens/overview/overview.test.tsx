@@ -96,6 +96,7 @@ describe('Overview (integrační test)', () => {
         
         expect(await screen.findByRole('heading', { level: 3, name: 'Ema' })).toBeInTheDocument();
         expect(screen.getByText('Today')).toBeInTheDocument();
+        expect(screen.getByRole('link', { name: 'Open-Meteo' })).toHaveAttribute('href', 'https://open-meteo.com/');
 
         // Pocitových 13 °C vyžaduje dvě vrstvy na nohou a přechodovou bundu.
         expect(screen.getByText('thin sweatpants')).toBeInTheDocument();

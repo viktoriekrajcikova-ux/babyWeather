@@ -2,6 +2,7 @@ import { Container } from "react-bootstrap";
 import { Link } from 'react-router-dom';
 import { Baby } from 'lucide-react';
 import Header from "../../components/header/header";
+import DataAttribution from '../../components/weather/dataAttribution';
 import { getOutfit } from "../../model/clothesDeterminer/clothesDeterminer";
 import type { ClothesItem } from "../../model/clothesDeterminer/clothesDeterminer";
 import { useChildrenQuery } from "../../hooks/api/useChildrenQuery";
@@ -90,6 +91,7 @@ const Overview = () => {
                         childrenError={childrenError ? 'Could not load children. Check your connection and try again.' : null}
                     />
                 )}
+                <DataAttribution />
             </Container>
         </>
     );
@@ -122,7 +124,7 @@ const OverviewContent = ({ hourly, kids, childrenError }: OverviewContentProps) 
     today[0]);
     const feelsLikeColdest = toCelsius(coldest.feels_like);
 
-    // graf: normalizace na okno min–max
+
     const chartTemps = chartHours.map(h => toCelsius(h.temp));
     const chartMin = Math.min(...chartTemps);
     const chartMax = Math.max(...chartTemps);
