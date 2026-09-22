@@ -8,24 +8,15 @@ import type { ClothesItem } from "../../model/clothesDeterminer/clothesDetermine
 import { useChildrenQuery } from "../../hooks/api/useChildrenQuery";
 import { useWeather } from "../../hooks/useWeather";
 import { useLocation } from "../../hooks/useLocation";
-import { kelvinToCelsius } from "../../model/temperature/temperature";
+import { kelvinToRoundedCelsius } from "../../model/temperature/temperature";
 import type { HourlyWeather } from "../../weatherApiClient";
 import type { Child } from "../../model/child/child";
 import styles from "./overview.module.scss";
+import TemperatureChart from './temperatureChart';
+import { formatHour } from './formatHour';
 
 const boyAvatar = 'assets/img/boy.png';
 const girlAvatar = 'assets/img/girl.png';
-
-// ať i minimum něco ukáže
-const BAR_FLOOR = 30;
-
-function toCelsius(kelvin: number): number {
-    return Math.round(kelvinToCelsius(kelvin));
-}
-
-function formatHour(dt: number): string {
-    return `${new Date(dt * 1000).getHours()}:00`;
-}
 
 function formatNames(children: Child[]): string {
     const names = children.map(c => c.name).filter(Boolean);
@@ -105,38 +96,26 @@ interface OverviewContentProps {
 
 const OverviewContent = ({ hourly, kids, childrenError }: OverviewContentProps) => {
     const today = hourly.slice(0, 24);
-    const chartHours = hourly.slice(0, 12);
 
-    const temps = today.map(h => toCelsius(h.temp));
+
+    const temps = today.map(h => kelvinToRoundedCelsius(h.temp));
     const dayMin = Math.min(...temps);
     const dayMax = Math.max(...temps);
 
     // oblečení plánuju podle pocitové teploty
-    const feels = today.map(h => toCelsius(h.feels_like));
+    const feels = today.map(h => kelvinToRoundedCelsius(h.feels_like));
     const feelsMin = Math.min(...feels);
     const feelsMax = Math.max(...feels);
 
-    const nowTemp = toCelsius(hourly[0].temp);
+    const nowTemp = kelvinToRoundedCelsius(hourly[0].temp);
     const nowDescription = hourly[0].weather[0]?.description ?? '';
 
     const coldest = today.reduce((coldestSoFar, hour) =>
         hour.temp < coldestSoFar.temp ? hour : coldestSoFar,
     today[0]);
-    const feelsLikeColdest = toCelsius(coldest.feels_like);
+    const feelsLikeColdest = kelvinToRoundedCelsius(coldest.feels_like);
 
 
-    const chartTemps = chartHours.map(h => toCelsius(h.temp));
-    const chartMin = Math.min(...chartTemps);
-    const chartMax = Math.max(...chartTemps);
-    const chartRange = chartMax - chartMin;
-    const barHeight = (temp: number): number => {
-        const ratio = chartRange === 0 ? 1 : (temp - chartMin) / chartRange;
-        return Math.round(BAR_FLOOR + ratio * (100 - BAR_FLOOR));
-    };
-
-    const chartLabel =
-        `Temperature over the next 12 hours: now ${nowTemp}°C, ` +
-        `low ${chartMin}°C, high ${chartMax}°C.`;
 
     return (
         <>
@@ -163,32 +142,7 @@ const OverviewContent = ({ hourly, kids, childrenError }: OverviewContentProps) 
                 </div>
             </section>
 
-            <h2 className={styles.sectionTitle}>Temperature outlook</h2>
-            <div className={styles.card}>
-                <p className={styles.chartNote}>Next 12 hours — plan layers around the cold morning.</p>
-                <div className={styles.chart} role="img" aria-label={chartLabel}>
-                    {chartHours.map((hour, index) => {
-                        const isNow = index === 0;
-                        return (
-                            <div
-                                key={hour.dt}
-                                className={`${styles.col} ${isNow ? styles.colNow : ''}`}
-                            >
-                                <span className={styles.temp}>{chartTemps[index]}&deg;</span>
-                                <div
-                                    className={`${styles.bar} ${isNow ? styles.barNow : ''}`}
-                                    style={{ height: `${barHeight(chartTemps[index])}%` }}
-                                />
-                                <span className={styles.hour}>{isNow ? 'Now' : formatHour(hour.dt)}</span>
-                            </div>
-                        );
-                    })}
-                </div>
-                <div className={styles.legend}>
-                    <span><span className={`${styles.swatch} ${styles.swatchNow}`} />Now</span>
-                    <span><span className={`${styles.swatch} ${styles.swatchForecast}`} />Forecast</span>
-                </div>
-            </div>
+            <TemperatureChart hourly={hourly} />
 
             <h2 className={styles.sectionTitle}>What to pack today</h2>
             {childrenError ? (
