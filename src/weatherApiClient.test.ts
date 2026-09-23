@@ -13,7 +13,7 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 it('fetches unchanged Kelvin and Unix-second weather from the authenticated local endpoint', async () => {
-    const weather = { hourly: [{ temp: 293.15, feels_like: 290.15, dt: 1800000000, weather: [{ icon: 'clear', description: 'Clear sky' }] }] };
+    const weather = { timezone: 'Europe/Prague', hourly: [{ temp: 293.15, feels_like: 290.15, dt: 1800000000, weather: [{ icon: 'clear', description: 'Clear sky' }] }] };
     fetchMock.mockResolvedValue({ ok: true, json: async () => weather });
     await expect(weatherApi.getData(49.35, -17.86)).resolves.toEqual(weather);
     expect(fetchMock).toHaveBeenCalledWith('/api/weather?lat=49.35&lon=-17.86', expect.objectContaining({ headers: { Authorization: 'Bearer private-token' } }));

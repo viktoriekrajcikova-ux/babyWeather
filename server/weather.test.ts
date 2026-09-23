@@ -9,11 +9,12 @@ const { redisGet, redisSet } = vi.hoisted(() => ({
 vi.mock('./redis', () => ({ redis: { get: redisGet, set: redisSet } }));
 
 const fetchMock = vi.fn<typeof fetch>();
-const upstreamWeather = { hourly: {
+const upstreamWeather = { timezone: 'Europe/Prague', hourly: {
     time: [1700000000], temperature_2m: [12], apparent_temperature: [10],
     weather_code: [0], is_day: [1],
 } };
 const validWeather = {
+    timezone: 'Europe/Prague',
     hourly: [{
         temp: 285.15,
         feels_like: 283.15,
@@ -39,10 +40,7 @@ describe('server getWeather', () => {
 
     it('bez API klíče načte Open-Meteo a převede Celsius na Kelvin', async () => {
         vi.stubEnv('OPENWEATHER_API_KEY', undefined);
-        fetchMock.mockResolvedValueOnce(Response.json({ hourly: {
-            time: [1700000000], temperature_2m: [12], apparent_temperature: [10],
-            weather_code: [0], is_day: [1],
-        } }));
+        fetchMock.mockResolvedValueOnce(Response.json(upstreamWeather));
 
         await expect(getWeather(50.08, 14.43)).resolves.toEqual(validWeather);
 
@@ -55,13 +53,13 @@ describe('server getWeather', () => {
         expect(Object.fromEntries(url.searchParams)).toEqual({
             latitude: '50.08', longitude: '14.43',
             hourly: 'temperature_2m,apparent_temperature,weather_code,is_day',
-            forecast_hours: '48', timeformat: 'unixtime', timezone: 'UTC',
+            forecast_hours: '48', timeformat: 'unixtime', timezone: 'auto',
             temperature_unit: 'celsius',
         });
         expect(options?.signal).toBeInstanceOf(AbortSignal);
-        expect(redisGet).toHaveBeenCalledWith('babyweather:weather:openmeteo:v1:50.08:14.43:cs');
+        expect(redisGet).toHaveBeenCalledWith('babyweather:weather:openmeteo:v2:50.08:14.43:cs');
         expect(redisSet).toHaveBeenCalledTimes(1);
-        expect(redisSet).toHaveBeenCalledWith('babyweather:weather:openmeteo:v1:50.08:14.43:cs', validWeather, { ex: 300 });
+        expect(redisSet).toHaveBeenCalledWith('babyweather:weather:openmeteo:v2:50.08:14.43:cs', validWeather, { ex: 300 });
     });
 
     it('platnou cache vrátí bez volání Open-Meteo a bez prodloužení expirace', async () => {
@@ -70,7 +68,7 @@ describe('server getWeather', () => {
         await expect(getWeather(50.08, 14.43)).resolves.toEqual(validWeather);
 
         expect(redisGet).toHaveBeenCalledTimes(1);
-        expect(redisGet).toHaveBeenCalledWith('babyweather:weather:openmeteo:v1:50.08:14.43:cs');
+        expect(redisGet).toHaveBeenCalledWith('babyweather:weather:openmeteo:v2:50.08:14.43:cs');
         expect(fetchMock).not.toHaveBeenCalled();
         expect(redisSet).not.toHaveBeenCalled();
     });
@@ -82,7 +80,7 @@ describe('server getWeather', () => {
         await expect(getWeather(0, 0)).resolves.toEqual(validWeather);
 
         expect(fetchMock).toHaveBeenCalledTimes(1);
-        expect(redisSet).toHaveBeenCalledWith('babyweather:weather:openmeteo:v1:0:0:cs', validWeather, { ex: 300 });
+        expect(redisSet).toHaveBeenCalledWith('babyweather:weather:openmeteo:v2:0:0:cs', validWeather, { ex: 300 });
     });
 
     it('různé souřadnice čtou různé klíče cache', async () => {
@@ -93,9 +91,9 @@ describe('server getWeather', () => {
         await getWeather(50, 15);
 
         expect(redisGet.mock.calls).toEqual([
-            ['babyweather:weather:openmeteo:v1:50:14:cs'],
-            ['babyweather:weather:openmeteo:v1:51:14:cs'],
-            ['babyweather:weather:openmeteo:v1:50:15:cs'],
+            ['babyweather:weather:openmeteo:v2:50:14:cs'],
+            ['babyweather:weather:openmeteo:v2:51:14:cs'],
+            ['babyweather:weather:openmeteo:v2:50:15:cs'],
         ]);
         expect(fetchMock).not.toHaveBeenCalled();
     });
@@ -115,7 +113,7 @@ describe('server getWeather', () => {
 
         await expect(getWeather(0, 0)).rejects.toThrow('Redis write failed');
 
-        expect(redisSet).toHaveBeenCalledWith('babyweather:weather:openmeteo:v1:0:0:cs', validWeather, { ex: 300 });
+        expect(redisSet).toHaveBeenCalledWith('babyweather:weather:openmeteo:v2:0:0:cs', validWeather, { ex: 300 });
     });
 
 
@@ -135,12 +133,12 @@ describe('server getWeather', () => {
         [95, 'thunderstorm', 'bouřka'], [96, 'thunderstorm', 'bouřka se slabým krupobitím'],
         [99, 'thunderstorm', 'bouřka se silným krupobitím'],
     ])('mapuje WMO %s na český popis a kategorii i v noci', async (code, icon, description) => {
-        fetchMock.mockResolvedValueOnce(Response.json({ hourly: {
+        fetchMock.mockResolvedValueOnce(Response.json({ timezone: 'Europe/Prague', hourly: {
             time: [1700000000, 1700003600], temperature_2m: [12, -5],
             apparent_temperature: [10, -8], weather_code: [code, code], is_day: [1, 0],
         } }));
 
-        await expect(getWeather(0, 0)).resolves.toEqual({ hourly: [
+        await expect(getWeather(0, 0)).resolves.toEqual({ timezone: 'Europe/Prague', hourly: [
             { temp: 285.15, feels_like: 283.15, dt: 1700000000, weather: [{ icon, description }] },
             { temp: 268.15, feels_like: 265.15, dt: 1700003600, weather: [{ icon, description }] },
         ] });
@@ -198,7 +196,7 @@ describe('server getWeather', () => {
         { name: 'prázdný čas', body: { hourly: { ...upstreamWeather.hourly, time: [] } } },
         { name: 'neplatný den', body: { hourly: { ...upstreamWeather.hourly, is_day: [2] } } },
     ])('odmítne chybnou strukturu: $name', async ({ body }) => {
-        fetchMock.mockResolvedValueOnce(Response.json(body));
+        fetchMock.mockResolvedValueOnce(Response.json({ timezone: 'Europe/Prague', ...body }));
 
         await expect(getWeather(0, 0)).rejects.toThrow();
         expect(redisSet).not.toHaveBeenCalled();
@@ -206,7 +204,7 @@ describe('server getWeather', () => {
 
     it.each(['time', 'temperature_2m', 'apparent_temperature', 'weather_code', 'is_day'] as const)(
         'odmítne nestejnou délku pole %s', async field => {
-            fetchMock.mockResolvedValueOnce(Response.json({ hourly: { ...upstreamWeather.hourly,
+            fetchMock.mockResolvedValueOnce(Response.json({ timezone: 'Europe/Prague', hourly: { ...upstreamWeather.hourly,
                 [field]: [...upstreamWeather.hourly[field], upstreamWeather.hourly[field][0]],
             } }));
             await expect(getWeather(0, 0)).rejects.toThrow();
@@ -214,8 +212,26 @@ describe('server getWeather', () => {
         },
     );
 
+    it.each([undefined, '', null, 123])('odmítne chybějící nebo neplatnou timezone %s', async timezone => {
+        fetchMock.mockResolvedValueOnce(Response.json({ ...upstreamWeather, timezone }));
+
+        await expect(getWeather(0, 0)).rejects.toThrow();
+        expect(redisSet).not.toHaveBeenCalled();
+    });
+
+    it('cache bez timezone nahradí novou předpovědí', async () => {
+        redisGet.mockResolvedValueOnce({ hourly: validWeather.hourly });
+        fetchMock.mockResolvedValueOnce(Response.json(upstreamWeather));
+
+        await expect(getWeather(50.08, 14.43)).resolves.toEqual(validWeather);
+
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+        expect(redisSet).toHaveBeenCalledWith('babyweather:weather:openmeteo:v2:50.08:14.43:cs', validWeather, { ex: 300 });
+    });
+
     it.each([NaN, Infinity, -Infinity, null])('odmítne neplatnou číselnou hodnotu %s', async value => {
         fetchMock.mockResolvedValueOnce({ ok: true, json: async () => ({
+            timezone: 'Europe/Prague',
             hourly: { ...upstreamWeather.hourly, temperature_2m: [value] },
         }) } as Response);
         await expect(getWeather(0, 0)).rejects.toThrow();

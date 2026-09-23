@@ -9,6 +9,7 @@ const { getUser, getWeather, limit } = vi.hoisted(() => ({
 vi.mock('../server/rateLimit', () => ({ weatherRateLimit: { limit } }));
 
 const weatherData = {
+    timezone: 'Europe/Prague',
     hourly: [{
         temp: 285.5,
         feels_like: 283.2,

@@ -9,8 +9,8 @@ type TemperatureChartProps = {
 
 const BAR_FLOOR = 30;
 
-export default function TemperatureChart({ hourly }: TemperatureChartProps) {
-    const chartHours = hourly.slice(0, 12);
+export default function TemperatureChart({ hourly, timezone }: TemperatureChartProps & { timezone: string }) {
+    const chartHours = hourly;
     const chartTemps = chartHours.map(h => kelvinToRoundedCelsius(h.temp));
     const chartMin = Math.min(...chartTemps);
     const chartMax = Math.max(...chartTemps);
@@ -21,13 +21,13 @@ export default function TemperatureChart({ hourly }: TemperatureChartProps) {
     };
     const nowTemp = kelvinToRoundedCelsius(hourly[0].temp);
     const chartLabel =
-        `Temperature over the next 12 hours: now ${nowTemp}°C, ` +
+        `Temperature for the rest of today: now ${nowTemp}°C, ` +
         `low ${chartMin}°C, high ${chartMax}°C.`;
     return (
         <>
             <h2 className={styles.sectionTitle}>Temperature outlook</h2>
             <div className={styles.card}>
-                <p className={styles.chartNote}>Next 12 hours — plan layers around the cold morning.</p>
+                <p className={styles.chartNote}>Forecast for the rest of today.</p>
                 <div className={styles.chart} role="img" aria-label={chartLabel}>
                     {chartHours.map((hour, index) => {
                         const isNow = index === 0;
@@ -41,7 +41,7 @@ export default function TemperatureChart({ hourly }: TemperatureChartProps) {
                                     className={`${styles.bar} ${isNow ? styles.barNow : ''}`}
                                     style={{ height: `${barHeight(chartTemps[index])}%` }}
                                 />
-                                <span className={styles.hour}>{isNow ? 'Now' : formatHour(hour.dt)}</span>
+                                <span className={styles.hour}>{isNow ? 'Now' : formatHour(hour.dt, timezone)}</span>
                             </div>
                         );
                     })}

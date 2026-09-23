@@ -1,8 +1,10 @@
 import { z } from 'zod';
 import { redis } from './redis.js';
 import { mapOpenMeteoWeather } from './weatherMapping.js';
+import { timezoneSchema } from './timezoneSchema.js';
 
 const weatherSchema = z.object({
+    timezone: timezoneSchema,
     hourly: z.array(z.object({
         temp: z.number(),
         feels_like: z.number(),
@@ -15,7 +17,7 @@ const weatherSchema = z.object({
 });
 
 export async function getWeather(lat: number, lon: number) {
-    const cacheKey = `babyweather:weather:openmeteo:v1:${lat}:${lon}:cs`;
+    const cacheKey = `babyweather:weather:openmeteo:v2:${lat}:${lon}:cs`;
     const cached = await redis.get<unknown>(cacheKey);
 
     if (cached !== null) {
@@ -31,7 +33,7 @@ export async function getWeather(lat: number, lon: number) {
     url.searchParams.set('hourly', 'temperature_2m,apparent_temperature,weather_code,is_day');
     url.searchParams.set('forecast_hours', '48');
     url.searchParams.set('timeformat', 'unixtime');
-    url.searchParams.set('timezone', 'UTC');
+    url.searchParams.set('timezone', 'auto');
     url.searchParams.set('temperature_unit', 'celsius');
 
     const response = await fetch(url, {

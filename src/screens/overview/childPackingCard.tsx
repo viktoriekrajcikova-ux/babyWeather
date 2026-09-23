@@ -27,7 +27,7 @@ export default function ChildPackingCard({ child, clothes }: ChildPackingCardPro
                 </div>
             </div>
             <p className={styles.planHint}>
-                Warm layers for the morning, lighter by afternoon &mdash; {clothes.length} items to have ready.
+                Clothing for the rest of today &mdash; {clothes.length} items to have ready.
             </p>
             <ul className={styles.chips}>
                 {clothes.map(item => (

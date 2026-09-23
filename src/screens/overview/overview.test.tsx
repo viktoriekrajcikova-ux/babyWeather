@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -28,10 +28,11 @@ function row(overrides: Partial<Child>): Child {
 }
 
 const kelvin = (celsius: number) => celsius + 273.15;
+const forecastStart = new Date('2026-01-15T00:00:00+01:00').getTime() / 1000;
 const hour = (index: number, celsius: number) => ({
     temp: kelvin(celsius),
     feels_like: kelvin(celsius - 1),
-    dt: index * 3600,
+    dt: forecastStart + index * 3600,
     weather: [{ description: 'clouds', icon: '04d' }],
 });
 
@@ -41,7 +42,7 @@ function makeWeather(): WeatherData {
     hourly[0] = hour(0, 15); // Now
     hourly[3] = hour(3, 14); // denní minimum
     hourly[9] = hour(9, 16); // denní maximum
-    return { hourly };
+    return { hourly, timezone: 'Europe/Prague' };
 }
 
 function createWrapper() {
@@ -83,9 +84,16 @@ function createWrapper() {
 describe('Overview (integrační test)', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        // Freeze Date only; React Query and DOM wait helpers keep real timers.
+        vi.useFakeTimers({ toFake: ['Date'] });
+        vi.setSystemTime(new Date('2026-01-15T00:15:00+01:00'));
     });
 
-    it('zobrazí KPI, jména dětí a plán oblečení na celý den', async () => {
+    afterEach(() => {
+        vi.useRealTimers();
+    });
+
+    it('zobrazí KPI, jména dětí a plán oblečení na zbytek dne', async () => {
         vi.mocked(weatherApi.getData).mockResolvedValue(makeWeather());
         vi.mocked(supabaseApi.getChildren).mockResolvedValue([
             row({ id: 1, name: 'Ema', age: 4, sex: 'female' }),
@@ -121,7 +129,7 @@ describe('Overview (integrační test)', () => {
 
         render(<Overview />, { wrapper: createWrapper() });
 
-        const chart = await screen.findByRole('img', { name: /temperature over the next 12 hours/i });
+        const chart = await screen.findByRole('img', { name: /temperature for the rest of today/i });
         expect(chart).toBeInTheDocument();
     });
 

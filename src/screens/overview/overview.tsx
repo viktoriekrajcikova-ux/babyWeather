@@ -15,6 +15,7 @@ import styles from "./overview.module.scss";
 import TemperatureChart from './temperatureChart';
 import ChildPackingCard from './childPackingCard';
 import { formatHour } from './formatHour';
+import { getTodayForecast } from './getTodayForecast';
 
 function formatNames(children: Child[]): string {
     const names = children.map(c => c.name).filter(Boolean);
@@ -23,14 +24,11 @@ function formatNames(children: Child[]): string {
     return `${names.slice(0, -1).join(', ')} & ${names[names.length - 1]}`;
 }
 
-
-// Přes den se počasí mění, tak sbalím, co dítě potřebuje pro nejchladnější
-// i nejteplejší chvíli (teplé vrstvy na ráno, lehčí na odpoledne).
-function packForToday(child: Child, feelsMin: number, feelsMax: number): ClothesItem[] {
-    const atMin = getOutfit(feelsMin, child.age, child.sex);
-    const atMax = getOutfit(feelsMax, child.age, child.sex);
+ // Spojí oblečení pro všechny zbývající dnešní hodiny bez duplicit.
+function packForToday(child: Child, feels: number[]): ClothesItem[] {
+ const outfits = feels.flatMap(temp => getOutfit(temp, child.age, child.sex));
     const byName = new Map<string, ClothesItem>();
-    for (const item of [...atMin, ...atMax]) {
+    for (const item of outfits) {
         if (!byName.has(item.name)) {
             byName.set(item.name, item);
         }
@@ -76,6 +74,7 @@ const Overview = () => {
                 ) : (
                     <OverviewContent
                         hourly={weather.hourly}
+                        timezone={weather.timezone}
                         kids={children ?? []}
                         childrenError={childrenError ? 'Could not load children. Check your connection and try again.' : null}
                     />
@@ -88,12 +87,16 @@ const Overview = () => {
 
 interface OverviewContentProps {
     hourly: HourlyWeather[];
+    timezone: string;
     kids: Child[];
     childrenError: string | null;
 }
 
-const OverviewContent = ({ hourly, kids, childrenError }: OverviewContentProps) => {
-    const today = hourly.slice(0, 24);
+const OverviewContent = ({ hourly, timezone, kids, childrenError }: OverviewContentProps) => {
+    const today = getTodayForecast(hourly, timezone, new Date());
+    if (today.length === 0) {
+       return <p role="status">No forecast available for the rest of today.</p>;
+   }
 
 
     const temps = today.map(h => kelvinToRoundedCelsius(h.temp));
@@ -102,11 +105,9 @@ const OverviewContent = ({ hourly, kids, childrenError }: OverviewContentProps) 
 
     // oblečení plánuju podle pocitové teploty
     const feels = today.map(h => kelvinToRoundedCelsius(h.feels_like));
-    const feelsMin = Math.min(...feels);
-    const feelsMax = Math.max(...feels);
 
-    const nowTemp = kelvinToRoundedCelsius(hourly[0].temp);
-    const nowDescription = hourly[0].weather[0]?.description ?? '';
+    const nowTemp = kelvinToRoundedCelsius(today[0].temp);
+    const nowDescription = today[0].weather[0]?.description ?? '';
 
     const coldest = today.reduce((coldestSoFar, hour) =>
         hour.temp < coldestSoFar.temp ? hour : coldestSoFar,
@@ -136,11 +137,11 @@ const OverviewContent = ({ hourly, kids, childrenError }: OverviewContentProps) 
                 <div className={`${styles.tile} ${styles.accent}`}>
                     <span className={styles.label}>Feels like</span>
                     <span className={styles.value}>{feelsLikeColdest}<span className={styles.unit}>&deg;C</span></span>
-                    <span className={styles.sub}>Coldest at {formatHour(coldest.dt)}</span>
+                    <span className={styles.sub}>Coldest at {formatHour(coldest.dt, timezone)}</span>
                 </div>
             </section>
 
-            <TemperatureChart hourly={hourly} />
+            <TemperatureChart hourly={today} timezone={timezone} />
 
             <h2 className={styles.sectionTitle}>What to pack today</h2>
             {childrenError ? (
@@ -154,7 +155,7 @@ const OverviewContent = ({ hourly, kids, childrenError }: OverviewContentProps) 
             ) : (
                 <div className={styles.plan}>
                     {kids.map(child => {
-                        const clothes = packForToday(child, feelsMin, feelsMax);
+                        const clothes = packForToday(child, feels);
                         return (
                             <ChildPackingCard key={child.id} child={child} clothes={clothes} />
                         );

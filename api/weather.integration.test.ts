@@ -12,12 +12,13 @@ vi.mock('../server/redis', () => ({ redis: { get: redisGet, set: redisSet } }));
 
 const fetchMock = vi.fn<typeof fetch>();
 const upstream = {
+    timezone: 'Europe/Prague',
     hourly: {
         time: [1700000000], temperature_2m: [0], apparent_temperature: [-2],
         weather_code: [3], is_day: [1],
     },
 };
-const expected = { hourly: [{
+const expected = { timezone: 'Europe/Prague', hourly: [{
     dt: 1700000000, temp: 273.15, feels_like: 271.15,
     weather: [{ description: 'zataženo', icon: 'cloudy' }],
 }] };
@@ -54,11 +55,11 @@ describe('weather endpoint with real Open-Meteo adapter and cache flow', () => {
         expect(limit).toHaveBeenCalledWith('user-A');
         expect(redisGet).toHaveBeenCalledTimes(2);
         expect(fetchMock).toHaveBeenCalledTimes(1);
-        expect(redisSet).toHaveBeenCalledWith('babyweather:weather:openmeteo:v1:50:14:cs', expected, { ex: 300 });
+        expect(redisSet).toHaveBeenCalledWith('babyweather:weather:openmeteo:v2:50:14:cs', expected, { ex: 300 });
     });
 
     it('does not disclose cached weather when token verification fails', async () => {
-        cache.set('babyweather:weather:openmeteo:v1:50:14:cs', expected);
+        cache.set('babyweather:weather:openmeteo:v2:50:14:cs', expected);
         getUser.mockResolvedValueOnce({ data: { user: null }, error: { status: 401 } });
 
         const response = await weather.fetch(request());
@@ -70,7 +71,7 @@ describe('weather endpoint with real Open-Meteo adapter and cache flow', () => {
     });
 
     it('enforces the user limit even when weather is cached', async () => {
-        cache.set('babyweather:weather:openmeteo:v1:50:14:cs', expected);
+        cache.set('babyweather:weather:openmeteo:v2:50:14:cs', expected);
         limit.mockResolvedValueOnce({ success: false });
 
         const response = await weather.fetch(request());
@@ -81,7 +82,7 @@ describe('weather endpoint with real Open-Meteo adapter and cache flow', () => {
     });
 
     it('invalid provider arrays become a generic 502 and are not cached', async () => {
-        fetchMock.mockResolvedValueOnce(Response.json({ hourly: { ...upstream.hourly, apparent_temperature: [] } }));
+        fetchMock.mockResolvedValueOnce(Response.json({ ...upstream, hourly: { ...upstream.hourly, apparent_temperature: [] } }));
 
         const response = await weather.fetch(request());
 

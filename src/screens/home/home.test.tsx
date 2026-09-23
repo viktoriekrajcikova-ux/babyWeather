@@ -28,6 +28,7 @@ function row(overrides: Partial<Child>): Child {
 
 // 293.15 K = 20 °C
 const weatherAt20C: WeatherData = {
+    timezone: 'Europe/Prague',
     hourly: [
         { temp: 293.15, feels_like: 293.15, dt: 0, weather: [{ description: 'jasno', icon: '01d' }] },
     ],
@@ -90,6 +91,7 @@ describe('Home (integrační test)', () => {
     it('teplota z počasí protéká přes Kelvin→°C až do rady na oblečení', async () => {
         // 278.15 K = 5 °C → zimní oblečení
         vi.mocked(weatherApi.getData).mockResolvedValue({
+            timezone: 'Europe/Prague',
             hourly: [
                 { temp: 278.15, feels_like: 278.15, dt: 0, weather: [{ description: 'zataženo', icon: '04d' }] },
             ],

@@ -14,6 +14,7 @@ export type HourlyWeather = {
 
 export type WeatherData = {
     hourly: HourlyWeather[]
+    timezone: string
 }
 
 class WeatherApiClient {

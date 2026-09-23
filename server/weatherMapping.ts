@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { timezoneSchema } from './timezoneSchema.js';
 
 const conditions: Record<number, { description: string; icon: string }> = {
     0: { description: 'jasno', icon: 'clear' },
@@ -32,6 +33,7 @@ const conditions: Record<number, { description: string; icon: string }> = {
 };
 
 const openMeteoSchema = z.object({
+    timezone: timezoneSchema,
     hourly: z.object({
         time: z.array(z.number().int().nonnegative()).min(1),
         temperature_2m: z.array(z.number().finite()),
@@ -48,8 +50,9 @@ const openMeteoSchema = z.object({
 });
 
 export function mapOpenMeteoWeather(body: unknown) {
-    const { hourly } = openMeteoSchema.parse(body);
-    return { hourly: hourly.time.map((dt, index) => ({
+    const { hourly, timezone } = openMeteoSchema.parse(body);
+    return { timezone,
+        hourly: hourly.time.map((dt, index) => ({
         dt,
         temp: hourly.temperature_2m[index] + 273.15,
         feels_like: hourly.apparent_temperature[index] + 273.15,
