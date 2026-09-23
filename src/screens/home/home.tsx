@@ -11,6 +11,7 @@ import { useChildrenQuery } from "../../hooks/api/useChildrenQuery";
 import { useDeleteChild } from "../../hooks/api/useDeleteChild";
 import { useWeather } from "../../hooks/useWeather";
 import { kelvinToCelsius } from '../../model/temperature/temperature';
+import { formatHour } from '../overview/formatHour';
 import { useLocation } from '../../hooks/useLocation';
 import LocationSearch from "../../components/search/locationSearch";
 import type { WeatherData } from "../../weatherApiClient";
@@ -78,14 +79,14 @@ const HomeContent = ({ weather, childrenError, kids, onDeleteChild }: HomeConten
         <>
             <Row>
                 <Col xs={12}>
-                    {weatherForecast && <WeatherForecast weatherForecastHourly={weather.hourly.slice(0, 13)} onClickForecast={selectForecast}/>}
+                    {weatherForecast && <WeatherForecast weatherForecastHourly={weather.hourly.slice(0, 13)} timezone={weather.timezone} onClickForecast={selectForecast}/>}
                     <Weather
                         onClickWeatherForecast={() => (setWeatherForecast(!weatherForecast))}
                         forecastOpen={weatherForecast}
                         temperature={currentTemp}
                         describe={weather.hourly[selectedWeatherIndex].weather[0].description}
                         feelsLike={Math.round(kelvinToCelsius(weather.hourly[selectedWeatherIndex].feels_like))}
-                        timeForecast={selectedWeatherIndex > 0 && `Forecast for ${ new Date(weather.hourly[selectedWeatherIndex].dt * 1000).getHours()}:00`}
+                        timeForecast={selectedWeatherIndex > 0 && `Forecast for ${formatHour(weather.hourly[selectedWeatherIndex].dt, weather.timezone)}`}
                         icon={weather.hourly[selectedWeatherIndex].weather[0].icon}/>
                     {selectedWeatherIndex > 0 && (
                         <button type="button" className="current-weather" onClick={() => setSelectedWeatherIndex(0)}>

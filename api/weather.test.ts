@@ -14,7 +14,7 @@ const weatherData = {
         temp: 285.5,
         feels_like: 283.2,
         dt: 1700000000,
-        weather: [{ description: 'jasno', icon: '01d' }],
+        weather: [{ description: 'Clear sky', icon: '01d' }],
     }],
 };
 

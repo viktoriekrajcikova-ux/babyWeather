@@ -30,7 +30,7 @@ function row(overrides: Partial<Child>): Child {
 const weatherAt20C: WeatherData = {
     timezone: 'Europe/Prague',
     hourly: [
-        { temp: 293.15, feels_like: 293.15, dt: 0, weather: [{ description: 'jasno', icon: '01d' }] },
+        { temp: 293.15, feels_like: 293.15, dt: 0, weather: [{ description: 'Clear sky', icon: '01d' }] },
     ],
 };
 
@@ -93,7 +93,7 @@ describe('Home (integrační test)', () => {
         vi.mocked(weatherApi.getData).mockResolvedValue({
             timezone: 'Europe/Prague',
             hourly: [
-                { temp: 278.15, feels_like: 278.15, dt: 0, weather: [{ description: 'zataženo', icon: '04d' }] },
+                { temp: 278.15, feels_like: 278.15, dt: 0, weather: [{ description: 'Overcast', icon: '04d' }] },
             ],
         });
         vi.mocked(supabaseApi.getChildren).mockResolvedValue([
@@ -125,10 +125,10 @@ describe('Home (integrační test)', () => {
 
         render(<Home />, { wrapper: createWrapper() });
 
-        expect(await screen.findByText('jasno')).toBeVisible();
+        expect(await screen.findByText('Clear sky')).toBeVisible();
         expect(await screen.findByRole('alert')).toHaveTextContent('Could not load children');
         expect(screen.getByRole('alert')).toBeVisible();
-        expect(screen.getByText('jasno')).toBeVisible();
+        expect(screen.getByText('Clear sky')).toBeVisible();
     });
 
         it('při chybě počasí zobrazí chybu a nerenderuje děti', async () => {

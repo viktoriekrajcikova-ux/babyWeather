@@ -17,7 +17,7 @@ const weatherSchema = z.object({
 });
 
 export async function getWeather(lat: number, lon: number) {
-    const cacheKey = `babyweather:weather:openmeteo:v2:${lat}:${lon}:cs`;
+    const cacheKey = `babyweather:weather:openmeteo:v2:${lat}:${lon}:en`;
     const cached = await redis.get<unknown>(cacheKey);
 
     if (cached !== null) {

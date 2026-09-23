@@ -19,7 +19,7 @@ const validWeather = {
         temp: 285.15,
         feels_like: 283.15,
         dt: 1700000000,
-        weather: [{ description: 'jasno', icon: 'clear' }],
+        weather: [{ description: 'Clear sky', icon: 'clear' }],
     }],
 };
 
@@ -57,9 +57,9 @@ describe('server getWeather', () => {
             temperature_unit: 'celsius',
         });
         expect(options?.signal).toBeInstanceOf(AbortSignal);
-        expect(redisGet).toHaveBeenCalledWith('babyweather:weather:openmeteo:v2:50.08:14.43:cs');
+        expect(redisGet).toHaveBeenCalledWith('babyweather:weather:openmeteo:v2:50.08:14.43:en');
         expect(redisSet).toHaveBeenCalledTimes(1);
-        expect(redisSet).toHaveBeenCalledWith('babyweather:weather:openmeteo:v2:50.08:14.43:cs', validWeather, { ex: 300 });
+        expect(redisSet).toHaveBeenCalledWith('babyweather:weather:openmeteo:v2:50.08:14.43:en', validWeather, { ex: 300 });
     });
 
     it('platnou cache vrátí bez volání Open-Meteo a bez prodloužení expirace', async () => {
@@ -68,7 +68,7 @@ describe('server getWeather', () => {
         await expect(getWeather(50.08, 14.43)).resolves.toEqual(validWeather);
 
         expect(redisGet).toHaveBeenCalledTimes(1);
-        expect(redisGet).toHaveBeenCalledWith('babyweather:weather:openmeteo:v2:50.08:14.43:cs');
+        expect(redisGet).toHaveBeenCalledWith('babyweather:weather:openmeteo:v2:50.08:14.43:en');
         expect(fetchMock).not.toHaveBeenCalled();
         expect(redisSet).not.toHaveBeenCalled();
     });
@@ -80,7 +80,7 @@ describe('server getWeather', () => {
         await expect(getWeather(0, 0)).resolves.toEqual(validWeather);
 
         expect(fetchMock).toHaveBeenCalledTimes(1);
-        expect(redisSet).toHaveBeenCalledWith('babyweather:weather:openmeteo:v2:0:0:cs', validWeather, { ex: 300 });
+        expect(redisSet).toHaveBeenCalledWith('babyweather:weather:openmeteo:v2:0:0:en', validWeather, { ex: 300 });
     });
 
     it('různé souřadnice čtou různé klíče cache', async () => {
@@ -91,9 +91,9 @@ describe('server getWeather', () => {
         await getWeather(50, 15);
 
         expect(redisGet.mock.calls).toEqual([
-            ['babyweather:weather:openmeteo:v2:50:14:cs'],
-            ['babyweather:weather:openmeteo:v2:51:14:cs'],
-            ['babyweather:weather:openmeteo:v2:50:15:cs'],
+            ['babyweather:weather:openmeteo:v2:50:14:en'],
+            ['babyweather:weather:openmeteo:v2:51:14:en'],
+            ['babyweather:weather:openmeteo:v2:50:15:en'],
         ]);
         expect(fetchMock).not.toHaveBeenCalled();
     });
@@ -113,26 +113,26 @@ describe('server getWeather', () => {
 
         await expect(getWeather(0, 0)).rejects.toThrow('Redis write failed');
 
-        expect(redisSet).toHaveBeenCalledWith('babyweather:weather:openmeteo:v2:0:0:cs', validWeather, { ex: 300 });
+        expect(redisSet).toHaveBeenCalledWith('babyweather:weather:openmeteo:v2:0:0:en', validWeather, { ex: 300 });
     });
 
 
     it.each([
-        [0, 'clear', 'jasno'], [1, 'clear', 'převážně jasno'],
-        [2, 'partly-cloudy', 'polojasno'], [3, 'cloudy', 'zataženo'],
-        [45, 'fog', 'mlha'], [48, 'fog', 'mlha s námrazou'],
-        [51, 'drizzle', 'slabé mrholení'], [53, 'drizzle', 'mírné mrholení'],
-        [55, 'drizzle', 'silné mrholení'], [56, 'freezing-rain', 'slabé mrznoucí mrholení'],
-        [57, 'freezing-rain', 'silné mrznoucí mrholení'],
-        [61, 'rain', 'slabý déšť'], [63, 'rain', 'mírný déšť'], [65, 'rain', 'silný déšť'],
-        [66, 'freezing-rain', 'slabý mrznoucí déšť'], [67, 'freezing-rain', 'silný mrznoucí déšť'],
-        [71, 'snow', 'slabé sněžení'], [73, 'snow', 'mírné sněžení'], [75, 'snow', 'silné sněžení'],
-        [77, 'snow', 'sněhová zrna'], [80, 'showers', 'slabé dešťové přeháňky'],
-        [81, 'showers', 'mírné dešťové přeháňky'], [82, 'showers', 'silné dešťové přeháňky'],
-        [85, 'snow-showers', 'slabé sněhové přeháňky'], [86, 'snow-showers', 'silné sněhové přeháňky'],
-        [95, 'thunderstorm', 'bouřka'], [96, 'thunderstorm', 'bouřka se slabým krupobitím'],
-        [99, 'thunderstorm', 'bouřka se silným krupobitím'],
-    ])('mapuje WMO %s na český popis a kategorii i v noci', async (code, icon, description) => {
+        [0, 'clear', 'Clear sky'], [1, 'clear', 'Mainly clear'],
+        [2, 'partly-cloudy', 'Partly cloudy'], [3, 'cloudy', 'Overcast'],
+        [45, 'fog', 'Fog'], [48, 'fog', 'Depositing rime fog'],
+        [51, 'drizzle', 'Light drizzle'], [53, 'drizzle', 'Moderate drizzle'],
+        [55, 'drizzle', 'Dense drizzle'], [56, 'freezing-rain', 'Light freezing drizzle'],
+        [57, 'freezing-rain', 'Dense freezing drizzle'],
+        [61, 'rain', 'Slight rain'], [63, 'rain', 'Moderate rain'], [65, 'rain', 'Heavy rain'],
+        [66, 'freezing-rain', 'Light freezing rain'], [67, 'freezing-rain', 'Heavy freezing rain'],
+        [71, 'snow', 'Slight snowfall'], [73, 'snow', 'Moderate snowfall'], [75, 'snow', 'Heavy snowfall'],
+        [77, 'snow', 'Snow grains'], [80, 'showers', 'Slight rain showers'],
+        [81, 'showers', 'Moderate rain showers'], [82, 'showers', 'Violent rain showers'],
+        [85, 'snow-showers', 'Slight snow showers'], [86, 'snow-showers', 'Heavy snow showers'],
+        [95, 'thunderstorm', 'Thunderstorm'], [96, 'thunderstorm', 'Thunderstorm with slight hail'],
+        [99, 'thunderstorm', 'Thunderstorm with heavy hail'],
+    ])('mapuje WMO %s na anglický popis a kategorii i v noci', async (code, icon, description) => {
         fetchMock.mockResolvedValueOnce(Response.json({ timezone: 'Europe/Prague', hourly: {
             time: [1700000000, 1700003600], temperature_2m: [12, -5],
             apparent_temperature: [10, -8], weather_code: [code, code], is_day: [1, 0],
@@ -226,7 +226,7 @@ describe('server getWeather', () => {
         await expect(getWeather(50.08, 14.43)).resolves.toEqual(validWeather);
 
         expect(fetchMock).toHaveBeenCalledTimes(1);
-        expect(redisSet).toHaveBeenCalledWith('babyweather:weather:openmeteo:v2:50.08:14.43:cs', validWeather, { ex: 300 });
+        expect(redisSet).toHaveBeenCalledWith('babyweather:weather:openmeteo:v2:50.08:14.43:en', validWeather, { ex: 300 });
     });
 
     it.each([NaN, Infinity, -Infinity, null])('odmítne neplatnou číselnou hodnotu %s', async value => {

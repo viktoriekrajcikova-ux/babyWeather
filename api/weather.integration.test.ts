@@ -20,7 +20,7 @@ const upstream = {
 };
 const expected = { timezone: 'Europe/Prague', hourly: [{
     dt: 1700000000, temp: 273.15, feels_like: 271.15,
-    weather: [{ description: 'zataženo', icon: 'cloudy' }],
+    weather: [{ description: 'Overcast', icon: 'cloudy' }],
 }] };
 const request = () => new Request('https://example.test/api/weather?lat=50&lon=14', {
     headers: { Authorization: 'Bearer test-token' },
@@ -55,11 +55,11 @@ describe('weather endpoint with real Open-Meteo adapter and cache flow', () => {
         expect(limit).toHaveBeenCalledWith('user-A');
         expect(redisGet).toHaveBeenCalledTimes(2);
         expect(fetchMock).toHaveBeenCalledTimes(1);
-        expect(redisSet).toHaveBeenCalledWith('babyweather:weather:openmeteo:v2:50:14:cs', expected, { ex: 300 });
+        expect(redisSet).toHaveBeenCalledWith('babyweather:weather:openmeteo:v2:50:14:en', expected, { ex: 300 });
     });
 
     it('does not disclose cached weather when token verification fails', async () => {
-        cache.set('babyweather:weather:openmeteo:v2:50:14:cs', expected);
+        cache.set('babyweather:weather:openmeteo:v2:50:14:en', expected);
         getUser.mockResolvedValueOnce({ data: { user: null }, error: { status: 401 } });
 
         const response = await weather.fetch(request());
@@ -71,7 +71,7 @@ describe('weather endpoint with real Open-Meteo adapter and cache flow', () => {
     });
 
     it('enforces the user limit even when weather is cached', async () => {
-        cache.set('babyweather:weather:openmeteo:v2:50:14:cs', expected);
+        cache.set('babyweather:weather:openmeteo:v2:50:14:en', expected);
         limit.mockResolvedValueOnce({ success: false });
 
         const response = await weather.fetch(request());

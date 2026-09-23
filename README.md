@@ -1,88 +1,43 @@
 # babyWeather
 
-> Tells parents how to dress their child for the current weather.
-
-babyWeather pulls live weather data for a location, lets you manage profiles for
-your children, and recommends suitable clothing based on the temperature. Built
-as a portfolio project to demonstrate a clean, production-minded React +
-TypeScript codebase.
+A React and TypeScript portfolio app that helps parents plan clothing for their
+children using the weather forecast. Recommendations are a general guide, not
+medical advice.
 
 **Live demo:** https://baby-weather-sand.vercel.app
 
 ## Features
 
-**Authentication** - email/password sign-up & sign-in via Supabase Auth
-**Child profiles** - add, list and remove children (data scoped per user)
-**Live weather** - hourly forecast from Open-Meteo through authenticated server endpoints
-**Location search** - search any city; the selected location is remembered across visits
-**Clothing advice** - recommends what to dress the child in, based on temperature
-**Protected routes** - app content is only accessible when logged in
+- Email/password sign-up and sign-in
+- Add, list and remove child profiles
+- City search with saved coordinates (uses the first matching result)
+- Hourly weather and clothing suggestions based on feels-like temperature and child profile
+- Overview and packing list for the rest of today in the selected location's time zone
+- English weather descriptions and local forecast times on Home and Overview
 
 ## Tech stack
 
-| Area            | Choice                                          |
-| --------------- | ----------------------------------------------- |
-| Framework       | React 18 + TypeScript                           |
-| Build tool      | Vite 5                                           |
-| Routing         | React Router 6                                   |
-| Backend / Auth  | Supabase (Postgres + Auth + Row Level Security) |
-| Weather data    | Open-Meteo (non-commercial public API, no API key) |
-| API / cache     | Vercel Functions + Upstash Redis                |
-| Server state    | TanStack Query (React Query) v5                 |
-| Styling         | SCSS Modules + Bootstrap / react-bootstrap      |
-| Testing         | Vitest + React Testing Library                  |
-| CI              | GitHub Actions (lint + typecheck + tests)       |
-| Hosting         | Vercel                                          |
-
-## Architecture
-
-The codebase separates concerns into clear layers, which keeps business logic
-testable and UI components thin:
-
-**API clients** (`src/weatherApiClient.ts`, `src/supabaseApiClient.ts`,
-  `src/geocodingApiClient.ts`) - isolate all external calls. The rest of the
-  app calls same-origin weather/geocoding endpoints with its Supabase access token.
-  `api/` authenticates requests and limits usage; `server/` validates and caches
-  Open-Meteo responses. The existing UI weather contract uses kelvins and Unix
-  seconds; the server adapts Open-Meteo Celsius values before returning data.
-**Domain logic** (`src/model/clothesDeterminer.ts`) - the clothing
-  recommendation is a pure function, fully unit-tested and independent of React.
-**Data hooks** (`src/hooks/useWeather.ts`, `src/hooks/useChildren.ts`) -
-  wrap TanStack Query, so fetching, caching and loading/error states live in
-  one place. `useChildren` also performs an optimistic delete with rollback
-  on failure.
-**Auth context** (`src/context/AuthContext.tsx`) - provides the session and
-  auth actions to the whole app.
-**Row Level Security** (`supabase/migrations/`) - children are protected at
-  the database level, so a user can only ever read or write their own rows.
-
-The reasoning behind the notable technical choices is recorded in
-[`docs/DECISIONS.md`](docs/DECISIONS.md).
-
-The prioritized code-review backlog for interview preparation is in
-[`docs/INTERVIEW_READINESS.md`](docs/INTERVIEW_READINESS.md), including acceptance
-criteria and the verification baseline. Start there when continuing this work.
+React, TypeScript, Vite, React Router, TanStack Query, SCSS Modules and React Bootstrap.
+Supabase provides authentication and PostgreSQL; access to child records relies on
+database Row Level Security. Vercel functions authenticate and rate-limit weather
+requests, validate Open-Meteo data and cache forecasts in Upstash Redis.
 
 ## Getting started
 
-### Prerequisites
+Requires Node.js 22+, a configured Supabase project and Upstash Redis with a
+write-capable REST token. Open-Meteo's non-commercial public API needs no API key.
 
-- Node.js 22+
-- A [Supabase](https://supabase.com) project
-- An [Upstash Redis](https://upstash.com/) database (REST URL and write-capable REST token)
-- No weather API key or payment card is required for Open-Meteo's non-commercial public API
-
-### Setup
+Database setup is not yet fully reproducible: the migration in
+`supabase/migrations/` assumes an existing `children` table. A fresh Supabase
+project requires additional schema setup and verification of RLS policies.
 
 ```bash
-# 1. Install dependencies
-npm install
-
-# 2. Create a git-ignored .env.local file locally using the names below
+npm ci
 ```
 
-Set these variables locally and in Vercel project settings. Keep server credentials
-out of `VITE_*` variables. Never commit the actual values:
+Create a git-ignored `.env.local` with the following variables. Use the same
+Supabase project for client and server. Never expose a service-role key or Redis
+token through `VITE_*` variables, and never commit credentials.
 
 ```env
 VITE_SUPABASE_URL=https://your-project.supabase.co
@@ -93,55 +48,30 @@ UPSTASH_REDIS_REST_URL=https://your-database.upstash.io
 UPSTASH_REDIS_REST_TOKEN=your-write-capable-rest-token
 ```
 
-### Run
+Run the frontend and API functions together:
 
 ```bash
 npx vercel dev
 ```
 
-Use the URL printed by Vercel CLI. The first run may ask you to authenticate and
-link the Vercel project; do that interactively, not by sharing tokens in chat.
-`npm run dev` runs only Vite, and `npm run preview` serves only the static build:
-neither serves the `/api/weather` and `/api/geocoding` functions.
+The CLI may ask you to sign in and link a Vercel project. Ensure the variables
+above are available to the server process. `npm run dev` and `npm run preview`
+serve only the frontend, not the API functions. For deployment, configure the
+same variables in Vercel project settings.
 
-See [the Open-Meteo setup and review checklist](docs/OPEN_METEO_SETUP.md) for
-request flow, test boundaries, service limits and deployment verification.
-
-## Scripts
-
-| Command             | What it does                                  |
-| ------------------- | --------------------------------------------- |
-| `npm run dev`       | Start the dev server with hot reload          |
-| `npm run build`     | Build for production                          |
-| `npm run preview`   | Preview the production build locally          |
-| `npm run lint`      | Lint the codebase (ESLint, 0 warnings allowed)|
-| `npm run typecheck` | Type-check without emitting files (`tsc`)     |
-| `npm run test`      | Run tests in watch mode                       |
-| `npm run test:run`  | Run tests once (used in CI)                   |
-
-## Testing
-
-Tests use **Vitest** and **React Testing Library**, across three levels:
-
-- **Unit** - pure domain logic (`clothesDeterminer`, `temperature`), no mocks.
-- **Hook** - `useChildren` via `renderHook`, including the optimistic delete
-  and its rollback, with the network client mocked.
-- **Integration** - the whole `Home` screen (`home.test.tsx`) rendered with
-  only the network clients mocked, plus the login flow.
-
-Run them with:
+## Checks
 
 ```bash
 npm run test:run
+npm run typecheck
+npm run lint
+npm run lint:css
+npm run build
 ```
 
-## Continuous Integration
+Vitest and React Testing Library cover clothing rules, auth/cache behaviour,
+hooks, components and API handlers. External services are mocked; these tests
+do not verify live database permissions or deployment.
 
-Every push and pull request to `master` runs the quality gate on GitHub Actions:
-lint, type-check and tests must all pass before changes are considered safe to
-merge. See [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
-
-## Deployment
-
-The app is deployed on [Vercel](https://vercel.com). Environment variables are
-configured in the Vercel project settings (same keys as `.env`).
+GitHub Actions currently runs ESLint, typecheck and tests on pushes and pull
+requests to `master`. Build and CSS lint are separate local checks.
