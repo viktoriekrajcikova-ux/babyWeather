@@ -12,6 +12,7 @@ DB schema changes pro projekt `ashilhuaxwjvavxoehbs`.
 ## Proč soubory, když Supabase má dashboard
 
 Aby DB schema bylo **infrastructure as code**:
+
 - Code review pokrývá i DB změny
 - Historii dohledáš v `git log`, ne v dashboardu
 - Setup nového prostředí = projít migrace v pořadí, ne klikat v UI

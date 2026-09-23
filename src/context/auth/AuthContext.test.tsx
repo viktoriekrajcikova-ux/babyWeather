@@ -29,15 +29,26 @@ vi.mock('../../supabaseApiClient', () => ({
 function deferred<T>() {
   let resolve!: (value: T | PromiseLike<T>) => void;
   let reject!: (reason: Error) => void;
-  const promise = new Promise<T>((yes, no) => { resolve = yes; reject = no; });
+  const promise = new Promise<T>((yes, no) => {
+    resolve = yes;
+    reject = no;
+  });
   return { promise, resolve, reject };
 }
 
 function sessionFor(id: string): Session {
   return {
-    access_token: `token-${id}`, refresh_token: 'refresh', expires_in: 3600,
+    access_token: `token-${id}`,
+    refresh_token: 'refresh',
+    expires_in: 3600,
     token_type: 'bearer',
-    user: { id, app_metadata: {}, user_metadata: {}, aud: 'authenticated', created_at: '2026-01-01T00:00:00.000Z' },
+    user: {
+      id,
+      app_metadata: {},
+      user_metadata: {},
+      aud: 'authenticated',
+      created_at: '2026-01-01T00:00:00.000Z',
+    },
   };
 }
 
@@ -55,55 +66,87 @@ function ChildrenList() {
   return <div data-testid="children-list">{JSON.stringify(data) ?? 'čeká'}</div>;
 }
 
-
 function AuthProbe() {
   const { session, getAuthGeneration } = useAuth();
-  return <div data-testid="auth">{JSON.stringify({
-    id: session === undefined ? 'čeká' : session?.user.id ?? null,
-    token: session?.access_token, generation: getAuthGeneration(),
-  })}</div>;
+  return (
+    <div data-testid="auth">
+      {JSON.stringify({
+        id: session === undefined ? 'čeká' : (session?.user.id ?? null),
+        token: session?.access_token,
+        generation: getAuthGeneration(),
+      })}
+    </div>
+  );
 }
 
-function PrivateScreen({ showList, onAdd }: { showList: boolean; onAdd: (operation: Promise<void>) => void }) {
+function PrivateScreen({
+  showList,
+  onAdd,
+}: {
+  showList: boolean;
+  onAdd: (operation: Promise<void>) => void;
+}) {
   const { addChild } = useAddChild();
   const { deleteChild } = useDeleteChild();
-  return <div data-testid="private-content">
-    <button onClick={() => onAdd(addChild(newChild))}>Přidat</button>
-    <button onClick={() => deleteChild(1)}>Smazat</button>
-    {showList && <ChildrenList />}
-  </div>;
+  return (
+    <div data-testid="private-content">
+      <button onClick={() => onAdd(addChild(newChild))}>Přidat</button>
+      <button onClick={() => deleteChild(1)}>Smazat</button>
+      {showList && <ChildrenList />}
+    </div>
+  );
 }
 
 function setup({ showList = true, strict = false } = {}) {
-  const client = new QueryClient({ defaultOptions: {
-    queries: { retry: false, staleTime: Infinity }, mutations: { retry: false },
-  } });
+  const client = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false, staleTime: Infinity },
+      mutations: { retry: false },
+    },
+  });
   clients.push(client);
   let addOperation: Promise<void> | undefined;
-  const onAdd = (operation: Promise<void>) => { addOperation = operation; };
+  const onAdd = (operation: Promise<void>) => {
+    addOperation = operation;
+  };
   const tree = (list: boolean) => {
-    const content = <QueryClientProvider client={client}>
-      <AuthProvider>
-        <AuthProbe />
-        {/* Bez Routes zůstane hranice přítomná i po Navigate na /login. */}
-        <MemoryRouter>
-          <ProtectedRoute><PrivateScreen showList={list} onAdd={onAdd} /></ProtectedRoute>
-        </MemoryRouter>
-      </AuthProvider>
-    </QueryClientProvider>;
+    const content = (
+      <QueryClientProvider client={client}>
+        <AuthProvider>
+          <AuthProbe />
+          {/* Bez Routes zůstane hranice přítomná i po Navigate na /login. */}
+          <MemoryRouter>
+            <ProtectedRoute>
+              <PrivateScreen showList={list} onAdd={onAdd} />
+            </ProtectedRoute>
+          </MemoryRouter>
+        </AuthProvider>
+      </QueryClientProvider>
+    );
     return strict ? <StrictMode>{content}</StrictMode> : content;
   };
   const view = render(tree(showList));
-  return { client, ...view, showList: () => view.rerender(tree(true)), finishAdd: () => addOperation };
+  return {
+    client,
+    ...view,
+    showList: () => view.rerender(tree(true)),
+    finishAdd: () => addOperation,
+  };
 }
 
 function auth() {
-  return JSON.parse(screen.getByTestId('auth').textContent!) as { id: string | null; token?: string; generation: number };
+  return JSON.parse(screen.getByTestId('auth').textContent!) as {
+    id: string | null;
+    token?: string;
+    generation: number;
+  };
 }
 
 async function emit(event: AuthChangeEvent, session: Session | null, subscription = 0) {
   const callback = vi.mocked(supabase.auth.onAuthStateChange).mock.calls[subscription][0];
-  await act(async () => { await callback(event, session); });
+  await act(async () => {
+    await callback(event, session);
+  });
 }
 
 function expectList(children: Child[]) {
@@ -113,7 +156,9 @@ function expectList(children: Child[]) {
 describe('AuthProvider se sdílenou cache dětí', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(supabase.auth.getSession).mockReset().mockResolvedValue({ data: { session: sessionA }, error: null });
+    vi.mocked(supabase.auth.getSession)
+      .mockReset()
+      .mockResolvedValue({ data: { session: sessionA }, error: null });
     vi.mocked(supabaseApi.getChildren).mockReset().mockResolvedValue(childrenA);
     vi.mocked(supabaseApi.addChild).mockReset();
     vi.mocked(supabaseApi.deleteChild).mockReset();
@@ -121,7 +166,7 @@ describe('AuthProvider se sdílenou cache dětí', () => {
 
   afterEach(() => {
     cleanup();
-    clients.splice(0).forEach(client => client.clear());
+    clients.splice(0).forEach((client) => client.clear());
     vi.restoreAllMocks();
   });
 
@@ -145,7 +190,10 @@ describe('AuthProvider se sdílenou cache dětí', () => {
   });
 
   it('ProtectedRoute bez přihlášení nepřipojí soukromou obrazovku a nenačítá děti', async () => {
-    vi.mocked(supabase.auth.getSession).mockResolvedValueOnce({ data: { session: null }, error: null });
+    vi.mocked(supabase.auth.getSession).mockResolvedValueOnce({
+      data: { session: null },
+      error: null,
+    });
     const { client } = setup();
 
     await waitFor(() => expect(auth().id).toBeNull());
@@ -159,33 +207,43 @@ describe('AuthProvider se sdílenou cache dětí', () => {
     { name: 'přímé přepnutí A → B', logout: false, next: sessionB, expected: childrenB },
     { name: 'A → odhlášení → B', logout: true, next: sessionB, expected: childrenB },
     { name: 'nové přihlášení stejného A', logout: true, next: sessionA, expected: freshChildrenA },
-  ])('$name skryje staré děti i během čekání na nový seznam', async ({ logout, next, expected }) => {
-    const pending = deferred<Child[]>();
-    vi.mocked(supabaseApi.getChildren).mockResolvedValueOnce(childrenA).mockReturnValueOnce(pending.promise);
-    const { client } = setup();
-    await waitFor(() => expectList(childrenA));
-    const original = client.getQueryCache().find({ queryKey: key, exact: true });
-    if (logout) {
-      await emit('SIGNED_OUT', null);
-      expect(auth().id).toBeNull();
-      expect(screen.queryByTestId('private-content')).not.toBeInTheDocument();
-      expect(client.getQueryState(key)).toBeUndefined();
-    }
-    await emit('SIGNED_IN', next);
-    await waitFor(() => expect(supabaseApi.getChildren).toHaveBeenCalledTimes(2));
-    expect(screen.getByTestId('children-list')).toHaveTextContent('čeká');
-    expect(screen.queryByText('Ema', { exact: false })).not.toBeInTheDocument();
-    expect(client.getQueryData(key)).toBeUndefined();
-    expect(client.getQueryCache().find({ queryKey: key, exact: true })).not.toBe(original);
-    await act(async () => { pending.resolve(expected); await pending.promise; });
-    await waitFor(() => expectList(expected));
-    expect(client.getQueryData(key)).toEqual(expected);
-  });
+  ])(
+    '$name skryje staré děti i během čekání na nový seznam',
+    async ({ logout, next, expected }) => {
+      const pending = deferred<Child[]>();
+      vi.mocked(supabaseApi.getChildren)
+        .mockResolvedValueOnce(childrenA)
+        .mockReturnValueOnce(pending.promise);
+      const { client } = setup();
+      await waitFor(() => expectList(childrenA));
+      const original = client.getQueryCache().find({ queryKey: key, exact: true });
+      if (logout) {
+        await emit('SIGNED_OUT', null);
+        expect(auth().id).toBeNull();
+        expect(screen.queryByTestId('private-content')).not.toBeInTheDocument();
+        expect(client.getQueryState(key)).toBeUndefined();
+      }
+      await emit('SIGNED_IN', next);
+      await waitFor(() => expect(supabaseApi.getChildren).toHaveBeenCalledTimes(2));
+      expect(screen.getByTestId('children-list')).toHaveTextContent('čeká');
+      expect(screen.queryByText('Ema', { exact: false })).not.toBeInTheDocument();
+      expect(client.getQueryData(key)).toBeUndefined();
+      expect(client.getQueryCache().find({ queryKey: key, exact: true })).not.toBe(original);
+      await act(async () => {
+        pending.resolve(expected);
+        await pending.promise;
+      });
+      await waitFor(() => expectList(expected));
+      expect(client.getQueryData(key)).toEqual(expected);
+    },
+  );
 
-  it.each([false, true])('opožděný fetch A nepřepíše B (přes odhlášení: %s)', async logout => {
+  it.each([false, true])('opožděný fetch A nepřepíše B (přes odhlášení: %s)', async (logout) => {
     const oldFetch = deferred<Child[]>();
     const newFetch = deferred<Child[]>();
-    vi.mocked(supabaseApi.getChildren).mockReturnValueOnce(oldFetch.promise).mockReturnValueOnce(newFetch.promise);
+    vi.mocked(supabaseApi.getChildren)
+      .mockReturnValueOnce(oldFetch.promise)
+      .mockReturnValueOnce(newFetch.promise);
     const { client } = setup();
     await waitFor(() => expect(supabaseApi.getChildren).toHaveBeenCalledTimes(1));
     if (logout) {
@@ -196,9 +254,15 @@ describe('AuthProvider se sdílenou cache dětí', () => {
     await emit('SIGNED_IN', sessionB);
     await waitFor(() => expect(supabaseApi.getChildren).toHaveBeenCalledTimes(2));
     expect(screen.getByTestId('children-list')).toHaveTextContent('čeká');
-    await act(async () => { newFetch.resolve(childrenB); await newFetch.promise; });
+    await act(async () => {
+      newFetch.resolve(childrenB);
+      await newFetch.promise;
+    });
     await waitFor(() => expectList(childrenB));
-    await act(async () => { oldFetch.resolve(childrenA); await oldFetch.promise; });
+    await act(async () => {
+      oldFetch.resolve(childrenA);
+      await oldFetch.promise;
+    });
     expectList(childrenB);
     expect(client.getQueryData(key)).toEqual(childrenB);
     expect(client.isFetching()).toBe(0);
@@ -206,18 +270,38 @@ describe('AuthProvider se sdílenou cache dětí', () => {
 
   it.each([
     { name: 'po odhlášení neobnoví cache', next: null, logout: true, expected: null },
-    { name: 'po opětovném přihlášení A nepřepíše nová data', next: sessionA, logout: true, expected: freshChildrenA },
-    { name: 'po přímém přepnutí na B nepřepíše jeho děti', next: sessionB, logout: false, expected: childrenB },
-    { name: 'po odhlášení a přihlášení B nepřepíše jeho děti', next: sessionB, logout: true, expected: childrenB },
+    {
+      name: 'po opětovném přihlášení A nepřepíše nová data',
+      next: sessionA,
+      logout: true,
+      expected: freshChildrenA,
+    },
+    {
+      name: 'po přímém přepnutí na B nepřepíše jeho děti',
+      next: sessionB,
+      logout: false,
+      expected: childrenB,
+    },
+    {
+      name: 'po odhlášení a přihlášení B nepřepíše jeho děti',
+      next: sessionB,
+      logout: true,
+      expected: childrenB,
+    },
   ])('opožděný rollback $name', async ({ next, logout, expected }) => {
     const deletion = deferred<void>();
     const unexpectedRefetch = deferred<Child[]>();
     vi.mocked(supabaseApi.deleteChild).mockReturnValueOnce(deletion.promise);
-    vi.mocked(supabaseApi.getChildren).mockReturnValue(unexpectedRefetch.promise).mockResolvedValueOnce(childrenA);
+    vi.mocked(supabaseApi.getChildren)
+      .mockReturnValue(unexpectedRefetch.promise)
+      .mockResolvedValueOnce(childrenA);
     const { client } = setup();
     await waitFor(() => expectList(childrenA));
     fireEvent.click(screen.getByRole('button', { name: 'Smazat' }));
-    await waitFor(() => { expect(supabaseApi.deleteChild).toHaveBeenCalledWith(1); expectList([]); });
+    await waitFor(() => {
+      expect(supabaseApi.deleteChild).toHaveBeenCalledWith(1);
+      expectList([]);
+    });
     expect(client.getQueryData(key)).toEqual([]);
     expect(client.isMutating()).toBe(1);
     if (logout) {
@@ -231,7 +315,10 @@ describe('AuthProvider se sdílenou cache dětí', () => {
       await waitFor(() => expectList(expected));
     }
     const calls = vi.mocked(supabaseApi.getChildren).mock.calls.length;
-    await act(async () => { deletion.reject(new Error('delete failed')); await deletion.promise.catch(() => {}); });
+    await act(async () => {
+      deletion.reject(new Error('delete failed'));
+      await deletion.promise.catch(() => {});
+    });
     await waitFor(() => expect(client.isMutating()).toBe(0));
     expect(supabaseApi.getChildren).toHaveBeenCalledTimes(calls);
     if (expected) {
@@ -244,45 +331,51 @@ describe('AuthProvider se sdílenou cache dětí', () => {
     }
   });
 
-  it.each([false, true])('změna přihlášení během await cancelQueries zabrání zápisu onMutate (B: %s)', async switchToB => {
-    const gate = deferred<void>();
-    vi.mocked(supabaseApi.deleteChild).mockResolvedValue(undefined);
-    const { client } = setup();
-    await waitFor(() => expectList(childrenA));
-    const realCancel = client.cancelQueries.bind(client);
-    const cancel = vi.spyOn(client, 'cancelQueries').mockImplementationOnce(async (...args) => {
-      await realCancel(...args);
-      await gate.promise;
-    });
-    try {
-      fireEvent.click(screen.getByRole('button', { name: 'Smazat' }));
-      await waitFor(() => expect(cancel).toHaveBeenCalledWith({ queryKey: key }));
-      expect(supabaseApi.deleteChild).not.toHaveBeenCalled();
-      expect(client.isMutating()).toBe(1);
-      expect(client.getQueryData(key)).toEqual(childrenA);
-      await emit('SIGNED_OUT', null);
-      expect(client.getQueryState(key)).toBeUndefined();
-      if (switchToB) {
-        vi.mocked(supabaseApi.getChildren).mockResolvedValue(childrenB);
-        await emit('SIGNED_IN', sessionB);
-        await waitFor(() => expectList(childrenB));
-      }
-      await act(async () => { gate.resolve(); await gate.promise; });
-      await waitFor(() => expect(client.isMutating()).toBe(0));
-      if (switchToB) {
-        expectList(childrenB);
-        expect(client.getQueryData(key)).toEqual(childrenB);
-        expect(client.getQueryState(key)?.isInvalidated).toBe(false);
-      } else {
+  it.each([false, true])(
+    'změna přihlášení během await cancelQueries zabrání zápisu onMutate (B: %s)',
+    async (switchToB) => {
+      const gate = deferred<void>();
+      vi.mocked(supabaseApi.deleteChild).mockResolvedValue(undefined);
+      const { client } = setup();
+      await waitFor(() => expectList(childrenA));
+      const realCancel = client.cancelQueries.bind(client);
+      const cancel = vi.spyOn(client, 'cancelQueries').mockImplementationOnce(async (...args) => {
+        await realCancel(...args);
+        await gate.promise;
+      });
+      try {
+        fireEvent.click(screen.getByRole('button', { name: 'Smazat' }));
+        await waitFor(() => expect(cancel).toHaveBeenCalledWith({ queryKey: key }));
+        expect(supabaseApi.deleteChild).not.toHaveBeenCalled();
+        expect(client.isMutating()).toBe(1);
+        expect(client.getQueryData(key)).toEqual(childrenA);
+        await emit('SIGNED_OUT', null);
         expect(client.getQueryState(key)).toBeUndefined();
-        expect(screen.queryByTestId('children-list')).not.toBeInTheDocument();
+        if (switchToB) {
+          vi.mocked(supabaseApi.getChildren).mockResolvedValue(childrenB);
+          await emit('SIGNED_IN', sessionB);
+          await waitFor(() => expectList(childrenB));
+        }
+        await act(async () => {
+          gate.resolve();
+          await gate.promise;
+        });
+        await waitFor(() => expect(client.isMutating()).toBe(0));
+        if (switchToB) {
+          expectList(childrenB);
+          expect(client.getQueryData(key)).toEqual(childrenB);
+          expect(client.getQueryState(key)?.isInvalidated).toBe(false);
+        } else {
+          expect(client.getQueryState(key)).toBeUndefined();
+          expect(screen.queryByTestId('children-list')).not.toBeInTheDocument();
+        }
+      } finally {
+        gate.resolve();
+        await waitFor(() => expect(client.isMutating()).toBe(0));
+        cancel.mockRestore();
       }
-    } finally {
-      gate.resolve();
-      await waitFor(() => expect(client.isMutating()).toBe(0));
-      cancel.mockRestore();
-    }
-  });
+    },
+  );
 
   it.each([
     { name: 'bez změny přihlášení obnoví dotaz', next: null, logout: false },
@@ -293,7 +386,9 @@ describe('AuthProvider se sdílenou cache dětí', () => {
     const addition = deferred<void>();
     const refetch = deferred<Child[]>();
     vi.mocked(supabaseApi.addChild).mockReturnValueOnce(addition.promise);
-    vi.mocked(supabaseApi.getChildren).mockReturnValue(refetch.promise).mockResolvedValueOnce(childrenA);
+    vi.mocked(supabaseApi.getChildren)
+      .mockReturnValue(refetch.promise)
+      .mockResolvedValueOnce(childrenA);
     const app = setup();
     await waitFor(() => expectList(childrenA));
     fireEvent.click(screen.getByRole('button', { name: 'Přidat' }));
@@ -311,7 +406,10 @@ describe('AuthProvider se sdílenou cache dětí', () => {
     }
     const calls = vi.mocked(supabaseApi.getChildren).mock.calls.length;
     expect(app.client.getQueryState(key)?.isInvalidated).toBe(false);
-    await act(async () => { addition.resolve(); await app.finishAdd(); });
+    await act(async () => {
+      addition.resolve();
+      await app.finishAdd();
+    });
     await waitFor(() => expect(app.client.isMutating()).toBe(0));
     expect(app.client.getQueryState(key)?.isInvalidated).toBe(next === null);
     expect(supabaseApi.getChildren).toHaveBeenCalledTimes(calls + (next ? 0 : 1));
@@ -319,39 +417,49 @@ describe('AuthProvider se sdílenou cache dětí', () => {
     expectList(next ? expected : childrenA);
   });
 
-  it.each([false, true])('přidávání bez původního seznamu respektuje pozdější seznam (nové přihlášení A: %s)', async relogin => {
-    const addition = deferred<void>();
-    const refetch = deferred<Child[]>();
-    vi.mocked(supabaseApi.addChild).mockReturnValueOnce(addition.promise);
-    vi.mocked(supabaseApi.getChildren).mockReturnValue(refetch.promise).mockResolvedValueOnce(freshChildrenA);
-    const app = setup({ showList: false });
-    await waitFor(() => expect(auth().id).toBe('user-A'));
-    expect(app.client.getQueryState(key)).toBeUndefined();
-    fireEvent.click(screen.getByRole('button', { name: 'Přidat' }));
-    await waitFor(() => expect(supabaseApi.addChild).toHaveBeenCalledWith(newChild));
-    expect(supabaseApi.getChildren).not.toHaveBeenCalled();
-    if (relogin) {
-      await emit('SIGNED_OUT', null);
+  it.each([false, true])(
+    'přidávání bez původního seznamu respektuje pozdější seznam (nové přihlášení A: %s)',
+    async (relogin) => {
+      const addition = deferred<void>();
+      const refetch = deferred<Child[]>();
+      vi.mocked(supabaseApi.addChild).mockReturnValueOnce(addition.promise);
+      vi.mocked(supabaseApi.getChildren)
+        .mockReturnValue(refetch.promise)
+        .mockResolvedValueOnce(freshChildrenA);
+      const app = setup({ showList: false });
+      await waitFor(() => expect(auth().id).toBe('user-A'));
       expect(app.client.getQueryState(key)).toBeUndefined();
-      await emit('SIGNED_IN', { ...sessionA, access_token: 'nové-přihlášení' });
-    }
-    app.showList();
-    await waitFor(() => expectList(freshChildrenA));
-    expect(app.client.isMutating()).toBe(1);
-    expect(app.client.getQueryState(key)?.isInvalidated).toBe(false);
-    await act(async () => { addition.resolve(); await app.finishAdd(); });
-    await waitFor(() => expect(app.client.isMutating()).toBe(0));
-    expect(supabaseApi.getChildren).toHaveBeenCalledTimes(relogin ? 1 : 2);
-    expect(app.client.getQueryState(key)?.isInvalidated).toBe(!relogin);
-    expect(app.client.getQueryData(key)).toEqual(freshChildrenA);
-    expectList(freshChildrenA);
-  });
+      fireEvent.click(screen.getByRole('button', { name: 'Přidat' }));
+      await waitFor(() => expect(supabaseApi.addChild).toHaveBeenCalledWith(newChild));
+      expect(supabaseApi.getChildren).not.toHaveBeenCalled();
+      if (relogin) {
+        await emit('SIGNED_OUT', null);
+        expect(app.client.getQueryState(key)).toBeUndefined();
+        await emit('SIGNED_IN', { ...sessionA, access_token: 'nové-přihlášení' });
+      }
+      app.showList();
+      await waitFor(() => expectList(freshChildrenA));
+      expect(app.client.isMutating()).toBe(1);
+      expect(app.client.getQueryState(key)?.isInvalidated).toBe(false);
+      await act(async () => {
+        addition.resolve();
+        await app.finishAdd();
+      });
+      await waitFor(() => expect(app.client.isMutating()).toBe(0));
+      expect(supabaseApi.getChildren).toHaveBeenCalledTimes(relogin ? 1 : 2);
+      expect(app.client.getQueryState(key)?.isInvalidated).toBe(!relogin);
+      expect(app.client.getQueryData(key)).toEqual(freshChildrenA);
+      expectList(freshChildrenA);
+    },
+  );
 
   it('obnovení tokenu stejného účtu zachová dotaz, generaci i platnost rozpracované mutace', async () => {
     const addition = deferred<void>();
     const refetch = deferred<Child[]>();
     vi.mocked(supabaseApi.addChild).mockReturnValueOnce(addition.promise);
-    vi.mocked(supabaseApi.getChildren).mockResolvedValueOnce(childrenA).mockReturnValue(refetch.promise);
+    vi.mocked(supabaseApi.getChildren)
+      .mockResolvedValueOnce(childrenA)
+      .mockReturnValue(refetch.promise);
     const app = setup();
     await waitFor(() => expectList(childrenA));
     const original = app.client.getQueryCache().find({ queryKey: key, exact: true });
@@ -365,7 +473,10 @@ describe('AuthProvider se sdílenou cache dětí', () => {
     expect(screen.getByTestId('children-list')).toBe(list);
     expectList(childrenA);
     expect(supabaseApi.getChildren).toHaveBeenCalledTimes(1);
-    await act(async () => { addition.resolve(); await app.finishAdd(); });
+    await act(async () => {
+      addition.resolve();
+      await app.finishAdd();
+    });
     await waitFor(() => expect(app.client.isMutating()).toBe(0));
     expect(app.client.getQueryState(key)?.isInvalidated).toBe(true);
     expect(supabaseApi.getChildren).toHaveBeenCalledTimes(2);
@@ -394,12 +505,16 @@ describe('AuthProvider se sdílenou cache dětí', () => {
     const { client } = setup();
     expect(auth().id).toBe('čeká');
     expect(supabaseApi.getChildren).not.toHaveBeenCalled();
-    expect(vi.mocked(supabase.auth.onAuthStateChange).mock.invocationCallOrder[0])
-      .toBeLessThan(vi.mocked(supabase.auth.getSession).mock.invocationCallOrder[0]);
+    expect(vi.mocked(supabase.auth.onAuthStateChange).mock.invocationCallOrder[0]).toBeLessThan(
+      vi.mocked(supabase.auth.getSession).mock.invocationCallOrder[0],
+    );
     await emit(event, next);
     if (next) await waitFor(() => expectList(childrenB));
     const generation = auth().generation;
-    await act(async () => { lookup.resolve({ data: { session: sessionA }, error: null }); await lookup.promise; });
+    await act(async () => {
+      lookup.resolve({ data: { session: sessionA }, error: null });
+      await lookup.promise;
+    });
     expect(auth().id).toBe(next?.user.id ?? null);
     expect(auth().generation).toBe(generation);
     if (next) {
@@ -416,13 +531,17 @@ describe('AuthProvider se sdílenou cache dětí', () => {
     const lookup = deferred<Awaited<ReturnType<typeof supabase.auth.getSession>>>();
     vi.mocked(supabase.auth.getSession).mockReturnValueOnce(lookup.promise);
     const app = setup();
-    const unsubscribe = vi.mocked(supabase.auth.onAuthStateChange).mock.results[0].value.data.subscription.unsubscribe;
+    const unsubscribe = vi.mocked(supabase.auth.onAuthStateChange).mock.results[0].value.data
+      .subscription.unsubscribe;
     app.unmount();
     expect(unsubscribe).toHaveBeenCalledTimes(1);
     app.client.setQueryData(key, childrenB);
     const remove = vi.spyOn(app.client, 'removeQueries');
     await emit('SIGNED_OUT', null);
-    await act(async () => { lookup.resolve({ data: { session: sessionA }, error: null }); await lookup.promise; });
+    await act(async () => {
+      lookup.resolve({ data: { session: sessionA }, error: null });
+      await lookup.promise;
+    });
     expect(remove).not.toHaveBeenCalled();
     expect(app.client.getQueryData(key)).toEqual(childrenB);
     expect(supabaseApi.getChildren).not.toHaveBeenCalled();
@@ -431,19 +550,28 @@ describe('AuthProvider se sdílenou cache dětí', () => {
   it('StrictMode nedovolí prvnímu efektu přepsat session druhého efektu starým lookupem ani callbackem', async () => {
     const oldLookup = deferred<Awaited<ReturnType<typeof supabase.auth.getSession>>>();
     const currentLookup = deferred<Awaited<ReturnType<typeof supabase.auth.getSession>>>();
-    vi.mocked(supabase.auth.getSession).mockReturnValueOnce(oldLookup.promise).mockReturnValueOnce(currentLookup.promise);
+    vi.mocked(supabase.auth.getSession)
+      .mockReturnValueOnce(oldLookup.promise)
+      .mockReturnValueOnce(currentLookup.promise);
     vi.mocked(supabaseApi.getChildren).mockResolvedValue(childrenB);
     const { client } = setup({ strict: true });
     expect(supabase.auth.getSession).toHaveBeenCalledTimes(2);
-    const oldSubscription = vi.mocked(supabase.auth.onAuthStateChange).mock.results[0].value.data.subscription;
+    const oldSubscription = vi.mocked(supabase.auth.onAuthStateChange).mock.results[0].value.data
+      .subscription;
     expect(oldSubscription.unsubscribe).toHaveBeenCalledTimes(1);
     // Druhý efekt nedostal auth událost: starý lookup musí blokovat jeho vlastní active flag.
-    await act(async () => { currentLookup.resolve({ data: { session: sessionB }, error: null }); await currentLookup.promise; });
+    await act(async () => {
+      currentLookup.resolve({ data: { session: sessionB }, error: null });
+      await currentLookup.promise;
+    });
     await waitFor(() => expectList(childrenB));
     const generation = auth().generation;
     const query = client.getQueryCache().find({ queryKey: key, exact: true });
     await emit('SIGNED_OUT', null, 0);
-    await act(async () => { oldLookup.resolve({ data: { session: sessionA }, error: null }); await oldLookup.promise; });
+    await act(async () => {
+      oldLookup.resolve({ data: { session: sessionA }, error: null });
+      await oldLookup.promise;
+    });
     expect(auth().id).toBe('user-B');
     expect(auth().generation).toBe(generation);
     expectList(childrenB);

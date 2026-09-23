@@ -28,20 +28,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const {
       data: { subscription },
-    } =    supabase.auth.onAuthStateChange((event, nextSession) => {
-    if (!active) return;
-    authEventReceived = true;
-     const nextUserId = nextSession?.user.id ?? null;
-     const identityChanged = previousUserId.current !== nextUserId;
+    } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      if (!active) return;
+      authEventReceived = true;
+      const nextUserId = nextSession?.user.id ?? null;
+      const identityChanged = previousUserId.current !== nextUserId;
 
-     if (event === 'SIGNED_OUT' || identityChanged) {
-       authGeneration.current += 1;
-       queryClient.removeQueries({ queryKey: ChildrenKeys.all });
-     }
+      if (event === 'SIGNED_OUT' || identityChanged) {
+        authGeneration.current += 1;
+        queryClient.removeQueries({ queryKey: ChildrenKeys.all });
+      }
 
-     previousUserId.current = nextUserId;
-     setSession(nextSession);
-   });
+      previousUserId.current = nextUserId;
+      setSession(nextSession);
+    });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!active || authEventReceived) return;
@@ -49,10 +49,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setSession(session);
     });
 
-   return () => {
-     active = false;
-     subscription.unsubscribe();
-   };
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
   }, [queryClient]);
 
   const signIn = async (email: string, password: string) => {
