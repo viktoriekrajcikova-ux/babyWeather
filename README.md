@@ -22,6 +22,20 @@ Supabase provides authentication and PostgreSQL; access to child records relies 
 database Row Level Security. Vercel functions authenticate and rate-limit weather
 requests, validate Open-Meteo data and cache forecasts in Upstash Redis.
 
+## Project structure
+
+- `src/app/`: router, providers, Query Client and application layout
+- `src/pages/`: route-level screens and their local components
+- `src/features/`: auth, children, weather, location and clothing
+- `src/components/`: domain-independent UI
+- `src/lib/` and `src/api/`: shared client initialization and authenticated HTTP transport
+- `src/types/`, `src/assets/` and `src/tests/`: database types, static assets and test setup
+- `api/`: Vercel entrypoints for `/api/weather` and `/api/geocoding`
+- `server/`: server-only handlers, provider adapters, schemas, infrastructure and tests
+
+Test suites live in `tests/` folders within their feature, page or server domain;
+shared HTTP transport tests live in `src/api/tests/`.
+
 ## Getting started
 
 Requires Node.js 22+, a configured Supabase project and Upstash Redis with a
@@ -58,6 +72,17 @@ The CLI may ask you to sign in and link a Vercel project. Ensure the variables
 above are available to the server process. `npm run dev` and `npm run preview`
 serve only the frontend, not the API functions. For deployment, configure the
 same variables in Vercel project settings.
+
+## Formatting
+
+Format the project with Prettier (including Markdown, excluding ignored files):
+
+```bash
+npm run format
+```
+
+To check formatting without changing files, run `npm run format:check`.
+`npm run lint` and `npm run lint:css` report lint issues without modifying files.
 
 ## Checks
 
