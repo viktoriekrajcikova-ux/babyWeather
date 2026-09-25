@@ -22,6 +22,8 @@ const Home = () => {
     setCoords({
       lat: locationQuery.data.lat,
       lon: locationQuery.data.lon,
+      name: locationQuery.data.name,
+      country: locationQuery.data.country,
     });
   }, [locationQuery.data, setCoords]);
 
@@ -47,6 +49,10 @@ const Home = () => {
   const { data: children, isError } = useChildrenQuery();
   const { mutate: deleteChild } = useDeleteChildMutation();
 
+  const locationLabel = coords.name
+    ? [coords.name, coords.country].filter(Boolean).join(', ')
+    : `${coords.lat}, ${coords.lon}`;
+
   return (
     <>
       <Header />
@@ -65,12 +71,15 @@ const Home = () => {
             Could not load weather
           </div>
         ) : (
-          <HomeContent
-            weather={weather}
-            kids={children ?? []}
-            childrenError={isError ? 'Could not load children' : null}
-            onDeleteChild={deleteChild}
-          />
+          <>
+            <p>Weather for {locationLabel}</p>
+            <HomeContent
+              weather={weather}
+              kids={children ?? []}
+              childrenError={isError ? 'Could not load children' : null}
+              onDeleteChild={deleteChild}
+            />
+          </>
         )}
         <DataAttribution />
       </Container>

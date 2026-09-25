@@ -3,7 +3,14 @@ import { useState, useEffect } from 'react';
 const STORAGE_KEY = 'babyweather:coords';
 const DEFAULT_COORDS = { lat: 49.3547, lon: 17.8694 };
 
-function readStoredCoords(): { lat: number; lon: number } {
+type SelectedLocation = {
+  lat: number;
+  lon: number;
+  name?: string;
+  country?: string;
+};
+
+function readStoredCoords(): SelectedLocation {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) return DEFAULT_COORDS;
   try {

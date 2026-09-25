@@ -17,6 +17,10 @@ const Overview = () => {
   } = useWeatherQuery(coords);
   const { data: children, isPending: childrenLoading, isError: childrenError } = useChildrenQuery();
 
+  const locationLabel = coords.name
+    ? [coords.name, coords.country].filter(Boolean).join(', ')
+    : `${coords.lat}, ${coords.lon}`;
+
   return (
     <>
       <Header />
@@ -33,14 +37,19 @@ const Overview = () => {
             Could not load weather. Check your connection and try again.
           </div>
         ) : (
-          <OverviewContent
-            hourly={weather.hourly}
-            timezone={weather.timezone}
-            kids={children ?? []}
-            childrenError={
-              childrenError ? 'Could not load children. Check your connection and try again.' : null
-            }
-          />
+          <>
+            <p>Weather for {locationLabel}</p>
+            <OverviewContent
+              hourly={weather.hourly}
+              timezone={weather.timezone}
+              kids={children ?? []}
+              childrenError={
+                childrenError
+                  ? 'Could not load children. Check your connection and try again.'
+                  : null
+              }
+            />
+          </>
         )}
         <DataAttribution />
       </Container>
