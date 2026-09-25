@@ -30,7 +30,7 @@ const Child = ({ name, sex, allClothes, id, onClickDelete }: ChildProps) => {
         >
           <X size={20} strokeWidth={2} />
         </button>
-        <Image className={styles.img} src={urlAvatar} alt="" roundedCircle />
+        {urlAvatar && <Image className={styles.img} src={urlAvatar} alt="" roundedCircle />}
         <h2 className={styles.name}>{name}</h2>
         <ul className={styles.clothes}>
           {allClothes.map((clothes, key) => (

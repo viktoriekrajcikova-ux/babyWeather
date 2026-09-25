@@ -46,8 +46,8 @@ const Home = () => {
     isPending: weatherLoading,
     isError: weatherError,
   } = useWeatherQuery(coords);
-  const { data: children, isError } = useChildrenQuery();
-  const { mutate: deleteChild } = useDeleteChildMutation();
+  const { data: children, isError: childrenError } = useChildrenQuery();
+  const { mutate: deleteChild, isError: deleteError } = useDeleteChildMutation();
 
   const locationLabel = coords.name
     ? [coords.name, coords.country].filter(Boolean).join(', ')
@@ -62,6 +62,11 @@ const Home = () => {
           <p>Today&apos;s weather and what to dress your kids in.</p>
         </div>
         <LocationSearch onSearch={searchLocation} loading={locationLoading} error={locationError} />
+        {deleteError && (
+          <div className={styles.alert} role="alert">
+            Could not remove child. Please try again.
+          </div>
+        )}
         {weatherLoading ? (
           <p className={styles.status} role="status">
             Loading…
@@ -76,7 +81,7 @@ const Home = () => {
             <HomeContent
               weather={weather}
               kids={children ?? []}
-              childrenError={isError ? 'Could not load children' : null}
+              childrenError={childrenError ? 'Could not load children' : null}
               onDeleteChild={deleteChild}
             />
           </>

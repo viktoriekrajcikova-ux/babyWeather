@@ -19,20 +19,20 @@ const weatherForecast = ({
     <>
       <h2 className="text-center mt-5">12 hours ahead forecast</h2>
       <ul className={styles.list}>
-        {weatherForecastHourly.map((weatherForecastHourlyItem, key) => (
-          <li key={key} onClick={() => onClickForecast(key)}>
-            <div>
+        {weatherForecastHourly.map((weatherForecastHourlyItem, index) => (
+          <li key={weatherForecastHourlyItem.dt}>
+            <button type="button" onClick={() => onClickForecast(index)}>
               <WeatherIcon
                 icon={weatherForecastHourlyItem.weather[0]?.icon ?? ''}
                 description={weatherForecastHourlyItem.weather[0]?.description ?? ''}
               />
-            </div>
-            {Math.round(kelvinToCelsius(weatherForecastHourlyItem.temp))} °C
-            {key === 0 ? (
-              <div>Now</div>
-            ) : (
-              <div>{formatHour(weatherForecastHourlyItem.dt, timezone)}</div>
-            )}
+              {Math.round(kelvinToCelsius(weatherForecastHourlyItem.temp))} °C
+              {index === 0 ? (
+                <div>Now</div>
+              ) : (
+                <div>{formatHour(weatherForecastHourlyItem.dt, timezone)}</div>
+              )}
+            </button>
           </li>
         ))}
       </ul>
