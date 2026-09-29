@@ -6,6 +6,20 @@ medical advice.
 
 **Live demo:** https://baby-weather-sand.vercel.app
 
+## Screenshots
+
+### Home
+
+Home with weather and clothing suggestions.
+
+![Home](./docs/images/home.png)
+
+### Overview
+
+Today's forecast and clothing packing list.
+
+![Overview](./docs/images/overview.png)
+
 ## Features
 
 - Email/password sign-up and sign-in
@@ -14,6 +28,14 @@ medical advice.
 - Hourly weather and clothing suggestions based on feels-like temperature and child profile
 - Overview and packing list for the rest of today in the selected location's time zone
 - English weather descriptions and local forecast times on Home and Overview
+
+## Example workflow
+
+1. Sign up and sign in.
+2. Add a child profile with their name and age.
+3. Search for your city on Home.
+4. Select a forecast hour to see clothing suggestions.
+5. Open Overview to see the forecast and packing list for the rest of today.
 
 ## Tech stack
 
