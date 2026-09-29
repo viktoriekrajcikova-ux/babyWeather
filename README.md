@@ -98,5 +98,5 @@ Vitest and React Testing Library cover clothing rules, auth/cache behaviour,
 hooks, components and API handlers. External services are mocked; these tests
 do not verify live database permissions or deployment.
 
-GitHub Actions currently runs ESLint, typecheck and tests on pushes and pull
-requests to `master`. Build and CSS lint are separate local checks.
+  GitHub Actions runs ESLint, CSS lint, typecheck, tests and a production
+  build on pushes and pull requests to master.

@@ -36,3 +36,9 @@ jobs:
 
       - name: Test
         run: npm run test:run
+
+      - name: CSS lint
+        run: npm run lint:css
+
+      - name: Build
+        run: npm run build
