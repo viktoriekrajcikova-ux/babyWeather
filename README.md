@@ -48,7 +48,7 @@ requests, validate Open-Meteo data and cache forecasts in Upstash Redis.
 
 - `src/app/`: router, providers, Query Client and application layout
 - `src/pages/`: route-level screens and their local components
-- `src/features/`: auth, children, weather, location and clothing
+- `src/modules/`: auth, children, weather, location and clothing
 - `src/components/`: domain-independent UI
 - `src/lib/` and `src/api/`: shared client initialization and authenticated HTTP transport
 - `src/types/`, `src/assets/` and `src/tests/`: database types, static assets and test setup
@@ -62,10 +62,6 @@ shared HTTP transport tests live in `src/api/tests/`.
 
 Requires Node.js 22+, a configured Supabase project and Upstash Redis with a
 write-capable REST token. Open-Meteo's non-commercial public API needs no API key.
-
-Database setup is not yet fully reproducible: the migration in
-`supabase/migrations/` assumes an existing `children` table. A fresh Supabase
-project requires additional schema setup and verification of RLS policies.
 
 ```bash
 npm ci

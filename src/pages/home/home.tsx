@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Container } from 'react-bootstrap';
 import Header from '../../app/layout/header';
-import DataAttribution from '../../features/weather/components/dataAttribution';
-import { useChildrenQuery } from '../../features/children/hooks/useChildrenQuery';
-import { useDeleteChildMutation } from '../../features/children/hooks/useDeleteChildMutation';
-import { useWeatherQuery } from '../../features/weather/hooks/useWeatherQuery';
-import { useSearchCityQuery } from '../../features/location/hooks/useSearchCityQuery';
-import LocationSearch from '../../features/location/components/locationSearch';
+import DataAttribution from '../../modules/weather/components/dataAttribution';
+import { useChildrenQuery } from '../../modules/children/hooks/useChildrenQuery';
+import { useDeleteChildMutation } from '../../modules/children/hooks/useDeleteChildMutation';
+import { useWeatherQuery } from '../../modules/weather/hooks/useWeatherQuery';
+import { useSearchCityQuery } from '../../modules/location/hooks/useSearchCityQuery';
+import LocationSearch from '../../modules/location/components/locationSearch';
 import styles from './home.module.scss';
-import { useSelectedCoords } from '../../features/location/hooks/useSelectedCoords';
-import HomeContent from './homeContent';
+import { useSelectedCoords } from '../../modules/location/hooks/useSelectedCoords';
+import HomeContent from './components/homeContent';
 
 const Home = () => {
   const [searchedCity, setSearchedCity] = useState('');

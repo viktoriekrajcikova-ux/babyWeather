@@ -1,12 +1,12 @@
 import { Container } from 'react-bootstrap';
 import Header from '../../app/layout/header';
-import DataAttribution from '../../features/weather/components/dataAttribution';
-import { useChildrenQuery } from '../../features/children/hooks/useChildrenQuery';
-import { useWeatherQuery } from '../../features/weather/hooks/useWeatherQuery';
+import DataAttribution from '../../modules/weather/components/dataAttribution';
+import { useChildrenQuery } from '../../modules/children/hooks/useChildrenQuery';
+import { useWeatherQuery } from '../../modules/weather/hooks/useWeatherQuery';
 import styles from './overview.module.scss';
-import { useSelectedCoords } from '../../features/location/hooks/useSelectedCoords';
-import OverviewSkeleton from './overviewSkeleton';
-import OverviewContent from './overviewContent';
+import { useSelectedCoords } from '../../modules/location/hooks/useSelectedCoords';
+import OverviewSkeleton from './components/overviewSkeleton';
+import OverviewContent from './components/overviewContent';
 
 const Overview = () => {
   const { coords } = useSelectedCoords();

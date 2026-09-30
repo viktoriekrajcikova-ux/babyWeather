@@ -1,15 +1,15 @@
 import { Link } from 'react-router-dom';
 import { Baby } from 'lucide-react';
-import { packForToday } from '../../features/clothing/helpers/packForToday';
-import { kelvinToRoundedCelsius } from '../../features/weather/helpers/temperature';
-import type { HourlyWeather } from '../../features/weather/weather.types';
-import type { Child } from '../../features/children/child';
-import { formatHour } from '../../features/weather/helpers/formatHour';
-import { getTodayForecast } from '../../features/weather/helpers/getTodayForecast';
+import { packForToday } from '../../../modules/clothing/helpers/packForToday';
+import { kelvinToRoundedCelsius } from '../../../modules/weather/helpers/temperature';
+import type { HourlyWeather } from '../../../modules/weather/weather.types';
+import type { Child } from '../../../modules/children/children.types';
+import { formatHour } from '../../../modules/weather/helpers/formatHour';
+import { getTodayForecast } from '../../../modules/weather/helpers/getTodayForecast';
 import TemperatureChart from './temperatureChart';
 import ChildPackingCard from './childPackingCard';
-import styles from './overview.module.scss';
-import { formatNames } from './helpers/formatNames';
+import styles from '../overview.module.scss';
+import { formatNames } from '../helpers/formatNames';
 
 interface OverviewContentProps {
   hourly: HourlyWeather[];

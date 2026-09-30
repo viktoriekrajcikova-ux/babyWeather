@@ -11,7 +11,7 @@ vi.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
 }));
 
-vi.mock('../../../features/auth/hooks/useAuth', () => ({
+vi.mock('../../../modules/auth/hooks/useAuth', () => ({
   useAuth: () => ({ signIn: mockSignIn, signUp: mockSignUp }),
 }));
 

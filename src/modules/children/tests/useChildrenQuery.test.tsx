@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 import { useChildrenQuery } from '../hooks/useChildrenQuery';
 import { useDeleteChildMutation } from '../hooks/useDeleteChildMutation';
 import { childrenApi } from '../api/childrenApi';
-import type { Child } from '../child';
+import type { Child } from '../children.types';
 import { useAuth } from '../../auth/hooks/useAuth';
 import type { Session } from '@supabase/supabase-js';
 import { ChildrenKeys } from '../childrenQueryKeys';

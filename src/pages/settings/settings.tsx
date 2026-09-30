@@ -1,4 +1,4 @@
-import AddChildForm from '../../features/children/components/addChildForm/addChildForm';
+import AddChildForm from '../../modules/children/components/addChildForm/addChildForm';
 import Header from '../../app/layout/header';
 import { Container } from 'react-bootstrap';
 

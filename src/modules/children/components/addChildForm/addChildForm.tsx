@@ -8,7 +8,7 @@ import { useAddChildMutation } from '../../hooks/useAddChildMutation';
 import Message from '../../../../components/message/message';
 import { useNavigate } from 'react-router-dom';
 import styles from './addChildForm.module.scss';
-import { addChildSchema } from '../../addChildForm.schema';
+import { addChildSchema } from './addChildForm.schema';
 import { z } from 'zod';
 
 type FieldErrors = {

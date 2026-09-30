@@ -1,4 +1,4 @@
-import type { Sex } from '../children/child';
+import type { Sex } from '../children/children.types';
 import type { ClothesItem } from './clothing.types';
 import { CLOTHES } from './clothesCatalog';
 

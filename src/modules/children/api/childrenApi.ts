@@ -1,6 +1,6 @@
 import { supabase } from '../../../lib/supabase';
 import type { Tables, TablesInsert } from '../../../types/database';
-import type { Child, Sex } from '../child';
+import type { Child, Sex } from '../children.types';
 
 function toSex(value: string | null): Sex | null {
   return value === 'male' || value === 'female' ? value : null;

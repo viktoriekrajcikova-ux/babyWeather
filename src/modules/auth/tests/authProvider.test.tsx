@@ -13,7 +13,7 @@ import { useAddChildMutation } from '../../children/hooks/useAddChildMutation';
 import { useDeleteChildMutation } from '../../children/hooks/useDeleteChildMutation';
 import { ChildrenKeys } from '../../children/childrenQueryKeys';
 import ProtectedRoute from '../components/protectedRoute';
-import type { Child } from '../../children/child';
+import type { Child } from '../../children/children.types';
 
 vi.mock('../../children/api/childrenApi', () => ({
   childrenApi: { getChildren: vi.fn(), deleteChild: vi.fn(), addChild: vi.fn() },

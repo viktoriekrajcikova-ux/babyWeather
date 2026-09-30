@@ -3,7 +3,7 @@ import Home from '../pages/home/home';
 import Overview from '../pages/overview/overview';
 import Settings from '../pages/settings/settings';
 import Login from '../pages/login/login';
-import ProtectedRoute from '../features/auth/components/protectedRoute';
+import ProtectedRoute from '../modules/auth/components/protectedRoute';
 
 const App = () => {
   return (

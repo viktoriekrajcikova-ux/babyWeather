@@ -1,4 +1,4 @@
-import styles from './overview.module.scss';
+import styles from '../overview.module.scss';
 
 const OverviewSkeleton = () => (
   <>

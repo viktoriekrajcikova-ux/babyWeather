@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 vi.mock('../../lib/supabase', () => ({ supabase: { auth: { getSession: vi.fn() } } }));
 import { supabase } from '../../lib/supabase';
-import { weatherApi } from '../../features/weather/api/weatherApiClient';
-import { geocodingApi } from '../../features/location/api/geocodingApiClient';
+import { weatherApi } from '../../modules/weather/api/weatherApiClient';
+import { geocodingApi } from '../../modules/location/api/geocodingApiClient';
 const fetchMock = vi.fn();
 const session = (token: string) =>
   ({ data: { session: { access_token: token } }, error: null }) as Awaited<

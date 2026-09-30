@@ -4,7 +4,7 @@ import {
   childAgeSchema,
   childNameSchema,
   childSexSchema,
-} from '../addChildForm.schema';
+} from '../components/addChildForm/addChildForm.schema';
 
 it('odstraní krajní mezery ze jména', () => {
   const name = childNameSchema.parse('  Ema  ');

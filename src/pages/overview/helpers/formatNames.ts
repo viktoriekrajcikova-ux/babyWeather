@@ -1,4 +1,4 @@
-import type { Child } from '../../../features/children/child';
+import type { Child } from '../../../modules/children/children.types';
 
 export function formatNames(children: Child[]): string {
   const names = children.map((c) => c.name).filter(Boolean);

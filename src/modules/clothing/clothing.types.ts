@@ -1,4 +1,4 @@
-import type { Sex } from '../children/child';
+import type { Sex } from '../children/children.types';
 
 export type BodySlot = 'head' | 'torso' | 'legs' | 'feet' | 'hands' | 'wholeBody';
 

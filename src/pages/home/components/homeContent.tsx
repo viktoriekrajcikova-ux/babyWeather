@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import { ArrowLeft } from 'lucide-react';
-import Child from '../../features/children/components/child/child';
-import Weather from '../../features/weather/components/weather';
-import WeatherForecast from '../../features/weather/components/weatherForecast';
-import { getOutfit } from '../../features/clothing/clothesDeterminer';
-import { kelvinToCelsius } from '../../features/weather/helpers/temperature';
-import { formatHour } from '../../features/weather/helpers/formatHour';
-import type { WeatherData } from '../../features/weather/weather.types';
-import type { Child as ChildModel } from '../../features/children/child';
-import styles from './home.module.scss';
+import Child from '../../../modules/children/components/child/child';
+import Weather from '../../../modules/weather/components/weather';
+import WeatherForecast from '../../../modules/weather/components/weatherForecast';
+import { getOutfit } from '../../../modules/clothing/clothesDeterminer';
+import { kelvinToCelsius } from '../../../modules/weather/helpers/temperature';
+import { formatHour } from '../../../modules/weather/helpers/formatHour';
+import type { WeatherData } from '../../../modules/weather/weather.types';
+import type { Child as ChildModel } from '../../../modules/children/children.types';
+import styles from '../home.module.scss';
 
 interface HomeContentProps {
   weather: WeatherData;

@@ -1,7 +1,7 @@
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../features/auth/hooks/useAuth';
+import { useAuth } from '../../modules/auth/hooks/useAuth';
 import styles from './login.module.scss';
 
 const Login = () => {

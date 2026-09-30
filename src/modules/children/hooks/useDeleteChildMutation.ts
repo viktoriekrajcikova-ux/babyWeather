@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { childrenApi } from '../api/childrenApi';
-import type { Child } from '../child';
+import type { Child } from '../children.types';
 import { ChildrenKeys } from '../childrenQueryKeys';
 
 export function useDeleteChildMutation() {

@@ -1,7 +1,7 @@
-import type { HourlyWeather } from '../../features/weather/weather.types';
-import { kelvinToRoundedCelsius } from '../../features/weather/helpers/temperature';
-import styles from './overview.module.scss';
-import { formatHour } from '../../features/weather/helpers/formatHour';
+import type { HourlyWeather } from '../../../modules/weather/weather.types';
+import { kelvinToRoundedCelsius } from '../../../modules/weather/helpers/temperature';
+import styles from '../overview.module.scss';
+import { formatHour } from '../../../modules/weather/helpers/formatHour';
 
 type TemperatureChartProps = {
   hourly: HourlyWeather[];

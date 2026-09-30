@@ -7,7 +7,7 @@ import { useChildrenQuery } from '../hooks/useChildrenQuery';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { childrenApi } from '../api/childrenApi';
 import { ChildrenKeys } from '../childrenQueryKeys';
-import type { Child } from '../child';
+import type { Child } from '../children.types';
 
 vi.mock('../api/childrenApi', () => ({
   childrenApi: {

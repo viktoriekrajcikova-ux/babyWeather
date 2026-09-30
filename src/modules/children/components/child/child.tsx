@@ -1,4 +1,4 @@
-import type { Sex } from '../../child';
+import type { Sex } from '../../children.types';
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import styles from './child.module.scss';

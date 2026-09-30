@@ -1,6 +1,6 @@
-import type { Child } from '../../features/children/child';
-import type { ClothesItem } from '../../features/clothing/clothing.types';
-import styles from './overview.module.scss';
+import type { Child } from '../../../modules/children/children.types';
+import type { ClothesItem } from '../../../modules/clothing/clothing.types';
+import styles from '../overview.module.scss';
 
 const boyAvatar = 'assets/img/boy.png';
 const girlAvatar = 'assets/img/girl.png';

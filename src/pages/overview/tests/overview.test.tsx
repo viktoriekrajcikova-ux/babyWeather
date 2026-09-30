@@ -3,25 +3,25 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
-import type { Child } from '../../../features/children/child';
-import type { WeatherData } from '../../../features/weather/weather.types';
-import { AuthContext, type AuthContextValue } from '../../../features/auth/authContext';
+import type { Child } from '../../../modules/children/children.types';
+import type { WeatherData } from '../../../modules/weather/weather.types';
+import { AuthContext, type AuthContextValue } from '../../../modules/auth/authContext';
 
-vi.mock('../../../features/weather/api/weatherApiClient', () => ({
+vi.mock('../../../modules/weather/api/weatherApiClient', () => ({
   weatherApi: { getData: vi.fn() },
 }));
-vi.mock('../../../features/children/api/childrenApi', () => ({
+vi.mock('../../../modules/children/api/childrenApi', () => ({
   childrenApi: { getChildren: vi.fn(), addChild: vi.fn(), deleteChild: vi.fn() },
 }));
-vi.mock('../../../features/location/api/geocodingApiClient', () => ({
+vi.mock('../../../modules/location/api/geocodingApiClient', () => ({
   geocodingApi: { geocode: vi.fn() },
 }));
 
 vi.mock('../../../app/layout/header', () => ({ default: () => null }));
 
 import Overview from '../overview';
-import { weatherApi } from '../../../features/weather/api/weatherApiClient';
-import { childrenApi } from '../../../features/children/api/childrenApi';
+import { weatherApi } from '../../../modules/weather/api/weatherApiClient';
+import { childrenApi } from '../../../modules/children/api/childrenApi';
 
 function row(overrides: Partial<Child>): Child {
   return { id: 0, name: '', age: 0, sex: null, ...overrides };

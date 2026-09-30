@@ -2,7 +2,7 @@ import { Container, Row, Col } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import styles from './header.module.scss';
 import { House, ChartColumn, Settings, LogOut } from 'lucide-react';
-import { useAuth } from '../../features/auth/hooks/useAuth';
+import { useAuth } from '../../modules/auth/hooks/useAuth';
 
 const Header = () => {
   const { signOut } = useAuth();
