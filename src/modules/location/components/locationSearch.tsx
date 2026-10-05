@@ -1,21 +1,41 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './locationSearch.module.scss';
+import type { GeocodingResult } from '../api/geocodingApiClient';
+import { useSearchCityQuery } from '../hooks/useSearchCityQuery';
 
 type LocationSearchProps = {
-  onSearch: (city: string) => void;
-  loading: boolean;
-  error: string | null;
+  onLocationSelect: (location: GeocodingResult) => void;
 };
 
-const LocationSearch = ({ onSearch, loading, error }: LocationSearchProps) => {
+const LocationSearch = ({ onLocationSelect }: LocationSearchProps) => {
   const [city, setCity] = useState('');
+  const [searchedCity, setSearchedCity] = useState('');
+  const locationQuery = useSearchCityQuery(searchedCity);
+
+  const searchLocation = (city: string) => {
+    const trimmedCity = city.trim();
+    if (!trimmedCity) return;
+
+    if (trimmedCity === searchedCity) {
+      void locationQuery.refetch();
+      return;
+    }
+
+    setSearchedCity(trimmedCity);
+  };
+
+  useEffect(() => {
+    if (!locationQuery.data) return;
+
+    onLocationSelect(locationQuery.data);
+  }, [locationQuery.data, onLocationSelect]);
 
   return (
     <form
       className={styles.form}
       onSubmit={(e) => {
         e.preventDefault();
-        onSearch(city);
+        searchLocation(city);
       }}
     >
       <input
@@ -26,12 +46,12 @@ const LocationSearch = ({ onSearch, loading, error }: LocationSearchProps) => {
         placeholder="Enter a city"
         aria-label="City"
       />
-      <button type="submit" className={styles.button} disabled={loading}>
-        {loading ? 'Searching…' : 'Search'}
+      <button type="submit" className={styles.button} disabled={locationQuery.isFetching}>
+        {locationQuery.isFetching ? 'Searching…' : 'Search'}
       </button>
-      {error && (
+      {locationQuery.isError && (
         <div className={styles.error} role="alert">
-          {error}
+          Could not find that location
         </div>
       )}
     </form>
