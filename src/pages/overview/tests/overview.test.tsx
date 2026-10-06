@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { ToastProvider } from '../../../components/toast/toastProvider';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
@@ -74,7 +76,9 @@ function createWrapper() {
   const Wrapper = ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={queryClient}>
       <AuthContext.Provider value={auth}>
-        <MemoryRouter>{children}</MemoryRouter>
+        <ToastProvider>
+          <MemoryRouter>{children}</MemoryRouter>
+        </ToastProvider>
       </AuthContext.Provider>
     </QueryClientProvider>
   );
@@ -146,11 +150,49 @@ describe('Overview (integrační test)', () => {
   });
 
   it('při chybě počasí zobrazí alert', async () => {
+    const user = userEvent.setup();
     vi.mocked(weatherApi.getData).mockRejectedValue(new Error('500'));
     vi.mocked(childrenApi.getChildren).mockResolvedValue([]);
 
     render(<Overview />, { wrapper: createWrapper() });
 
     expect(await screen.findByRole('alert')).toHaveTextContent(/could not load weather/i);
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+    await waitFor(() => expect(screen.queryByRole('alert')).not.toBeInTheDocument());
+    expect(screen.getByText('Weather is currently unavailable.')).toBeVisible();
+    // This suite freezes Date; give the next failure its own query timestamp.
+    vi.setSystemTime(new Date('2026-01-15T00:15:01+01:00'));
+    await user.click(screen.getByRole('button', { name: 'Try again' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent(/could not load weather/i);
+    vi.mocked(weatherApi.getData).mockResolvedValue(makeWeather());
+    await user.click(screen.getByRole('button', { name: 'Try again' }));
+    expect(await screen.findByText('Today')).toBeVisible();
+    await waitFor(() => expect(screen.queryByRole('alert')).not.toBeInTheDocument());
   });
+
+  it.each([false, true])(
+    'retries children without a false empty state (no forecast: %s)',
+    async (noForecast) => {
+      const user = userEvent.setup();
+      vi.mocked(weatherApi.getData).mockResolvedValue(
+        noForecast ? { hourly: [], timezone: 'Europe/Prague' } : makeWeather(),
+      );
+      vi.mocked(childrenApi.getChildren).mockRejectedValue(new Error('children failed'));
+      render(<Overview />, { wrapper: createWrapper() });
+      expect(await screen.findByText('Could not load children')).toBeVisible();
+      expect(screen.queryByText('No children yet')).not.toBeInTheDocument();
+      expect(screen.queryByRole('link', { name: 'Add child' })).not.toBeInTheDocument();
+      await user.click(screen.getByRole('button', { name: 'Close' }));
+      await waitFor(() => expect(screen.queryByRole('alert')).not.toBeInTheDocument());
+      vi.mocked(childrenApi.getChildren).mockResolvedValue([
+        row({ id: 1, name: 'Ema', age: 4, sex: 'female' }),
+      ]);
+      await user.click(screen.getByRole('button', { name: 'Try again' }));
+      await waitFor(() =>
+        expect(screen.queryByRole('button', { name: 'Try again' })).not.toBeInTheDocument(),
+      );
+      if (!noForecast) expect(await screen.findByRole('heading', { name: 'Ema' })).toBeVisible();
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    },
+  );
 });

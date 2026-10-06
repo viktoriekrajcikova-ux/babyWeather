@@ -16,12 +16,39 @@ interface OverviewContentProps {
   timezone: string;
   kids: Child[];
   childrenError: string | null;
+  onRetryChildren: () => void;
+  childrenFetching: boolean;
 }
 
-const OverviewContent = ({ hourly, timezone, kids, childrenError }: OverviewContentProps) => {
+const OverviewContent = ({
+  hourly,
+  timezone,
+  kids,
+  childrenError,
+  onRetryChildren,
+  childrenFetching,
+}: OverviewContentProps) => {
   const today = getTodayForecast(hourly, timezone, new Date());
+  const childrenStatus = childrenError ? (
+    <div className={styles.alert}>
+      <p>{childrenError}</p>
+      <button
+        type="button"
+        className="btn btn-outline-secondary btn-sm"
+        onClick={onRetryChildren}
+        disabled={childrenFetching}
+      >
+        {childrenFetching ? 'Retrying…' : 'Try again'}
+      </button>
+    </div>
+  ) : null;
   if (today.length === 0) {
-    return <p role="status">No forecast available for the rest of today.</p>;
+    return (
+      <>
+        {childrenStatus}
+        <p role="status">No forecast available for the rest of today.</p>
+      </>
+    );
   }
 
   const temps = today.map((h) => kelvinToRoundedCelsius(h.temp));
@@ -45,8 +72,10 @@ const OverviewContent = ({ hourly, timezone, kids, childrenError }: OverviewCont
       <section className={styles.tiles}>
         <div className={styles.tile}>
           <span className={styles.label}>Kids</span>
-          <span className={styles.value}>{kids.length}</span>
-          <span className={styles.sub}>{formatNames(kids) || 'No children yet'}</span>
+          <span className={styles.value}>{childrenError ? '-' : kids.length}</span>
+          <span className={styles.sub}>
+            {childrenError ? 'Unavailable' : formatNames(kids) || 'No children yet'}
+          </span>
         </div>
         <div className={styles.tile}>
           <span className={styles.label}>Now</span>
@@ -77,9 +106,7 @@ const OverviewContent = ({ hourly, timezone, kids, childrenError }: OverviewCont
 
       <h2 className={styles.sectionTitle}>What to pack today</h2>
       {childrenError ? (
-        <div className={styles.alert} role="alert">
-          {childrenError}
-        </div>
+        childrenStatus
       ) : kids.length === 0 ? (
         <div className={`${styles.card} ${styles.empty}`}>
           <Baby className={styles.emptyIcon} size={40} strokeWidth={2} aria-hidden="true" />

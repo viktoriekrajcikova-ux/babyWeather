@@ -1,7 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
+import { ToastProvider } from '../../../components/toast/toastProvider';
 import type { Child } from '../../../modules/children/children.types';
 import type { WeatherData } from '../../../modules/weather/weather.types';
 import { AuthContext, type AuthContextValue } from '../../../modules/auth/authContext';
@@ -67,7 +69,9 @@ function createWrapper() {
   });
   const Wrapper = ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={queryClient}>
-      <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>
+      <ToastProvider>
+        <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>
+      </ToastProvider>
     </QueryClientProvider>
   );
   return Wrapper;
@@ -144,7 +148,34 @@ describe('Home (integrační test)', () => {
     expect(screen.getByText('Clear sky')).toBeVisible();
   });
 
+  it('allows retry after dismissing the loading error and clears the toast on recovery', async () => {
+    const user = userEvent.setup();
+    vi.mocked(weatherApi.getData).mockResolvedValue(weatherAt20C);
+    vi.mocked(childrenApi.getChildren).mockRejectedValue(new Error('load failed'));
+    render(<Home />, { wrapper: createWrapper() });
+
+    expect(await screen.findByText('Could not load children')).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+    await waitFor(() =>
+      expect(screen.queryByText('Could not load children')).not.toBeInTheDocument(),
+    );
+    expect(screen.getByText('Children are currently unavailable.')).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Try again' }));
+    expect(await screen.findByText('Could not load children')).toBeVisible();
+
+    vi.mocked(childrenApi.getChildren).mockResolvedValue([
+      row({ id: 1, name: 'Ema', age: 2, sex: 'female' }),
+    ]);
+    await user.click(screen.getByRole('button', { name: 'Try again' }));
+    expect(await screen.findByText('Ema')).toBeVisible();
+    await waitFor(() =>
+      expect(screen.queryByText('Could not load children')).not.toBeInTheDocument(),
+    );
+    expect(screen.queryByRole('button', { name: 'Try again' })).not.toBeInTheDocument();
+  });
+
   it('při chybě počasí zobrazí chybu a nerenderuje děti', async () => {
+    const user = userEvent.setup();
     vi.mocked(weatherApi.getData).mockRejectedValue(new Error('500'));
     vi.mocked(childrenApi.getChildren).mockResolvedValue([
       row({ id: 1, name: 'Ema', age: 2, sex: 'female' }),
@@ -154,5 +185,11 @@ describe('Home (integrační test)', () => {
 
     expect(await screen.findByText('Could not load weather')).toBeInTheDocument();
     expect(screen.queryByText('Ema')).not.toBeInTheDocument();
+    vi.mocked(weatherApi.getData).mockResolvedValue(weatherAt20C);
+    await user.click(screen.getByRole('button', { name: 'Try again' }));
+    expect(await screen.findByText('Ema')).toBeVisible();
+    await waitFor(() =>
+      expect(screen.queryByText('Could not load weather')).not.toBeInTheDocument(),
+    );
   });
 });

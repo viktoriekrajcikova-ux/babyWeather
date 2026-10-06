@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
+import { ToastProvider } from '../../../components/toast/toastProvider';
 
 vi.mock('../hooks/useAddChildMutation', () => ({
   useAddChildMutation: vi.fn(),
@@ -35,7 +36,9 @@ describe('AddChildForm', () => {
 
     render(
       <MemoryRouter>
-        <AddChildForm />
+        <ToastProvider>
+          <AddChildForm />
+        </ToastProvider>
       </MemoryRouter>,
     );
 
@@ -51,5 +54,14 @@ describe('AddChildForm', () => {
     );
     expect(screen.getByRole('combobox', { name: 'Sex' })).toHaveAttribute('aria-invalid', 'false');
     expect(addChild).not.toHaveBeenCalled();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+
+    addChild.mockRejectedValue(new Error('server failure'));
+    await user.type(screen.getByRole('textbox', { name: 'First name' }), 'Ema');
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Age' }), '2');
+    await user.click(screen.getByRole('button', { name: 'Add child' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Could not add child');
+    expect(screen.getByRole('textbox', { name: 'First name' })).toHaveValue('Ema');
+    expect(screen.getByRole('combobox', { name: 'Age' })).toHaveValue('2');
   });
 });

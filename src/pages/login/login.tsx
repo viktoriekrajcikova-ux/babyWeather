@@ -1,13 +1,16 @@
 import type { FormEvent } from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useToast } from '../../components/toast/toastContext';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../modules/auth/hooks/useAuth';
 import styles from './login.module.scss';
 
 const Login = () => {
+  const { showError, dismiss } = useToast();
+  useEffect(() => () => dismiss('auth-submit'), [dismiss]);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
+
   const [message, setMessage] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
   const [mode, setMode] = useState<'signIn' | 'signUp'>('signIn');
@@ -17,7 +20,7 @@ const Login = () => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isPending) return;
-    setError(null);
+    dismiss('auth-submit');
     setMessage(null);
     setIsPending(true);
     try {
@@ -29,8 +32,12 @@ const Login = () => {
         if (session) return navigate('/');
         setMessage('Check your email to confirm your registration.');
       }
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'Something went wrong');
+    } catch {
+      showError({
+        id: 'auth-submit',
+        title: mode === 'signIn' ? 'Could not sign in' : 'Could not create account',
+        message: 'Check your details and connection, then try again.',
+      });
     } finally {
       setIsPending(false);
     }
@@ -38,7 +45,7 @@ const Login = () => {
 
   const handleMode = () => {
     setMode(mode === 'signIn' ? 'signUp' : 'signIn');
-    setError(null);
+    dismiss('auth-submit');
     setMessage(null);
   };
 
@@ -82,11 +89,7 @@ const Login = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
-        {error && (
-          <div className={styles.alert} role="alert">
-            {error}
-          </div>
-        )}
+
         {message && (
           <div className={styles.status} role="status">
             {message}

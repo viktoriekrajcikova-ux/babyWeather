@@ -3,14 +3,23 @@ import { Link } from 'react-router-dom';
 import styles from './header.module.scss';
 import { House, ChartColumn, Settings, LogOut } from 'lucide-react';
 import { useAuth } from '../../modules/auth/hooks/useAuth';
+import { useState } from 'react';
+import { useToast } from '../../components/toast/toastContext';
 
 const Header = () => {
   const { signOut } = useAuth();
+  const { showError, dismiss } = useToast();
+  const [isSigningOut, setIsSigningOut] = useState(false);
   const handleSignOut = async () => {
+    if (isSigningOut) return;
+    dismiss('auth-signout');
+    setIsSigningOut(true);
     try {
       await signOut();
-    } catch (e) {
-      console.error(e);
+    } catch {
+      showError({ id: 'auth-signout', title: 'Could not sign out', message: 'Please try again.' });
+    } finally {
+      setIsSigningOut(false);
     }
   };
 
@@ -33,7 +42,12 @@ const Header = () => {
                 SETTINGS
               </Link>
               <span className={styles.divider} aria-hidden="true" />
-              <button type="button" onClick={handleSignOut} className={styles.logout}>
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className={styles.logout}
+                disabled={isSigningOut}
+              >
                 <LogOut size={20} strokeWidth={2} />
                 LOGOUT
               </button>

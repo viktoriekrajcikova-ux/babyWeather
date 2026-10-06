@@ -1,9 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { act, render, screen } from '@testing-library/react';
+import { act, render as renderUI, screen } from '@testing-library/react';
+import { ToastProvider } from '../../../components/toast/toastProvider';
 import userEvent from '@testing-library/user-event';
 import Login from '../login';
 
 const mockNavigate = vi.fn();
+const render = (ui) => renderUI(ui, { wrapper: ToastProvider });
 const mockSignIn = vi.fn();
 const mockSignUp = vi.fn();
 
@@ -126,7 +128,7 @@ describe('Login', () => {
 
     const alert = await screen.findByRole('alert');
     expect(alert).toBeVisible();
-    expect(alert).toHaveTextContent('Špatné heslo');
+    expect(alert).toHaveTextContent('Could not sign in');
     expect(screen.getByRole('button', { name: 'Sign In' })).toBeEnabled();
     expect(screen.getByRole('button', { name: 'Create an account' })).toBeEnabled();
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
@@ -171,7 +173,7 @@ describe('Login', () => {
       rejectSignUp(new Error('Registration failed'));
     });
 
-    expect(screen.getByRole('alert')).toHaveTextContent('Registration failed');
+    expect(screen.getByRole('alert')).toHaveTextContent('Could not create account');
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Sign Up', exact: true })).toBeEnabled();
     await user.click(screen.getByRole('button', { name: 'Back to login' }));

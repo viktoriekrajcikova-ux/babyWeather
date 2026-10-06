@@ -6,14 +6,19 @@ import LocationSearch from '../../modules/location/components/locationSearch';
 import styles from './home.module.scss';
 import { useSelectedCoords } from '../../modules/location/hooks/useSelectedCoords';
 import HomeContent from './components/homeContent';
+import { useWeatherErrorToast } from '../../modules/weather/hooks/useWeatherErrorToast';
 
 const Home = () => {
   const { coords, setCoords } = useSelectedCoords();
+  const weatherQuery = useWeatherQuery(coords);
+  useWeatherErrorToast(`home-weather:${coords.lat}:${coords.lon}`, weatherQuery);
   const {
     data: weather,
     isPending: weatherLoading,
     isError: weatherError,
-  } = useWeatherQuery(coords);
+    refetch,
+    isFetching,
+  } = weatherQuery;
 
   const locationLabel = coords.name
     ? [coords.name, coords.country].filter(Boolean).join(', ')
@@ -33,8 +38,18 @@ const Home = () => {
             Loading…
           </p>
         ) : weatherError || !weather ? (
-          <div className={styles.alert} role="alert">
-            Could not load weather
+          <div className={styles.alert}>
+            <p>Weather is currently unavailable.</p>
+            <button
+              type="button"
+              className="btn btn-outline-secondary btn-sm"
+              disabled={isFetching}
+              onClick={() => {
+                void refetch();
+              }}
+            >
+              {isFetching ? 'Retrying…' : 'Try again'}
+            </button>
           </div>
         ) : (
           <>

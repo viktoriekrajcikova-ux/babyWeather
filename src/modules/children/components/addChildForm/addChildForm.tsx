@@ -1,11 +1,12 @@
 import type { FormEvent } from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useToast } from '../../../../components/toast/toastContext';
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import { useAddChildMutation } from '../../hooks/useAddChildMutation';
-import Message from '../../../../components/message/message';
+
 import { useNavigate } from 'react-router-dom';
 import styles from './addChildForm.module.scss';
 import { addChildSchema } from './addChildForm.schema';
@@ -21,11 +22,12 @@ const optionsSex = ['male', 'female'];
 const optionsAge = [0, 1, 2, 3, 4, 5];
 
 function AddChildForm() {
+  const { showError, dismiss } = useToast();
+  useEffect(() => () => dismiss('children-add'), [dismiss]);
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
   const [sex, setSex] = useState('');
-  const [message, setMessage] = useState('');
-  const [variant, setVariant] = useState('primary');
+
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const { mutateAsync: addChild, isPending } = useAddChildMutation();
   const navigate = useNavigate();
@@ -35,7 +37,7 @@ function AddChildForm() {
     event.stopPropagation();
     if (isPending) return;
 
-    setMessage('');
+    dismiss('children-add');
     setFieldErrors({});
     const result = addChildSchema.safeParse({ name, age, sex });
 
@@ -48,14 +50,16 @@ function AddChildForm() {
       await addChild(result.data);
       navigate('/');
     } catch {
-      setVariant('danger');
-      setMessage('Something went wrong');
+      showError({
+        id: 'children-add',
+        title: 'Could not add child',
+        message: 'Your entries are still here. Please try again.',
+      });
     }
   };
 
   return (
     <>
-      {message && <Message id="message" text={message} variant={variant} />}
       <Form onSubmit={handleSubmit} className={styles.form} noValidate>
         <Row className="mb-3">
           <Form.Group as={Col} controlId="childName">
