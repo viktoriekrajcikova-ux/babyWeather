@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useToast } from '../../../components/toast/toastContext';
 
 interface WeatherErrorState {
@@ -10,19 +11,20 @@ interface WeatherErrorState {
 
 export function useWeatherErrorToast(id: string, state: WeatherErrorState) {
   const { showError, dismiss } = useToast();
+  const { t } = useTranslation();
   const { isError, isLoadingError, isSuccess, errorUpdatedAt } = state;
 
   useEffect(() => {
     if (isError) {
       showError({
         id,
-        title: isLoadingError ? 'Could not load weather' : 'Could not refresh weather',
-        message: 'Check your connection and use Try again on the page.',
+        title: isLoadingError ? t('weather.errors.load') : t('weather.errors.refresh'),
+        message: t('weather.errors.retryHint'),
       });
     } else if (isSuccess) {
       dismiss(id);
     }
-  }, [id, isError, isLoadingError, isSuccess, errorUpdatedAt, showError, dismiss]);
+  }, [id, isError, isLoadingError, isSuccess, errorUpdatedAt, showError, dismiss, t]);
 
   useEffect(() => () => dismiss(id), [id, dismiss]);
 }

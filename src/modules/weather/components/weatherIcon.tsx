@@ -13,6 +13,8 @@ import {
   CircleHelp,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { translateWeatherDescription } from '../helpers/translateWeatherDescription';
 
 const icons: Record<string, LucideIcon> = {
   clear: Sun,
@@ -37,13 +39,14 @@ export default function WeatherIcon({
   description: string;
   size?: number;
 }) {
+  const { t } = useTranslation();
   const Icon = Object.prototype.hasOwnProperty.call(icons, icon) ? icons[icon] : CircleHelp;
   return (
     <Icon
       size={size}
       strokeWidth={1.5}
       role="img"
-      aria-label={description || 'Weather condition unavailable'}
+      aria-label={translateWeatherDescription(description, t)}
       aria-hidden={false}
     />
   );

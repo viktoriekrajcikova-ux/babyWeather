@@ -1,5 +1,7 @@
 import styles from './weather.module.scss';
 import WeatherIcon from './weatherIcon';
+import { useTranslation } from 'react-i18next';
+import { translateWeatherDescription } from '../helpers/translateWeatherDescription';
 
 interface WeatherProps {
   temperature: number;
@@ -20,14 +22,17 @@ const Weather = ({
   forecastOpen,
   timeForecast,
 }: WeatherProps) => {
+  const { t } = useTranslation();
   return (
     <div className={styles.weather}>
       <p className={styles.forecastTime}>{timeForecast}</p>
       <WeatherIcon icon={icon} description={describe} size={96} />
       <p className={styles.temp}>{temperature} °C</p>
       <div>
-        <div className={styles.feels}>Feels like {feelsLike} °C</div>
-        <div className={styles.desc}>{describe}</div>
+        <div className={styles.feels}>
+          {t('weather.feelsLikeValue', { temperature: feelsLike })}
+        </div>
+        <div className={styles.desc}>{translateWeatherDescription(describe, t)}</div>
       </div>
       <button
         type="button"
@@ -35,7 +40,7 @@ const Weather = ({
         onClick={onClickWeatherForecast}
         aria-expanded={forecastOpen}
       >
-        {forecastOpen ? 'Hide hourly forecast' : 'Show hourly forecast'}
+        {forecastOpen ? t('weather.hideForecast') : t('weather.showForecast')}
       </button>
     </div>
   );

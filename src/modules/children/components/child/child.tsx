@@ -4,6 +4,7 @@ import Image from 'react-bootstrap/Image';
 import styles from './child.module.scss';
 import { X } from 'lucide-react';
 import type { ClothesItem } from '../../../clothing/clothing.types';
+import { useTranslation } from 'react-i18next';
 
 const imgUrlGirl = 'assets/img/girl.png';
 const imgUrlBoy = 'assets/img/boy.png';
@@ -17,6 +18,7 @@ interface ChildProps {
 }
 
 const Child = ({ name, sex, allClothes, id, onClickDelete }: ChildProps) => {
+  const { t } = useTranslation();
   const urlAvatar = sex === 'male' ? imgUrlBoy : sex === 'female' ? imgUrlGirl : '';
 
   return (
@@ -25,7 +27,7 @@ const Child = ({ name, sex, allClothes, id, onClickDelete }: ChildProps) => {
         <button
           type="button"
           className={styles.delete}
-          aria-label={`Remove ${name}`}
+          aria-label={t('children.remove', { name })}
           onClick={() => onClickDelete(id)}
         >
           <X size={20} strokeWidth={2} />
@@ -36,7 +38,7 @@ const Child = ({ name, sex, allClothes, id, onClickDelete }: ChildProps) => {
           {allClothes.map((clothes, key) => (
             <li key={key}>
               <img src={clothes.imageUrl} alt="" />
-              <p>{clothes.name}</p>
+              <p>{t(`clothing.${clothes.name}`, { defaultValue: clothes.name })}</p>
             </li>
           ))}
         </ul>

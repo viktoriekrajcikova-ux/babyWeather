@@ -5,8 +5,10 @@ import { House, ChartColumn, Settings, LogOut } from 'lucide-react';
 import { useAuth } from '../../modules/auth/hooks/useAuth';
 import { useState } from 'react';
 import { useToast } from '../../components/toast/toastContext';
+import { useTranslation } from 'react-i18next';
 
 const Header = () => {
+  const { t, i18n } = useTranslation();
   const { signOut } = useAuth();
   const { showError, dismiss } = useToast();
   const [isSigningOut, setIsSigningOut] = useState(false);
@@ -17,7 +19,11 @@ const Header = () => {
     try {
       await signOut();
     } catch {
-      showError({ id: 'auth-signout', title: 'Could not sign out', message: 'Please try again.' });
+      showError({
+        id: 'auth-signout',
+        title: t('auth.signOutError'),
+        message: t('common.pleaseRetry'),
+      });
     } finally {
       setIsSigningOut(false);
     }
@@ -31,17 +37,32 @@ const Header = () => {
             <Col className={styles.wrapper}>
               <Link to="/">
                 <House size={20} strokeWidth={2} />
-                HOME
+                {t('navigation.home')}
               </Link>
               <Link to="/overview">
                 <ChartColumn size={20} strokeWidth={2} />
-                OVERVIEW
+                {t('navigation.overview')}
               </Link>
               <Link to="/settings">
                 <Settings size={20} strokeWidth={2} />
-                SETTINGS
+                {t('navigation.settings')}
               </Link>
               <span className={styles.divider} aria-hidden="true" />
+              <select
+                className={styles.language}
+                aria-label={t('navigation.language')}
+                value={i18n.resolvedLanguage ?? 'cs'}
+                onChange={(event) => {
+                  void i18n.changeLanguage(event.target.value);
+                }}
+              >
+                <option value="cs" lang="cs">
+                  Čeština
+                </option>
+                <option value="en" lang="en">
+                  English
+                </option>
+              </select>
               <button
                 type="button"
                 onClick={handleSignOut}
@@ -49,7 +70,7 @@ const Header = () => {
                 disabled={isSigningOut}
               >
                 <LogOut size={20} strokeWidth={2} />
-                LOGOUT
+                {t('navigation.logout')}
               </button>
             </Col>
           </Row>

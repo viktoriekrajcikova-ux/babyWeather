@@ -3,12 +3,14 @@ import styles from './locationSearch.module.scss';
 import type { GeocodingResult } from '../api/geocodingApiClient';
 import { useSearchCityQuery } from '../hooks/useSearchCityQuery';
 import { useToast } from '../../../components/toast/toastContext';
+import { useTranslation } from 'react-i18next';
 
 type LocationSearchProps = {
   onLocationSelect: (location: GeocodingResult) => void;
 };
 
 const LocationSearch = ({ onLocationSelect }: LocationSearchProps) => {
+  const { t } = useTranslation();
   const { showError, dismiss } = useToast();
   const [city, setCity] = useState('');
   const [searchedCity, setSearchedCity] = useState('');
@@ -19,13 +21,13 @@ const LocationSearch = ({ onLocationSelect }: LocationSearchProps) => {
     if (isError) {
       showError({
         id: 'location-search',
-        title: 'Could not find that location',
-        message: 'Check the city name and your connection, then search again.',
+        title: t('location.searchError'),
+        message: t('location.searchHint'),
       });
     } else if (isSuccess) {
       dismiss('location-search');
     }
-  }, [isError, isSuccess, errorUpdatedAt, showError, dismiss]);
+  }, [isError, isSuccess, errorUpdatedAt, showError, dismiss, t]);
 
   useEffect(() => () => dismiss('location-search'), [dismiss]);
 
@@ -61,11 +63,11 @@ const LocationSearch = ({ onLocationSelect }: LocationSearchProps) => {
         className={styles.input}
         value={city}
         onChange={(e) => setCity(e.target.value)}
-        placeholder="Enter a city"
-        aria-label="City"
+        placeholder={t('location.placeholder')}
+        aria-label={t('location.city')}
       />
       <button type="submit" className={styles.button} disabled={locationQuery.isFetching}>
-        {locationQuery.isFetching ? 'Searching…' : 'Search'}
+        {locationQuery.isFetching ? t('location.searching') : t('location.search')}
       </button>
     </form>
   );

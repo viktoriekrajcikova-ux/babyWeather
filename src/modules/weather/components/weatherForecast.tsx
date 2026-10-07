@@ -3,6 +3,7 @@ import WeatherIcon from './weatherIcon';
 import type { HourlyWeather } from '../weather.types';
 import { kelvinToCelsius } from '../helpers/temperature';
 import { formatHour } from '../helpers/formatHour';
+import { useTranslation } from 'react-i18next';
 
 interface WeatherForecastProps {
   weatherForecastHourly: HourlyWeather[];
@@ -10,14 +11,15 @@ interface WeatherForecastProps {
   onClickForecast: (index: number) => void;
 }
 
-const weatherForecast = ({
+const WeatherForecast = ({
   weatherForecastHourly,
   timezone,
   onClickForecast,
 }: WeatherForecastProps) => {
+  const { t, i18n } = useTranslation();
   return (
     <>
-      <h2 className="text-center mt-5">12 hours ahead forecast</h2>
+      <h2 className="text-center mt-5">{t('weather.hourlyTitle')}</h2>
       <ul className={styles.list}>
         {weatherForecastHourly.map((weatherForecastHourlyItem, index) => (
           <li key={weatherForecastHourlyItem.dt}>
@@ -28,9 +30,11 @@ const weatherForecast = ({
               />
               {Math.round(kelvinToCelsius(weatherForecastHourlyItem.temp))} °C
               {index === 0 ? (
-                <div>Now</div>
+                <div>{t('common.now')}</div>
               ) : (
-                <div>{formatHour(weatherForecastHourlyItem.dt, timezone)}</div>
+                <div>
+                  {formatHour(weatherForecastHourlyItem.dt, timezone, i18n.resolvedLanguage)}
+                </div>
               )}
             </button>
           </li>
@@ -40,4 +44,4 @@ const weatherForecast = ({
   );
 };
 
-export default weatherForecast;
+export default WeatherForecast;

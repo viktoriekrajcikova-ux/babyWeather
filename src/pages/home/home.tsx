@@ -1,4 +1,5 @@
 import { Container } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 import Header from '../../app/layout/header';
 import DataAttribution from '../../modules/weather/components/dataAttribution';
 import { useWeatherQuery } from '../../modules/weather/hooks/useWeatherQuery';
@@ -9,6 +10,7 @@ import HomeContent from './components/homeContent';
 import { useWeatherErrorToast } from '../../modules/weather/hooks/useWeatherErrorToast';
 
 const Home = () => {
+  const { t } = useTranslation();
   const { coords, setCoords } = useSelectedCoords();
   const weatherQuery = useWeatherQuery(coords);
   useWeatherErrorToast(`home-weather:${coords.lat}:${coords.lon}`, weatherQuery);
@@ -29,17 +31,17 @@ const Home = () => {
       <Header />
       <Container>
         <div className={styles.pageHead}>
-          <h1>Home</h1>
-          <p>Today&apos;s weather and what to dress your kids in.</p>
+          <h1>{t('home.title')}</h1>
+          <p>{t('home.description')}</p>
         </div>
         <LocationSearch onLocationSelect={setCoords} />
         {weatherLoading ? (
           <p className={styles.status} role="status">
-            Loading…
+            {t('common.loading')}
           </p>
         ) : weatherError || !weather ? (
           <div className={styles.alert}>
-            <p>Weather is currently unavailable.</p>
+            <p>{t('weather.unavailable')}</p>
             <button
               type="button"
               className="btn btn-outline-secondary btn-sm"
@@ -48,12 +50,12 @@ const Home = () => {
                 void refetch();
               }}
             >
-              {isFetching ? 'Retrying…' : 'Try again'}
+              {isFetching ? t('common.retrying') : t('common.tryAgain')}
             </button>
           </div>
         ) : (
           <>
-            <p>Weather for {locationLabel}</p>
+            <p>{t('weather.forLocation', { location: locationLabel })}</p>
             <HomeContent weather={weather} />
           </>
         )}

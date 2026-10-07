@@ -6,6 +6,7 @@ import WeatherForecast from '../../../modules/weather/components/weatherForecast
 import Weather from '../../../modules/weather/components/weather';
 import { formatHour } from '../../../modules/weather/helpers/formatHour';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface WeatherPanelProps {
   weather: WeatherData;
@@ -20,6 +21,7 @@ export const WeatherPanel = ({
   feelsLike,
   onSelectForecast,
 }: WeatherPanelProps) => {
+  const { t, i18n } = useTranslation();
   const currentTemp = Math.round(kelvinToCelsius(weather.hourly[selectedWeatherIndex].temp));
   const [weatherForecast, setWeatherForecast] = useState(false);
 
@@ -46,14 +48,20 @@ export const WeatherPanel = ({
           feelsLike={feelsLike}
           timeForecast={
             selectedWeatherIndex > 0 &&
-            `Forecast for ${formatHour(weather.hourly[selectedWeatherIndex].dt, weather.timezone)}`
+            t('weather.forecastFor', {
+              time: formatHour(
+                weather.hourly[selectedWeatherIndex].dt,
+                weather.timezone,
+                i18n.resolvedLanguage,
+              ),
+            })
           }
           icon={weather.hourly[selectedWeatherIndex].weather[0].icon}
         />
         {selectedWeatherIndex > 0 && (
           <button type="button" className="current-weather" onClick={() => onSelectForecast(0)}>
             <ArrowLeft size={16} strokeWidth={2} />
-            Back to current weather
+            {t('weather.backToCurrent')}
           </button>
         )}
       </Col>

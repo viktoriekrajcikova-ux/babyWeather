@@ -6,12 +6,14 @@ import { useDeleteChildMutation } from '../../../modules/children/hooks/useDelet
 import { useChildrenQuery } from '../../../modules/children/hooks/useChildrenQuery';
 import Child from '../../../modules/children/components/child/child';
 import styles from '../home.module.scss';
+import { useTranslation } from 'react-i18next';
 
 interface ChildrenOutfitsProps {
   feelsLike: number;
 }
 
 export const ChildrenOutfits = ({ feelsLike }: ChildrenOutfitsProps) => {
+  const { t } = useTranslation();
   const { showError, dismiss } = useToast();
   const {
     data: kids = [],
@@ -28,25 +30,25 @@ export const ChildrenOutfits = ({ feelsLike }: ChildrenOutfitsProps) => {
     if (deleteError) {
       showError({
         id: 'children-delete',
-        title: 'Could not delete child',
-        message: 'Please try again.',
+        title: t('children.deleteError'),
+        message: t('common.pleaseRetry'),
       });
     } else {
       dismiss('children-delete');
     }
-  }, [deleteError, submittedAt, showError, dismiss]);
+  }, [deleteError, submittedAt, showError, dismiss, t]);
 
   useEffect(() => {
     if (childrenError) {
       showError({
         id: 'children-load',
-        title: isLoadingError ? 'Could not load children' : 'Could not refresh children',
-        message: 'Use Try again in the children section to retry.',
+        title: isLoadingError ? t('children.loadError') : t('children.refreshError'),
+        message: t('children.retryHint'),
       });
     } else if (isSuccess) {
       dismiss('children-load');
     }
-  }, [childrenError, isLoadingError, isSuccess, errorUpdatedAt, showError, dismiss]);
+  }, [childrenError, isLoadingError, isSuccess, errorUpdatedAt, showError, dismiss, t]);
 
   useEffect(
     () => () => {
@@ -65,11 +67,7 @@ export const ChildrenOutfits = ({ feelsLike }: ChildrenOutfitsProps) => {
     <>
       {childrenError && (
         <div className={styles.alert}>
-          <p>
-            {isLoadingError
-              ? 'Children are currently unavailable.'
-              : 'Showing previously loaded children.'}
-          </p>
+          <p>{isLoadingError ? t('children.unavailable') : t('children.stale')}</p>
           <button
             type="button"
             className="btn btn-outline-secondary btn-sm"
@@ -78,7 +76,7 @@ export const ChildrenOutfits = ({ feelsLike }: ChildrenOutfitsProps) => {
             }}
             disabled={isFetching}
           >
-            {isFetching ? 'Retrying…' : 'Try again'}
+            {isFetching ? t('common.retrying') : t('common.tryAgain')}
           </button>
         </div>
       )}

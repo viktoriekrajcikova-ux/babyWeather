@@ -2,6 +2,7 @@ import type { HourlyWeather } from '../../../modules/weather/weather.types';
 import { kelvinToRoundedCelsius } from '../../../modules/weather/helpers/temperature';
 import styles from '../overview.module.scss';
 import { formatHour } from '../../../modules/weather/helpers/formatHour';
+import { useTranslation } from 'react-i18next';
 
 type TemperatureChartProps = {
   hourly: HourlyWeather[];
@@ -13,6 +14,7 @@ export default function TemperatureChart({
   hourly,
   timezone,
 }: TemperatureChartProps & { timezone: string }) {
+  const { t, i18n } = useTranslation();
   const chartHours = hourly;
   const chartTemps = chartHours.map((h) => kelvinToRoundedCelsius(h.temp));
   const chartMin = Math.min(...chartTemps);
@@ -23,14 +25,12 @@ export default function TemperatureChart({
     return Math.round(BAR_FLOOR + ratio * (100 - BAR_FLOOR));
   };
   const nowTemp = kelvinToRoundedCelsius(hourly[0].temp);
-  const chartLabel =
-    `Temperature for the rest of today: now ${nowTemp}°C, ` +
-    `low ${chartMin}°C, high ${chartMax}°C.`;
+  const chartLabel = t('overview.chartLabel', { now: nowTemp, low: chartMin, high: chartMax });
   return (
     <>
-      <h2 className={styles.sectionTitle}>Temperature outlook</h2>
+      <h2 className={styles.sectionTitle}>{t('overview.chartTitle')}</h2>
       <div className={styles.card}>
-        <p className={styles.chartNote}>Forecast for the rest of today.</p>
+        <p className={styles.chartNote}>{t('overview.chartNote')}</p>
         <div className={styles.chart} role="img" aria-label={chartLabel}>
           {chartHours.map((hour, index) => {
             const isNow = index === 0;
@@ -41,7 +41,9 @@ export default function TemperatureChart({
                   className={`${styles.bar} ${isNow ? styles.barNow : ''}`}
                   style={{ height: `${barHeight(chartTemps[index])}%` }}
                 />
-                <span className={styles.hour}>{isNow ? 'Now' : formatHour(hour.dt, timezone)}</span>
+                <span className={styles.hour}>
+                  {isNow ? t('common.now') : formatHour(hour.dt, timezone, i18n.resolvedLanguage)}
+                </span>
               </div>
             );
           })}
@@ -49,11 +51,11 @@ export default function TemperatureChart({
         <div className={styles.legend}>
           <span>
             <span className={`${styles.swatch} ${styles.swatchNow}`} />
-            Now
+            {t('common.now')}
           </span>
           <span>
             <span className={`${styles.swatch} ${styles.swatchForecast}`} />
-            Forecast
+            {t('overview.forecast')}
           </span>
         </div>
       </div>

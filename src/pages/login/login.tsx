@@ -4,8 +4,10 @@ import { useToast } from '../../components/toast/toastContext';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../modules/auth/hooks/useAuth';
 import styles from './login.module.scss';
+import { useTranslation } from 'react-i18next';
 
 const Login = () => {
+  const { t } = useTranslation();
   const { showError, dismiss } = useToast();
   useEffect(() => () => dismiss('auth-submit'), [dismiss]);
   const [email, setEmail] = useState('');
@@ -30,13 +32,13 @@ const Login = () => {
       } else {
         const session = await signUp(email, password);
         if (session) return navigate('/');
-        setMessage('Check your email to confirm your registration.');
+        setMessage('auth.confirmEmail');
       }
     } catch {
       showError({
         id: 'auth-submit',
-        title: mode === 'signIn' ? 'Could not sign in' : 'Could not create account',
-        message: 'Check your details and connection, then try again.',
+        title: mode === 'signIn' ? t('auth.signInError') : t('auth.signUpError'),
+        message: t('auth.retryHint'),
       });
     } finally {
       setIsPending(false);
@@ -56,35 +58,31 @@ const Login = () => {
       </p>
       <form onSubmit={handleSubmit} className={styles.card} aria-labelledby="loginTitle">
         <div className={styles.pageHead}>
-          <h1 id="loginTitle">{mode === 'signIn' ? 'Login' : 'Create account'}</h1>
-          <p>
-            {mode === 'signIn'
-              ? 'Sign in to plan what your kids wear today.'
-              : 'Get started with weather and outfits for your kids.'}
-          </p>
+          <h1 id="loginTitle">{mode === 'signIn' ? t('auth.login') : t('auth.createAccount')}</h1>
+          <p>{mode === 'signIn' ? t('auth.loginDescription') : t('auth.registerDescription')}</p>
         </div>
         <div className={styles.field}>
-          <label htmlFor="loginEmail">Email</label>
+          <label htmlFor="loginEmail">{t('auth.email')}</label>
           <input
             required
             id="loginEmail"
             name="email"
             autoComplete="username"
             type="email"
-            placeholder="Email"
+            placeholder={t('auth.email')}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
         <div className={styles.field}>
-          <label htmlFor="loginPassword">Password</label>
+          <label htmlFor="loginPassword">{t('auth.password')}</label>
           <input
             required
             autoComplete={mode === 'signIn' ? 'current-password' : 'new-password'}
             id="loginPassword"
             name="password"
             type="password"
-            placeholder="Password"
+            placeholder={t('auth.password')}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -92,21 +90,21 @@ const Login = () => {
 
         {message && (
           <div className={styles.status} role="status">
-            {message}
+            {t(message)}
           </div>
         )}
         {isPending && (
           <div className={styles.status} role="status">
-            Please wait…
+            {t('common.pleaseWait')}
           </div>
         )}
         <button className={styles.submit} type="submit" disabled={isPending}>
-          {mode === 'signIn' ? 'Sign In' : 'Sign Up'}
+          {mode === 'signIn' ? t('auth.signIn') : t('auth.signUp')}
         </button>
         <div className={styles.switchMode}>
-          <p>{mode === 'signIn' ? 'New to BabyWeather?' : 'Already have an account?'}</p>
+          <p>{mode === 'signIn' ? t('auth.newUser') : t('auth.existingUser')}</p>
           <button onClick={handleMode} type="button" disabled={isPending}>
-            {mode === 'signIn' ? 'Create an account' : 'Back to login'}
+            {mode === 'signIn' ? t('auth.registerLink') : t('auth.loginLink')}
           </button>
         </div>
       </form>

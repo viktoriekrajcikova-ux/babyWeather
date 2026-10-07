@@ -180,7 +180,7 @@ describe('AuthProvider se sdílenou cache dětí', () => {
     const { client } = setup();
 
     expect(auth().id).toBe('čeká');
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByText('Loading…')).toBeInTheDocument();
     expect(screen.queryByTestId('private-content')).not.toBeInTheDocument();
     expect(childrenApi.getChildren).not.toHaveBeenCalled();
     expect(client.getQueryState(key)).toBeUndefined();

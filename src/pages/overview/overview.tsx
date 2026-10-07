@@ -1,4 +1,5 @@
 import { Container } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 import { useEffect } from 'react';
 import { useToast } from '../../components/toast/toastContext';
 import Header from '../../app/layout/header';
@@ -12,6 +13,7 @@ import OverviewContent from './components/overviewContent';
 import { useWeatherErrorToast } from '../../modules/weather/hooks/useWeatherErrorToast';
 
 const Overview = () => {
+  const { t } = useTranslation();
   const { showError, dismiss } = useToast();
   const { coords } = useSelectedCoords();
   const weatherQuery = useWeatherQuery(coords);
@@ -38,13 +40,13 @@ const Overview = () => {
     if (childrenError) {
       showError({
         id: 'overview-children',
-        title: isLoadingError ? 'Could not load children' : 'Could not refresh children',
-        message: 'Use Try again in the packing section to retry.',
+        title: isLoadingError ? t('children.loadError') : t('children.refreshError'),
+        message: t('overview.retryHint'),
       });
     } else if (childrenSuccess) {
       dismiss('overview-children');
     }
-  }, [childrenError, isLoadingError, childrenSuccess, errorUpdatedAt, showError, dismiss]);
+  }, [childrenError, isLoadingError, childrenSuccess, errorUpdatedAt, showError, dismiss, t]);
 
   useEffect(() => () => dismiss('overview-children'), [dismiss]);
 
@@ -57,15 +59,15 @@ const Overview = () => {
       <Header />
       <Container>
         <div className={styles.pageHead}>
-          <h1>Overview</h1>
-          <p>Everything for today, at a glance.</p>
+          <h1>{t('overview.title')}</h1>
+          <p>{t('overview.description')}</p>
         </div>
 
         {weatherLoading || childrenLoading ? (
           <OverviewSkeleton />
         ) : weatherError || !weather ? (
           <div className={styles.alert}>
-            <p>Weather is currently unavailable.</p>
+            <p>{t('weather.unavailable')}</p>
             <button
               type="button"
               className="btn btn-outline-secondary btn-sm"
@@ -74,19 +76,17 @@ const Overview = () => {
                 void refetch();
               }}
             >
-              {isFetching ? 'Retrying…' : 'Try again'}
+              {isFetching ? t('common.retrying') : t('common.tryAgain')}
             </button>
           </div>
         ) : (
           <>
-            <p>Weather for {locationLabel}</p>
+            <p>{t('weather.forLocation', { location: locationLabel })}</p>
             <OverviewContent
               hourly={weather.hourly}
               timezone={weather.timezone}
               kids={children ?? []}
-              childrenError={
-                childrenError ? 'The children’s packing plan is currently unavailable.' : null
-              }
+              childrenError={childrenError ? t('overview.packingUnavailable') : null}
               onRetryChildren={() => {
                 void refetchChildren();
               }}

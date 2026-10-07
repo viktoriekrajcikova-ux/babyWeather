@@ -10,6 +10,8 @@ import TemperatureChart from './temperatureChart';
 import ChildPackingCard from './childPackingCard';
 import styles from '../overview.module.scss';
 import { formatNames } from '../helpers/formatNames';
+import { useTranslation } from 'react-i18next';
+import { translateWeatherDescription } from '../../../modules/weather/helpers/translateWeatherDescription';
 
 interface OverviewContentProps {
   hourly: HourlyWeather[];
@@ -28,6 +30,7 @@ const OverviewContent = ({
   onRetryChildren,
   childrenFetching,
 }: OverviewContentProps) => {
+  const { t, i18n } = useTranslation();
   const today = getTodayForecast(hourly, timezone, new Date());
   const childrenStatus = childrenError ? (
     <div className={styles.alert}>
@@ -38,7 +41,7 @@ const OverviewContent = ({
         onClick={onRetryChildren}
         disabled={childrenFetching}
       >
-        {childrenFetching ? 'Retrying…' : 'Try again'}
+        {childrenFetching ? t('common.retrying') : t('common.tryAgain')}
       </button>
     </div>
   ) : null;
@@ -46,7 +49,7 @@ const OverviewContent = ({
     return (
       <>
         {childrenStatus}
-        <p role="status">No forecast available for the rest of today.</p>
+        <p role="status">{t('overview.noForecast')}</p>
       </>
     );
   }
@@ -71,48 +74,54 @@ const OverviewContent = ({
     <>
       <section className={styles.tiles}>
         <div className={styles.tile}>
-          <span className={styles.label}>Kids</span>
+          <span className={styles.label}>{t('overview.kids')}</span>
           <span className={styles.value}>{childrenError ? '-' : kids.length}</span>
           <span className={styles.sub}>
-            {childrenError ? 'Unavailable' : formatNames(kids) || 'No children yet'}
+            {childrenError
+              ? t('common.unavailable')
+              : formatNames(kids) || t('overview.noChildren')}
           </span>
         </div>
         <div className={styles.tile}>
-          <span className={styles.label}>Now</span>
+          <span className={styles.label}>{t('common.now')}</span>
           <span className={styles.value}>
             {nowTemp}
             <span className={styles.unit}>&deg;C</span>
           </span>
-          <span className={styles.sub}>{nowDescription}</span>
+          <span className={styles.sub}>{translateWeatherDescription(nowDescription, t)}</span>
         </div>
         <div className={styles.tile}>
-          <span className={styles.label}>Today</span>
+          <span className={styles.label}>{t('overview.today')}</span>
           <span className={styles.value}>
             {dayMin}&deg; / {dayMax}&deg;
           </span>
-          <span className={styles.sub}>Low / high</span>
+          <span className={styles.sub}>{t('overview.lowHigh')}</span>
         </div>
         <div className={`${styles.tile} ${styles.accent}`}>
-          <span className={styles.label}>Feels like</span>
+          <span className={styles.label}>{t('weather.feelsLike')}</span>
           <span className={styles.value}>
             {feelsLikeColdest}
             <span className={styles.unit}>&deg;C</span>
           </span>
-          <span className={styles.sub}>Coldest at {formatHour(coldest.dt, timezone)}</span>
+          <span className={styles.sub}>
+            {t('overview.coldestAt', {
+              time: formatHour(coldest.dt, timezone, i18n.resolvedLanguage),
+            })}
+          </span>
         </div>
       </section>
 
       <TemperatureChart hourly={today} timezone={timezone} />
 
-      <h2 className={styles.sectionTitle}>What to pack today</h2>
+      <h2 className={styles.sectionTitle}>{t('overview.packingTitle')}</h2>
       {childrenError ? (
         childrenStatus
       ) : kids.length === 0 ? (
         <div className={`${styles.card} ${styles.empty}`}>
           <Baby className={styles.emptyIcon} size={40} strokeWidth={2} aria-hidden="true" />
-          <p>Add a child and we&apos;ll show today&apos;s dressing plan here.</p>
+          <p>{t('overview.addHint')}</p>
           <Link to="/settings" className={styles.button}>
-            Add child
+            {t('children.add')}
           </Link>
         </div>
       ) : (

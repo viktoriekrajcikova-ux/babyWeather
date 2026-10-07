@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import styles from './addChildForm.module.scss';
 import { addChildSchema } from './addChildForm.schema';
 import { z } from 'zod';
+import { useTranslation } from 'react-i18next';
 
 type FieldErrors = {
   name?: string[];
@@ -18,10 +19,11 @@ type FieldErrors = {
   sex?: string[];
 };
 
-const optionsSex = ['male', 'female'];
+const optionsSex = ['male', 'female'] as const;
 const optionsAge = [0, 1, 2, 3, 4, 5];
 
 function AddChildForm() {
+  const { t } = useTranslation();
   const { showError, dismiss } = useToast();
   useEffect(() => () => dismiss('children-add'), [dismiss]);
   const [name, setName] = useState('');
@@ -52,8 +54,8 @@ function AddChildForm() {
     } catch {
       showError({
         id: 'children-add',
-        title: 'Could not add child',
-        message: 'Your entries are still here. Please try again.',
+        title: t('children.addError'),
+        message: t('children.addHint'),
       });
     }
   };
@@ -63,7 +65,7 @@ function AddChildForm() {
       <Form onSubmit={handleSubmit} className={styles.form} noValidate>
         <Row className="mb-3">
           <Form.Group as={Col} controlId="childName">
-            <Form.Label>First name</Form.Label>
+            <Form.Label>{t('children.firstName')}</Form.Label>
             <Form.Control
               required
               type="text"
@@ -76,13 +78,13 @@ function AddChildForm() {
               aria-describedby={fieldErrors.name?.length ? 'childNameError' : undefined}
             />
             <Form.Control.Feedback type="invalid" id="childNameError">
-              {fieldErrors.name?.[0]}
+              {fieldErrors.name?.[0] && t(fieldErrors.name[0])}
             </Form.Control.Feedback>
           </Form.Group>
         </Row>
         <Row className="mb-3">
           <Form.Group as={Col} controlId="childAge">
-            <Form.Label>Age</Form.Label>
+            <Form.Label>{t('children.age')}</Form.Label>
             <Form.Select
               onChange={(e) => {
                 setAge(e.target.value);
@@ -98,13 +100,13 @@ function AddChildForm() {
               ))}
             </Form.Select>
             <Form.Control.Feedback type="invalid" id="childAgeError">
-              {fieldErrors.age?.[0]}
+              {fieldErrors.age?.[0] && t(fieldErrors.age[0])}
             </Form.Control.Feedback>
           </Form.Group>
         </Row>
         <Row className="mb-3">
           <Form.Group as={Col} controlId="childSex">
-            <Form.Label>Sex</Form.Label>
+            <Form.Label>{t('children.sex')}</Form.Label>
             <Form.Select
               onChange={(e) => {
                 setSex(e.target.value);
@@ -116,17 +118,19 @@ function AddChildForm() {
             >
               <option></option>
               {optionsSex.map((optionSex, index) => (
-                <option key={index}>{optionSex}</option>
+                <option key={index} value={optionSex}>
+                  {t(`children.${optionSex}`)}
+                </option>
               ))}
             </Form.Select>
             <Form.Control.Feedback type="invalid" id="childSexError">
-              {fieldErrors.sex?.[0]}
+              {fieldErrors.sex?.[0] && t(fieldErrors.sex[0])}
             </Form.Control.Feedback>
           </Form.Group>
         </Row>
         <div className="mb-3 ">
           <Button type="submit" className="btn-success" disabled={isPending}>
-            {isPending ? 'Saving...' : 'Add child'}
+            {isPending ? t('common.saving') : t('children.add')}
           </Button>
         </div>
       </Form>

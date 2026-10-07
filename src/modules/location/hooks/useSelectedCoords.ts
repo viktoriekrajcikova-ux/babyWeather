@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '../../../components/toast/toastContext';
+import { useTranslation } from 'react-i18next';
 
 const STORAGE_KEY = 'babyweather:coords';
 const DEFAULT_COORDS = { lat: 49.3547, lon: 17.8694 };
@@ -43,6 +44,7 @@ function readStoredCoords(): SelectedLocation {
 }
 
 export function useSelectedCoords() {
+  const { t } = useTranslation();
   const { showError, dismiss } = useToast();
   const [coords, setCoords] = useState(readStoredCoords);
   useEffect(() => {
@@ -52,12 +54,11 @@ export function useSelectedCoords() {
     } catch {
       showError({
         id: 'location-storage',
-        title: 'Could not save your location',
-        message:
-          'You can keep using this location, but it may not be remembered after leaving this page.',
+        title: t('location.saveError'),
+        message: t('location.saveHint'),
       });
     }
-  }, [coords, showError, dismiss]);
+  }, [coords, showError, dismiss, t]);
   useEffect(() => () => dismiss('location-storage'), [dismiss]);
   return { coords, setCoords };
 }

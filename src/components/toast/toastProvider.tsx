@@ -1,8 +1,10 @@
 import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import { Toast, ToastContainer } from 'react-bootstrap';
 import { ToastContext, type ErrorNotification } from './toastContext';
+import { useTranslation } from 'react-i18next';
 
 export function ToastProvider({ children }: { children: ReactNode }) {
+  const { t } = useTranslation();
   const [notifications, setNotifications] = useState<ErrorNotification[]>([]);
 
   const showError = useCallback((notification: ErrorNotification) => {
@@ -32,7 +34,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             aria-live="assertive"
             aria-atomic="true"
           >
-            <Toast.Header>
+            <Toast.Header closeLabel={t('common.close')}>
               <strong className="me-auto">{notification.title}</strong>
             </Toast.Header>
             <Toast.Body>{notification.message}</Toast.Body>
