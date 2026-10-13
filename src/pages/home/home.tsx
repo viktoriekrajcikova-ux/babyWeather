@@ -2,6 +2,7 @@ import { Button, Container } from 'react-bootstrap';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Header from '../../app/layout/header';
+import Loader from '../../components/loader/loader';
 import DataAttribution from '../../modules/weather/components/dataAttribution/dataAttribution';
 import { useWeatherQuery } from '../../modules/weather/hooks/useWeatherQuery';
 import LocationSearch from '../../modules/location/components/locationSearch';
@@ -51,9 +52,7 @@ const Home = () => {
         </div>
         <LocationSearch onLocationSelect={setCoords} />
         {weatherLoading ? (
-          <p className={styles.status} role="status">
-            {t('common.loading')}
-          </p>
+          <Loader />
         ) : weatherError || !weather ? (
           <div className={styles.alert}>
             <p>{t('weather.unavailable')}</p>

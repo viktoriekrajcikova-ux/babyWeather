@@ -71,7 +71,7 @@ $breakpoint-md: 48rem;
   color: $color-accent-500;
 }
 
-/* ---- Card (empty state + skeleton) ---- */
+/* ---- Card (empty state) ---- */
 .card {
   padding: 1.5rem;
   background: $color-surface;
@@ -134,56 +134,5 @@ $breakpoint-md: 48rem;
   &:focus-visible {
     outline: 3px solid $color-primary-700;
     outline-offset: 2px;
-  }
-}
-
-/* ---- Loading skeleton ---- */
-.skeleton {
-  background: $color-neutral-200;
-  border-radius: 0.75rem;
-
-  @media (prefers-reduced-motion: no-preference) {
-    animation: pulse 1.4s ease-in-out infinite;
-  }
-}
-
-.skeletonTile {
-  min-height: 6.5rem;
-  border-radius: 1.5rem;
-}
-
-.skeletonCard {
-  margin-top: 2.5rem;
-}
-
-.skeletonLine {
-  height: 0.75rem;
-  margin-bottom: 1.25rem;
-}
-
-.skeletonChart {
-  height: 11rem;
-}
-
-.visuallyHidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.45;
   }
 }

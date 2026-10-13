@@ -105,6 +105,7 @@ describe('Overview (integrační test)', () => {
     render(<Overview />, { wrapper: createWrapper() });
 
     expect(await screen.findByRole('heading', { level: 3, name: 'Ema' })).toBeInTheDocument();
+    expect(screen.queryByText('Loading…')).not.toBeInTheDocument();
     expect(screen.getByText('Today')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Open-Meteo' })).toHaveAttribute(
       'href',
@@ -126,6 +127,17 @@ describe('Overview (integrační test)', () => {
     expect(screen.queryByText('socks')).not.toBeInTheDocument();
     // žádné letní tričko (tempFrom 20)
     expect(screen.queryByText('shirt')).not.toBeInTheDocument();
+  });
+
+  it('během načítání zobrazí společný loader místo obsahu', () => {
+    vi.mocked(weatherApi.getData).mockReturnValue(new Promise(() => {}));
+    vi.mocked(childrenApi.getChildren).mockReturnValue(new Promise(() => {}));
+
+    render(<Overview />, { wrapper: createWrapper() });
+
+    expect(screen.getByRole('status')).toHaveTextContent('Loading…');
+    expect(screen.getByText('Loading…')).toBeVisible();
+    expect(screen.queryByText('Today')).not.toBeInTheDocument();
   });
 
   it('graf má textovou alternativu (role="img" + aria-label)', async () => {

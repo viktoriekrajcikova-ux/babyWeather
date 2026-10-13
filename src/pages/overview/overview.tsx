@@ -8,7 +8,7 @@ import { useChildrenQuery } from '../../modules/children/hooks/useChildrenQuery'
 import { useWeatherQuery } from '../../modules/weather/hooks/useWeatherQuery';
 import styles from './overview.module.scss';
 import { useSelectedCoords } from '../../modules/location/hooks/useSelectedCoords';
-import OverviewSkeleton from './components/overviewSkeleton';
+import Loader from '../../components/loader/loader';
 import OverviewDashboard from './components/overviewDashboard';
 import { useWeatherErrorToast } from '../../modules/weather/hooks/useWeatherErrorToast';
 
@@ -63,7 +63,7 @@ const Overview = () => {
         </div>
 
         {weatherLoading || childrenLoading ? (
-          <OverviewSkeleton />
+          <Loader />
         ) : weatherError || !weather ? (
           <div className={styles.alert}>
             <p>{t('weather.unavailable')}</p>
