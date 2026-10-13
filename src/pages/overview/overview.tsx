@@ -10,7 +10,11 @@ import styles from './overview.module.scss';
 import { useSelectedCoords } from '../../modules/location/hooks/useSelectedCoords';
 import { formatLocationLabel } from '../../modules/location/helpers/formatLocationLabel';
 import Loader from '../../components/loader/loader';
-import OverviewDashboard from './components/overviewDashboard';
+import WeatherSummary from '../../modules/weather/components/weatherSummary/weatherSummary';
+import ChildrenSummary from '../../modules/children/components/childrenSummary/childrenSummary';
+import ChildrenPacking from '../../modules/children/components/childrenPacking/childrenPacking';
+import TemperatureChart from '../../modules/weather/components/temperatureChart/temperatureChart';
+import { getTodayForecast } from '../../modules/weather/helpers/getTodayForecast';
 import { useWeatherErrorToast } from '../../modules/weather/hooks/useWeatherErrorToast';
 
 const Overview = () => {
@@ -51,6 +55,7 @@ const Overview = () => {
   useEffect(() => () => toast.dismiss('overview-children'), []);
 
   const locationLabel = formatLocationLabel(coords);
+  const today = weather ? getTodayForecast(weather.hourly, weather.timezone, new Date()) : [];
 
   return (
     <>
@@ -81,16 +86,25 @@ const Overview = () => {
         ) : (
           <>
             <p>{t('weather.forLocation', { location: locationLabel })}</p>
-            <OverviewDashboard
-              hourly={weather.hourly}
-              timezone={weather.timezone}
+            {today.length > 0 && (
+              <>
+                <section className={styles.tiles}>
+                  <ChildrenSummary kids={children ?? []} isError={childrenError} />
+                  <WeatherSummary hourly={today} timezone={weather.timezone} />
+                </section>
+                <TemperatureChart hourly={today} timezone={weather.timezone} />
+              </>
+            )}
+            <ChildrenPacking
+              hourly={today}
               kids={children ?? []}
-              childrenError={childrenError ? t('overview.packingUnavailable') : null}
-              onRetryChildren={() => {
+              error={childrenError ? t('overview.packingUnavailable') : null}
+              onRetry={() => {
                 void refetchChildren();
               }}
-              childrenFetching={childrenFetching}
+              isFetching={childrenFetching}
             />
+            {today.length === 0 && <p role="status">{t('overview.noForecast')}</p>}
           </>
         )}
         <DataAttribution />

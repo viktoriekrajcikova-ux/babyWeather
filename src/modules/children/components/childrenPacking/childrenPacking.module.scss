@@ -1,0 +1,73 @@
+@use '../../../../assets/scss/variables' as *;
+
+$breakpoint-md: 48rem;
+
+.sectionTitle {
+  margin: 2.5rem 0 1rem;
+}
+
+/* ---- Card (empty state) ---- */
+.card {
+  padding: 1.5rem;
+  background: $color-surface;
+  border-radius: 2rem;
+  box-shadow: 0 10px 15px -3px $color-shadow;
+}
+
+/* ---- What to pack today ---- */
+.plan {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: 1fr;
+
+  @media (min-width: $breakpoint-md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ---- States ---- */
+.alert {
+  padding: 0.75rem 1rem;
+  background: $color-surface;
+  border: 1px solid $color-accent-500;
+  border-left-width: 4px;
+  border-radius: 0.9rem;
+  box-shadow: 0 10px 15px -3px $color-shadow;
+  font-size: $font-size-small;
+  font-weight: $font-weight-semibold;
+}
+
+.empty {
+  text-align: center;
+
+  p {
+    margin: 0.75rem 0 1.25rem;
+    color: $color-neutral-500;
+    font-size: $font-size-small;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.emptyIcon {
+  color: $color-neutral-500;
+}
+
+.button {
+  display: inline-block;
+  padding: 0.55rem 1.1rem;
+  background: $color-primary-500;
+  color: $color-surface;
+  border-radius: 1.25rem;
+  font-size: $font-size-small;
+  font-weight: $font-weight-bold;
+  text-decoration: none;
+
+  &:hover {
+    box-shadow: 0 10px 15px -3px $color-shadow;
+  }
+
+  &:focus-visible {
+    outline: 3px solid $color-primary-700;
+    outline-offset: 2px;
+  }
+}

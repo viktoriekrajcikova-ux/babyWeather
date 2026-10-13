@@ -16,10 +16,6 @@ $breakpoint-md: 48rem;
   }
 }
 
-.sectionTitle {
-  margin: 2.5rem 0 1rem;
-}
-
 /* ---- KPI tiles ---- */
 .tiles {
   display: grid;
@@ -28,65 +24,6 @@ $breakpoint-md: 48rem;
 
   @media (min-width: $breakpoint-md) {
     grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-.tile {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  min-height: 6.5rem;
-  padding: 1.1rem 1.25rem;
-  background: $color-surface;
-  border-radius: 1.5rem;
-  box-shadow: 0 10px 15px -3px $color-shadow;
-}
-
-.label {
-  font-size: $font-size-caption;
-  font-weight: $font-weight-bold;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: $color-neutral-500;
-}
-
-.value {
-  font-size: $font-size-display;
-  font-weight: $font-weight-extrabold;
-  line-height: $line-height-tight;
-  letter-spacing: -0.02em;
-}
-
-.unit {
-  font-size: $font-size-title;
-}
-
-.sub {
-  font-size: $font-size-small;
-  font-weight: $font-weight-semibold;
-  color: $color-neutral-500;
-}
-
-.accent .value {
-  color: $color-accent-500;
-}
-
-/* ---- Card (empty state) ---- */
-.card {
-  padding: 1.5rem;
-  background: $color-surface;
-  border-radius: 2rem;
-  box-shadow: 0 10px 15px -3px $color-shadow;
-}
-
-/* ---- What to pack today ---- */
-.plan {
-  display: grid;
-  gap: 1.25rem;
-  grid-template-columns: 1fr;
-
-  @media (min-width: $breakpoint-md) {
-    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -100,39 +37,4 @@ $breakpoint-md: 48rem;
   box-shadow: 0 10px 15px -3px $color-shadow;
   font-size: $font-size-small;
   font-weight: $font-weight-semibold;
-}
-
-.empty {
-  text-align: center;
-
-  p {
-    margin: 0.75rem 0 1.25rem;
-    color: $color-neutral-500;
-    font-size: $font-size-small;
-    font-weight: $font-weight-semibold;
-  }
-}
-
-.emptyIcon {
-  color: $color-neutral-500;
-}
-
-.button {
-  display: inline-block;
-  padding: 0.55rem 1.1rem;
-  background: $color-primary-500;
-  color: $color-surface;
-  border-radius: 1.25rem;
-  font-size: $font-size-small;
-  font-weight: $font-weight-bold;
-  text-decoration: none;
-
-  &:hover {
-    box-shadow: 0 10px 15px -3px $color-shadow;
-  }
-
-  &:focus-visible {
-    outline: 3px solid $color-primary-700;
-    outline-offset: 2px;
-  }
 }
