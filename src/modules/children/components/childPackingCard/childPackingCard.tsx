@@ -1,6 +1,6 @@
-import type { Child } from '../../../modules/children/children.types';
-import type { ClothesItem } from '../../../modules/clothing/clothing.types';
-import styles from '../overview.module.scss';
+import type { Child } from '../../children.types';
+import type { ClothesItem } from '../../../clothing/clothing.types';
+import styles from './childPackingCard.module.scss';
 import { useTranslation } from 'react-i18next';
 
 const boyAvatar = 'assets/img/boy.png';

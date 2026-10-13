@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ToastProvider } from '../../../components/toast/toastProvider';
+import toast, { Toaster } from 'react-hot-toast';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
@@ -76,9 +76,8 @@ function createWrapper() {
   const Wrapper = ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={queryClient}>
       <AuthContext.Provider value={auth}>
-        <ToastProvider>
-          <MemoryRouter>{children}</MemoryRouter>
-        </ToastProvider>
+        <Toaster />
+        <MemoryRouter>{children}</MemoryRouter>
       </AuthContext.Provider>
     </QueryClientProvider>
   );
@@ -149,25 +148,29 @@ describe('Overview (integrační test)', () => {
     expect(screen.getByRole('link', { name: 'Add child' })).toHaveAttribute('href', '/settings');
   });
 
-  it('při chybě počasí zobrazí alert', async () => {
+  it('při chybě počasí zobrazí oznámení a zachová opakování po zavření', async () => {
     const user = userEvent.setup();
     vi.mocked(weatherApi.getData).mockRejectedValue(new Error('500'));
     vi.mocked(childrenApi.getChildren).mockResolvedValue([]);
 
     render(<Overview />, { wrapper: createWrapper() });
 
-    expect(await screen.findByRole('alert')).toHaveTextContent(/could not load weather/i);
-    await user.click(screen.getByRole('button', { name: 'Close' }));
-    await waitFor(() => expect(screen.queryByRole('alert')).not.toBeInTheDocument());
+    expect(await screen.findByText(/could not load weather/i)).toHaveAttribute('role', 'status');
+    act(() => toast.dismiss('overview-weather:49.3547:17.8694'));
+    await waitFor(() => expect(screen.queryByRole('status')).not.toBeInTheDocument(), {
+      timeout: 2000,
+    });
     expect(screen.getByText('Weather is currently unavailable.')).toBeVisible();
     // This suite freezes Date; give the next failure its own query timestamp.
     vi.setSystemTime(new Date('2026-01-15T00:15:01+01:00'));
     await user.click(screen.getByRole('button', { name: 'Try again' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent(/could not load weather/i);
+    expect(await screen.findByRole('status')).toHaveTextContent(/could not load weather/i);
     vi.mocked(weatherApi.getData).mockResolvedValue(makeWeather());
     await user.click(screen.getByRole('button', { name: 'Try again' }));
     expect(await screen.findByText('Today')).toBeVisible();
-    await waitFor(() => expect(screen.queryByRole('alert')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('status')).not.toBeInTheDocument(), {
+      timeout: 2000,
+    });
   });
 
   it.each([false, true])(
@@ -179,11 +182,14 @@ describe('Overview (integrační test)', () => {
       );
       vi.mocked(childrenApi.getChildren).mockRejectedValue(new Error('children failed'));
       render(<Overview />, { wrapper: createWrapper() });
-      expect(await screen.findByText('Could not load children')).toBeVisible();
+      expect(await screen.findByText(/Could not load children/)).toBeVisible();
       expect(screen.queryByText('No children yet')).not.toBeInTheDocument();
       expect(screen.queryByRole('link', { name: 'Add child' })).not.toBeInTheDocument();
-      await user.click(screen.getByRole('button', { name: 'Close' }));
-      await waitFor(() => expect(screen.queryByRole('alert')).not.toBeInTheDocument());
+      act(() => toast.dismiss('overview-children'));
+      await waitFor(
+        () => expect(screen.queryByText(/Could not load children/)).not.toBeInTheDocument(),
+        { timeout: 2000 },
+      );
       vi.mocked(childrenApi.getChildren).mockResolvedValue([
         row({ id: 1, name: 'Ema', age: 4, sex: 'female' }),
       ]);
@@ -192,7 +198,12 @@ describe('Overview (integrační test)', () => {
         expect(screen.queryByRole('button', { name: 'Try again' })).not.toBeInTheDocument(),
       );
       if (!noForecast) expect(await screen.findByRole('heading', { name: 'Ema' })).toBeVisible();
-      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+      expect(screen.queryByText(/Could not load children/)).not.toBeInTheDocument();
+      if (noForecast) {
+        expect(screen.getByRole('status')).toHaveTextContent(
+          'No forecast available for the rest of today.',
+        );
+      }
     },
   );
 });

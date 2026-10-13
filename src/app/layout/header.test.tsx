@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Header from './header';
-import { ToastProvider } from '../../components/toast/toastProvider';
+import { Toaster } from 'react-hot-toast';
 import i18n from '../../i18n/i18n';
 
 vi.mock('../../modules/auth/hooks/useAuth', () => ({
@@ -21,10 +21,9 @@ it('switches both ways and updates navigation, page text and document language',
   const user = userEvent.setup();
   render(
     <MemoryRouter>
-      <ToastProvider>
-        <Header />
-        <PageLabel />
-      </ToastProvider>
+      <Toaster />
+      <Header />
+      <PageLabel />
     </MemoryRouter>,
   );
   const select = screen.getByRole('combobox', { name: 'Jazyk aplikace' });

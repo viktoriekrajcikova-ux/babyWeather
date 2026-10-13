@@ -1,12 +1,13 @@
-import { Row, Col } from 'react-bootstrap';
+import { Button, Row, Col } from 'react-bootstrap';
 import { ArrowLeft } from 'lucide-react';
-import type { WeatherData } from '../../../modules/weather/weather.types';
-import { kelvinToCelsius } from '../../../modules/weather/helpers/temperature';
-import WeatherForecast from '../../../modules/weather/components/weatherForecast';
-import Weather from '../../../modules/weather/components/weather';
-import { formatHour } from '../../../modules/weather/helpers/formatHour';
+import type { WeatherData } from '../../weather.types';
+import { kelvinToCelsius } from '../../helpers/temperature';
+import WeatherForecast from '../weatherForecast/weatherForecast';
+import Weather from '../weather/weather';
+import { formatHour } from '../../helpers/formatHour';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import styles from './weatherPanel.module.scss';
 
 interface WeatherPanelProps {
   weather: WeatherData;
@@ -59,10 +60,16 @@ export const WeatherPanel = ({
           icon={weather.hourly[selectedWeatherIndex].weather[0].icon}
         />
         {selectedWeatherIndex > 0 && (
-          <button type="button" className="current-weather" onClick={() => onSelectForecast(0)}>
+          <Button
+            type="button"
+            variant="outline-secondary"
+            size="sm"
+            className={styles.currentWeather}
+            onClick={() => onSelectForecast(0)}
+          >
             <ArrowLeft size={16} strokeWidth={2} />
             {t('weather.backToCurrent')}
-          </button>
+          </Button>
         )}
       </Col>
     </Row>

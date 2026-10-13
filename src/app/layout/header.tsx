@@ -1,29 +1,25 @@
-import { Container, Row, Col } from 'react-bootstrap';
+import { Button, Container, Row, Col, Form } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import styles from './header.module.scss';
 import { House, ChartColumn, Settings, LogOut } from 'lucide-react';
 import { useAuth } from '../../modules/auth/hooks/useAuth';
 import { useState } from 'react';
-import { useToast } from '../../components/toast/toastContext';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 
 const Header = () => {
   const { t, i18n } = useTranslation();
   const { signOut } = useAuth();
-  const { showError, dismiss } = useToast();
+
   const [isSigningOut, setIsSigningOut] = useState(false);
   const handleSignOut = async () => {
     if (isSigningOut) return;
-    dismiss('auth-signout');
+    toast.dismiss('auth-signout');
     setIsSigningOut(true);
     try {
       await signOut();
     } catch {
-      showError({
-        id: 'auth-signout',
-        title: t('auth.signOutError'),
-        message: t('common.pleaseRetry'),
-      });
+      toast.error(`${t('auth.signOutError')} ${t('common.pleaseRetry')}`, { id: 'auth-signout' });
     } finally {
       setIsSigningOut(false);
     }
@@ -48,7 +44,7 @@ const Header = () => {
                 {t('navigation.settings')}
               </Link>
               <span className={styles.divider} aria-hidden="true" />
-              <select
+              <Form.Select
                 className={styles.language}
                 aria-label={t('navigation.language')}
                 value={i18n.resolvedLanguage ?? 'cs'}
@@ -62,16 +58,17 @@ const Header = () => {
                 <option value="en" lang="en">
                   English
                 </option>
-              </select>
-              <button
+              </Form.Select>
+              <Button
                 type="button"
+                variant="outline-secondary"
                 onClick={handleSignOut}
                 className={styles.logout}
                 disabled={isSigningOut}
               >
                 <LogOut size={20} strokeWidth={2} />
                 {t('navigation.logout')}
-              </button>
+              </Button>
             </Col>
           </Row>
         </Container>

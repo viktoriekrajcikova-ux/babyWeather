@@ -1,26 +1,24 @@
 import { useEffect } from 'react';
+import { Button } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
-import { useToast } from '../../../components/toast/toastContext';
+import toast from 'react-hot-toast';
 
 export default function SessionRecovery({ onRetry }: { onRetry: () => void }) {
-  const { showError, dismiss } = useToast();
   const { t } = useTranslation();
 
   useEffect(() => {
-    showError({
+    toast.error(`${t('auth.sessionRecovery.title')} ${t('auth.sessionRecovery.message')}`, {
       id: 'auth-session',
-      title: t('auth.sessionRecovery.title'),
-      message: t('auth.sessionRecovery.message'),
     });
-    return () => dismiss('auth-session');
-  }, [showError, dismiss, t]);
+    return () => toast.dismiss('auth-session');
+  }, [t]);
 
   return (
     <main className="container py-4">
       <p>{t('auth.sessionRecovery.unavailable')}</p>
-      <button type="button" className="btn btn-outline-secondary" onClick={onRetry}>
+      <Button type="button" variant="outline-secondary" onClick={onRetry}>
         {t('common.tryAgain')}
-      </button>
+      </Button>
     </main>
   );
 }

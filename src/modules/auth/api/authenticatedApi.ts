@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase';
+import { supabase } from '../../../lib/supabase';
 
 export async function authenticatedGet<T>(path: string, errorMessage: string): Promise<T> {
   try {

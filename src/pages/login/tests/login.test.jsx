@@ -1,11 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { act, render as renderUI, screen } from '@testing-library/react';
-import { ToastProvider } from '../../../components/toast/toastProvider';
+import { act, render as renderUI, screen, waitFor } from '@testing-library/react';
+import { Toaster } from 'react-hot-toast';
 import userEvent from '@testing-library/user-event';
 import Login from '../login';
 
 const mockNavigate = vi.fn();
-const render = (ui) => renderUI(ui, { wrapper: ToastProvider });
+const render = (ui) =>
+  renderUI(
+    <>
+      <Toaster />
+      {ui}
+    </>,
+  );
 const mockSignIn = vi.fn();
 const mockSignUp = vi.fn();
 
@@ -126,12 +132,12 @@ describe('Login', () => {
     await user.type(screen.getByPlaceholderText('Password'), 'spatne');
     await user.click(screen.getByRole('button', { name: 'Sign In' }));
 
-    const alert = await screen.findByRole('alert');
+    const alert = await screen.findByRole('status');
     expect(alert).toBeVisible();
     expect(alert).toHaveTextContent('Could not sign in');
     expect(screen.getByRole('button', { name: 'Sign In' })).toBeEnabled();
     expect(screen.getByRole('button', { name: 'Create an account' })).toBeEnabled();
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    expect(screen.queryByText('Please wait…')).not.toBeInTheDocument();
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 
@@ -151,7 +157,7 @@ describe('Login', () => {
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
 
-  it('chyba registrace ukončí pending a přepnutí režimu odstraní alert', async () => {
+  it('chyba registrace ukončí pending a přepnutí režimu odstraní oznámení', async () => {
     let rejectSignUp;
     mockSignUp.mockReturnValue(
       new Promise((_, reject) => {
@@ -173,11 +179,13 @@ describe('Login', () => {
       rejectSignUp(new Error('Registration failed'));
     });
 
-    expect(screen.getByRole('alert')).toHaveTextContent('Could not create account');
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('Could not create account');
+    expect(screen.queryByText('Please wait…')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Sign Up', exact: true })).toBeEnabled();
     await user.click(screen.getByRole('button', { name: 'Back to login' }));
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByRole('status')).not.toBeInTheDocument(), {
+      timeout: 2000,
+    });
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 

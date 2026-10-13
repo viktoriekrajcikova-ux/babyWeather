@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
+import { Button, Form } from 'react-bootstrap';
 import styles from './locationSearch.module.scss';
 import type { GeocodingResult } from '../api/geocodingApiClient';
 import { useSearchCityQuery } from '../hooks/useSearchCityQuery';
-import { useToast } from '../../../components/toast/toastContext';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 
 type LocationSearchProps = {
@@ -11,7 +12,7 @@ type LocationSearchProps = {
 
 const LocationSearch = ({ onLocationSelect }: LocationSearchProps) => {
   const { t } = useTranslation();
-  const { showError, dismiss } = useToast();
+
   const [city, setCity] = useState('');
   const [searchedCity, setSearchedCity] = useState('');
   const locationQuery = useSearchCityQuery(searchedCity);
@@ -19,22 +20,20 @@ const LocationSearch = ({ onLocationSelect }: LocationSearchProps) => {
 
   useEffect(() => {
     if (isError) {
-      showError({
+      toast.error(`${t('location.searchError')} ${t('location.searchHint')}`, {
         id: 'location-search',
-        title: t('location.searchError'),
-        message: t('location.searchHint'),
       });
     } else if (isSuccess) {
-      dismiss('location-search');
+      toast.dismiss('location-search');
     }
-  }, [isError, isSuccess, errorUpdatedAt, showError, dismiss, t]);
+  }, [isError, isSuccess, errorUpdatedAt, t]);
 
-  useEffect(() => () => dismiss('location-search'), [dismiss]);
+  useEffect(() => () => toast.dismiss('location-search'), []);
 
   const searchLocation = (city: string) => {
     const trimmedCity = city.trim();
     if (!trimmedCity) return;
-    dismiss('location-search');
+    toast.dismiss('location-search');
 
     if (trimmedCity === searchedCity) {
       void locationQuery.refetch();
@@ -51,14 +50,14 @@ const LocationSearch = ({ onLocationSelect }: LocationSearchProps) => {
   }, [locationQuery.data, onLocationSelect]);
 
   return (
-    <form
+    <Form
       className={styles.form}
       onSubmit={(e) => {
         e.preventDefault();
         searchLocation(city);
       }}
     >
-      <input
+      <Form.Control
         type="text"
         className={styles.input}
         value={city}
@@ -66,10 +65,10 @@ const LocationSearch = ({ onLocationSelect }: LocationSearchProps) => {
         placeholder={t('location.placeholder')}
         aria-label={t('location.city')}
       />
-      <button type="submit" className={styles.button} disabled={locationQuery.isFetching}>
+      <Button type="submit" variant="primary" disabled={locationQuery.isFetching}>
         {locationQuery.isFetching ? t('location.searching') : t('location.search')}
-      </button>
-    </form>
+      </Button>
+    </Form>
   );
 };
 

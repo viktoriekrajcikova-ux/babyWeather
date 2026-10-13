@@ -45,61 +45,18 @@
 }
 
 .language {
+  width: auto;
   max-width: 100%;
-  min-height: 2.75rem;
-  padding: 0.45rem 0.9rem;
-  background: $color-surface;
-  color: $color-neutral-900;
-  border: 1px solid $color-neutral-200;
   border-radius: 1.25rem;
-  font-family: inherit;
   font-size: $font-size-small;
   font-weight: $font-weight-bold;
-  line-height: $line-height-base;
   letter-spacing: 0.04em;
-  cursor: pointer;
-
-  &:hover {
-    background: $color-bg;
-    border-color: $color-primary-700;
-    color: $color-primary-700;
-  }
-
-  &:focus-visible {
-    outline: 3px solid $color-primary-700;
-    outline-offset: 2px;
-  }
-
-  option {
-    background: $color-surface;
-    color: $color-neutral-900;
-    font-weight: $font-weight-regular;
-  }
 }
 
 .logout {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.45rem 0.9rem;
-  background: $color-surface;
-  color: $color-neutral-900;
-  border: 1px solid $color-neutral-200;
-  border-radius: 1.25rem;
-  font-family: inherit;
   font-size: $font-size-small;
-  font-weight: $font-weight-bold;
   letter-spacing: 0.04em;
-  cursor: pointer;
-
-  &:hover {
-    background: $color-bg;
-    border-color: $color-accent-500;
-    color: $color-accent-500;
-  }
-
-  &:focus-visible {
-    outline: 3px solid $color-primary-700;
-    outline-offset: 2px;
-  }
 }

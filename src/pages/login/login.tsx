@@ -1,6 +1,7 @@
 import type { FormEvent } from 'react';
 import { useState, useEffect } from 'react';
-import { useToast } from '../../components/toast/toastContext';
+import { Button, Form } from 'react-bootstrap';
+import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../modules/auth/hooks/useAuth';
 import styles from './login.module.scss';
@@ -8,8 +9,7 @@ import { useTranslation } from 'react-i18next';
 
 const Login = () => {
   const { t } = useTranslation();
-  const { showError, dismiss } = useToast();
-  useEffect(() => () => dismiss('auth-submit'), [dismiss]);
+  useEffect(() => () => toast.dismiss('auth-submit'), []);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -22,7 +22,7 @@ const Login = () => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isPending) return;
-    dismiss('auth-submit');
+    toast.dismiss('auth-submit');
     setMessage(null);
     setIsPending(true);
     try {
@@ -35,11 +35,10 @@ const Login = () => {
         setMessage('auth.confirmEmail');
       }
     } catch {
-      showError({
-        id: 'auth-submit',
-        title: mode === 'signIn' ? t('auth.signInError') : t('auth.signUpError'),
-        message: t('auth.retryHint'),
-      });
+      toast.error(
+        `${mode === 'signIn' ? t('auth.signInError') : t('auth.signUpError')} ${t('auth.retryHint')}`,
+        { id: 'auth-submit' },
+      );
     } finally {
       setIsPending(false);
     }
@@ -47,7 +46,7 @@ const Login = () => {
 
   const handleMode = () => {
     setMode(mode === 'signIn' ? 'signUp' : 'signIn');
-    dismiss('auth-submit');
+    toast.dismiss('auth-submit');
     setMessage(null);
   };
 
@@ -56,16 +55,15 @@ const Login = () => {
       <p className={styles.brand}>
         BabyWeather<span aria-hidden="true">.</span>
       </p>
-      <form onSubmit={handleSubmit} className={styles.card} aria-labelledby="loginTitle">
+      <Form onSubmit={handleSubmit} className={styles.card} aria-labelledby="loginTitle">
         <div className={styles.pageHead}>
           <h1 id="loginTitle">{mode === 'signIn' ? t('auth.login') : t('auth.createAccount')}</h1>
           <p>{mode === 'signIn' ? t('auth.loginDescription') : t('auth.registerDescription')}</p>
         </div>
-        <div className={styles.field}>
-          <label htmlFor="loginEmail">{t('auth.email')}</label>
-          <input
+        <Form.Group className={styles.field} controlId="loginEmail">
+          <Form.Label>{t('auth.email')}</Form.Label>
+          <Form.Control
             required
-            id="loginEmail"
             name="email"
             autoComplete="username"
             type="email"
@@ -73,20 +71,19 @@ const Login = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-        </div>
-        <div className={styles.field}>
-          <label htmlFor="loginPassword">{t('auth.password')}</label>
-          <input
+        </Form.Group>
+        <Form.Group className={styles.field} controlId="loginPassword">
+          <Form.Label>{t('auth.password')}</Form.Label>
+          <Form.Control
             required
             autoComplete={mode === 'signIn' ? 'current-password' : 'new-password'}
-            id="loginPassword"
             name="password"
             type="password"
             placeholder={t('auth.password')}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-        </div>
+        </Form.Group>
 
         {message && (
           <div className={styles.status} role="status">
@@ -98,16 +95,16 @@ const Login = () => {
             {t('common.pleaseWait')}
           </div>
         )}
-        <button className={styles.submit} type="submit" disabled={isPending}>
+        <Button variant="primary" type="submit" disabled={isPending}>
           {mode === 'signIn' ? t('auth.signIn') : t('auth.signUp')}
-        </button>
+        </Button>
         <div className={styles.switchMode}>
           <p>{mode === 'signIn' ? t('auth.newUser') : t('auth.existingUser')}</p>
-          <button onClick={handleMode} type="button" disabled={isPending}>
+          <Button variant="link" onClick={handleMode} type="button" disabled={isPending}>
             {mode === 'signIn' ? t('auth.registerLink') : t('auth.loginLink')}
-          </button>
+          </Button>
         </div>
-      </form>
+      </Form>
     </main>
   );
 };

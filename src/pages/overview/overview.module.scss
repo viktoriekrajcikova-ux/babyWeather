@@ -71,99 +71,12 @@ $breakpoint-md: 48rem;
   color: $color-accent-500;
 }
 
-/* ---- Card (chart + empty state) ---- */
+/* ---- Card (empty state + skeleton) ---- */
 .card {
   padding: 1.5rem;
   background: $color-surface;
   border-radius: 2rem;
   box-shadow: 0 10px 15px -3px $color-shadow;
-}
-
-.chartNote {
-  margin: 0 0 1.25rem;
-  color: $color-neutral-500;
-  font-size: $font-size-small;
-  font-weight: $font-weight-semibold;
-}
-
-/* ---- Temperature outlook (bar chart, bez knihovny) ---- */
-.chart {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 1fr;
-  align-items: end;
-  gap: 0.5rem;
-  height: 11rem;
-  padding-bottom: 0.25rem;
-  overflow-x: auto;
-}
-
-.col {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.4rem;
-  height: 100%;
-  min-width: 2.25rem;
-}
-
-.temp {
-  font-size: $font-size-caption;
-  font-weight: $font-weight-bold;
-  font-variant-numeric: tabular-nums;
-}
-
-.bar {
-  width: 100%;
-  max-width: 1.75rem;
-  background: $color-primary-500;
-  border-radius: 0.5rem 0.5rem 0 0;
-}
-
-.barNow {
-  background: $color-accent-500;
-}
-
-.hour {
-  font-size: $font-size-caption;
-  font-weight: $font-weight-semibold;
-  color: $color-neutral-500;
-  font-variant-numeric: tabular-nums;
-}
-
-.colNow .hour {
-  color: $color-accent-500;
-  font-weight: $font-weight-bold;
-}
-
-.legend {
-  display: flex;
-  gap: 1.25rem;
-  margin-top: 1rem;
-  font-size: $font-size-caption;
-  font-weight: $font-weight-semibold;
-  color: $color-neutral-500;
-
-  span {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
-}
-
-.swatch {
-  width: 0.9rem;
-  height: 0.9rem;
-  border-radius: 0.25rem;
-}
-
-.swatchNow {
-  background: $color-accent-500;
-}
-
-.swatchForecast {
-  background: $color-primary-500;
 }
 
 /* ---- What to pack today ---- */
@@ -174,81 +87,6 @@ $breakpoint-md: 48rem;
 
   @media (min-width: $breakpoint-md) {
     grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-.childCard {
-  padding: 1.5rem;
-  background: $color-surface;
-  border-radius: 3.75rem 0.75rem 3.75rem 3.75rem;
-  box-shadow: 0 10px 15px -3px $color-shadow;
-}
-
-.childHead {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  margin-bottom: 0.35rem;
-
-  h3 {
-    margin: 0;
-  }
-}
-
-.avatar {
-  flex: none;
-  width: 3rem;
-  height: 3rem;
-  border-radius: 50%;
-  object-fit: cover;
-  background: $color-bg;
-}
-
-.meta {
-  font-size: $font-size-small;
-  font-weight: $font-weight-semibold;
-  color: $color-neutral-500;
-}
-
-.planHint {
-  margin: 0.25rem 0 1rem;
-  font-size: $font-size-small;
-  font-weight: $font-weight-semibold;
-  color: $color-neutral-500;
-}
-
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
-
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  padding: 0.4rem 0.75rem 0.4rem 0.5rem;
-  background: $color-bg;
-  border-radius: 1.25rem;
-  font-size: $font-size-small;
-  font-weight: $font-weight-semibold;
-}
-
-.thumb {
-  display: grid;
-  place-items: center;
-  width: 1.6rem;
-  height: 1.6rem;
-  background: $color-surface;
-  border: 1px solid $color-neutral-200;
-  border-radius: 0.5rem;
-
-  img {
-    max-width: 1.2rem;
-    max-height: 1.2rem;
   }
 }
 

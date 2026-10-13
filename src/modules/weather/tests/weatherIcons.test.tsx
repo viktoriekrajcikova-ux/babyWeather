@@ -1,7 +1,7 @@
 import { expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import Weather from '../components/weather';
-import WeatherForecast from '../components/weatherForecast';
+import Weather from '../components/weather/weather';
+import WeatherForecast from '../components/weatherForecast/weatherForecast';
 
 it.each([
   'clear',

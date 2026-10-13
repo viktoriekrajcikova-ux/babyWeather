@@ -1,8 +1,8 @@
 import styles from './weatherForecast.module.scss';
-import WeatherIcon from './weatherIcon';
-import type { HourlyWeather } from '../weather.types';
-import { kelvinToCelsius } from '../helpers/temperature';
-import { formatHour } from '../helpers/formatHour';
+import WeatherIcon from '../weatherIcon/weatherIcon';
+import type { HourlyWeather } from '../../weather.types';
+import { kelvinToCelsius } from '../../helpers/temperature';
+import { formatHour } from '../../helpers/formatHour';
 import { useTranslation } from 'react-i18next';
 
 interface WeatherForecastProps {

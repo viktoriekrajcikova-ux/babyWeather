@@ -1,6 +1,7 @@
 import type { Sex } from '../../children.types';
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
+import Button from 'react-bootstrap/Button';
 import styles from './child.module.scss';
 import { X } from 'lucide-react';
 import type { ClothesItem } from '../../../clothing/clothing.types';
@@ -24,14 +25,15 @@ const Child = ({ name, sex, allClothes, id, onClickDelete }: ChildProps) => {
   return (
     <>
       <Col xs={12} md={6} className={styles.child} id={String(id)}>
-        <button
+        <Button
           type="button"
+          variant="outline-danger"
           className={styles.delete}
           aria-label={t('children.remove', { name })}
           onClick={() => onClickDelete(id)}
         >
           <X size={20} strokeWidth={2} />
-        </button>
+        </Button>
         {urlAvatar && <Image className={styles.img} src={urlAvatar} alt="" roundedCircle />}
         <h2 className={styles.name}>{name}</h2>
         <ul className={styles.clothes}>

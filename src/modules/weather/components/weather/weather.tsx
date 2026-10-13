@@ -1,7 +1,8 @@
 import styles from './weather.module.scss';
-import WeatherIcon from './weatherIcon';
+import { Button } from 'react-bootstrap';
+import WeatherIcon from '../weatherIcon/weatherIcon';
 import { useTranslation } from 'react-i18next';
-import { translateWeatherDescription } from '../helpers/translateWeatherDescription';
+import { translateWeatherDescription } from '../../helpers/translateWeatherDescription';
 
 interface WeatherProps {
   temperature: number;
@@ -34,14 +35,16 @@ const Weather = ({
         </div>
         <div className={styles.desc}>{translateWeatherDescription(describe, t)}</div>
       </div>
-      <button
+      <Button
         type="button"
+        variant="outline-secondary"
+        size="sm"
         className={styles.forecastToggle}
         onClick={onClickWeatherForecast}
         aria-expanded={forecastOpen}
       >
         {forecastOpen ? t('weather.hideForecast') : t('weather.showForecast')}
-      </button>
+      </Button>
     </div>
   );
 };

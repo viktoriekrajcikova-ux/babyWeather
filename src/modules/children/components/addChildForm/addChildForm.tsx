@@ -1,6 +1,6 @@
 import type { FormEvent } from 'react';
 import { useState, useEffect } from 'react';
-import { useToast } from '../../../../components/toast/toastContext';
+import toast from 'react-hot-toast';
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
@@ -24,8 +24,7 @@ const optionsAge = [0, 1, 2, 3, 4, 5];
 
 function AddChildForm() {
   const { t } = useTranslation();
-  const { showError, dismiss } = useToast();
-  useEffect(() => () => dismiss('children-add'), [dismiss]);
+  useEffect(() => () => toast.dismiss('children-add'), []);
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
   const [sex, setSex] = useState('');
@@ -39,7 +38,7 @@ function AddChildForm() {
     event.stopPropagation();
     if (isPending) return;
 
-    dismiss('children-add');
+    toast.dismiss('children-add');
     setFieldErrors({});
     const result = addChildSchema.safeParse({ name, age, sex });
 
@@ -52,11 +51,7 @@ function AddChildForm() {
       await addChild(result.data);
       navigate('/');
     } catch {
-      showError({
-        id: 'children-add',
-        title: t('children.addError'),
-        message: t('children.addHint'),
-      });
+      toast.error(`${t('children.addError')} ${t('children.addHint')}`, { id: 'children-add' });
     }
   };
 
@@ -129,7 +124,7 @@ function AddChildForm() {
           </Form.Group>
         </Row>
         <div className="mb-3 ">
-          <Button type="submit" className="btn-success" disabled={isPending}>
+          <Button type="submit" variant="success" disabled={isPending}>
             {isPending ? t('common.saving') : t('children.add')}
           </Button>
         </div>

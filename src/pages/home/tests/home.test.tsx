@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
-import { ToastProvider } from '../../../components/toast/toastProvider';
+import toast, { Toaster } from 'react-hot-toast';
 import type { Child } from '../../../modules/children/children.types';
 import type { WeatherData } from '../../../modules/weather/weather.types';
 import { AuthContext, type AuthContextValue } from '../../../modules/auth/authContext';
@@ -69,9 +69,8 @@ function createWrapper() {
   });
   const Wrapper = ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={queryClient}>
-      <ToastProvider>
-        <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>
-      </ToastProvider>
+      <Toaster />
+      <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>
     </QueryClientProvider>
   );
   return Wrapper;
@@ -143,8 +142,8 @@ describe('Home (integrační test)', () => {
     render(<Home />, { wrapper: createWrapper() });
 
     expect(await screen.findByText('Clear sky')).toBeVisible();
-    expect(await screen.findByRole('alert')).toHaveTextContent('Could not load children');
-    expect(screen.getByRole('alert')).toBeVisible();
+    expect(await screen.findByRole('status')).toHaveTextContent('Could not load children');
+    expect(screen.getByRole('status')).toBeVisible();
     expect(screen.getByText('Clear sky')).toBeVisible();
   });
 
@@ -154,22 +153,24 @@ describe('Home (integrační test)', () => {
     vi.mocked(childrenApi.getChildren).mockRejectedValue(new Error('load failed'));
     render(<Home />, { wrapper: createWrapper() });
 
-    expect(await screen.findByText('Could not load children')).toBeVisible();
-    await user.click(screen.getByRole('button', { name: 'Close' }));
-    await waitFor(() =>
-      expect(screen.queryByText('Could not load children')).not.toBeInTheDocument(),
+    expect(await screen.findByText(/Could not load children/)).toBeVisible();
+    act(() => toast.dismiss('children-load'));
+    await waitFor(
+      () => expect(screen.queryByText(/Could not load children/)).not.toBeInTheDocument(),
+      { timeout: 2000 },
     );
     expect(screen.getByText('Children are currently unavailable.')).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'Try again' }));
-    expect(await screen.findByText('Could not load children')).toBeVisible();
+    expect(await screen.findByText(/Could not load children/)).toBeVisible();
 
     vi.mocked(childrenApi.getChildren).mockResolvedValue([
       row({ id: 1, name: 'Ema', age: 2, sex: 'female' }),
     ]);
     await user.click(screen.getByRole('button', { name: 'Try again' }));
     expect(await screen.findByText('Ema')).toBeVisible();
-    await waitFor(() =>
-      expect(screen.queryByText('Could not load children')).not.toBeInTheDocument(),
+    await waitFor(
+      () => expect(screen.queryByText(/Could not load children/)).not.toBeInTheDocument(),
+      { timeout: 2000 },
     );
     expect(screen.queryByRole('button', { name: 'Try again' })).not.toBeInTheDocument();
   });
@@ -183,13 +184,14 @@ describe('Home (integrační test)', () => {
 
     render(<Home />, { wrapper: createWrapper() });
 
-    expect(await screen.findByText('Could not load weather')).toBeInTheDocument();
+    expect(await screen.findByText(/Could not load weather/)).toBeInTheDocument();
     expect(screen.queryByText('Ema')).not.toBeInTheDocument();
     vi.mocked(weatherApi.getData).mockResolvedValue(weatherAt20C);
     await user.click(screen.getByRole('button', { name: 'Try again' }));
     expect(await screen.findByText('Ema')).toBeVisible();
-    await waitFor(() =>
-      expect(screen.queryByText('Could not load weather')).not.toBeInTheDocument(),
+    await waitFor(
+      () => expect(screen.queryByText(/Could not load weather/)).not.toBeInTheDocument(),
+      { timeout: 2000 },
     );
   });
 });

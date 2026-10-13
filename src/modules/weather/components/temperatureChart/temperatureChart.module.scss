@@ -1,0 +1,99 @@
+@use '../../../../assets/scss/variables' as *;
+
+.sectionTitle {
+  margin: 2.5rem 0 1rem;
+}
+
+.card {
+  padding: 1.5rem;
+  background: $color-surface;
+  border-radius: 2rem;
+  box-shadow: 0 10px 15px -3px $color-shadow;
+}
+
+.chartNote {
+  margin: 0 0 1.25rem;
+  color: $color-neutral-500;
+  font-size: $font-size-small;
+  font-weight: $font-weight-semibold;
+}
+
+/* ---- Temperature outlook (bar chart, bez knihovny) ---- */
+.chart {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  align-items: end;
+  gap: 0.5rem;
+  height: 11rem;
+  padding-bottom: 0.25rem;
+  overflow-x: auto;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  height: 100%;
+  min-width: 2.25rem;
+}
+
+.temp {
+  font-size: $font-size-caption;
+  font-weight: $font-weight-bold;
+  font-variant-numeric: tabular-nums;
+}
+
+.bar {
+  width: 100%;
+  max-width: 1.75rem;
+  background: $color-primary-500;
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.barNow {
+  background: $color-accent-500;
+}
+
+.hour {
+  font-size: $font-size-caption;
+  font-weight: $font-weight-semibold;
+  color: $color-neutral-500;
+  font-variant-numeric: tabular-nums;
+}
+
+.colNow .hour {
+  color: $color-accent-500;
+  font-weight: $font-weight-bold;
+}
+
+.legend {
+  display: flex;
+  gap: 1.25rem;
+  margin-top: 1rem;
+  font-size: $font-size-caption;
+  font-weight: $font-weight-semibold;
+  color: $color-neutral-500;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+}
+
+.swatch {
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 0.25rem;
+}
+
+.swatchNow {
+  background: $color-accent-500;
+}
+
+.swatchForecast {
+  background: $color-primary-500;
+}

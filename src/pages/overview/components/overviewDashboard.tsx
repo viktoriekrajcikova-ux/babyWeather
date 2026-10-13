@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { Button } from 'react-bootstrap';
 import { Baby } from 'lucide-react';
 import { packForToday } from '../../../modules/clothing/helpers/packForToday';
 import { kelvinToRoundedCelsius } from '../../../modules/weather/helpers/temperature';
@@ -6,14 +7,14 @@ import type { HourlyWeather } from '../../../modules/weather/weather.types';
 import type { Child } from '../../../modules/children/children.types';
 import { formatHour } from '../../../modules/weather/helpers/formatHour';
 import { getTodayForecast } from '../../../modules/weather/helpers/getTodayForecast';
-import TemperatureChart from './temperatureChart';
-import ChildPackingCard from './childPackingCard';
+import TemperatureChart from '../../../modules/weather/components/temperatureChart/temperatureChart';
+import ChildPackingCard from '../../../modules/children/components/childPackingCard/childPackingCard';
 import styles from '../overview.module.scss';
 import { formatNames } from '../helpers/formatNames';
 import { useTranslation } from 'react-i18next';
 import { translateWeatherDescription } from '../../../modules/weather/helpers/translateWeatherDescription';
 
-interface OverviewContentProps {
+interface OverviewDashboardProps {
   hourly: HourlyWeather[];
   timezone: string;
   kids: Child[];
@@ -22,27 +23,28 @@ interface OverviewContentProps {
   childrenFetching: boolean;
 }
 
-const OverviewContent = ({
+const OverviewDashboard = ({
   hourly,
   timezone,
   kids,
   childrenError,
   onRetryChildren,
   childrenFetching,
-}: OverviewContentProps) => {
+}: OverviewDashboardProps) => {
   const { t, i18n } = useTranslation();
   const today = getTodayForecast(hourly, timezone, new Date());
   const childrenStatus = childrenError ? (
     <div className={styles.alert}>
       <p>{childrenError}</p>
-      <button
+      <Button
         type="button"
-        className="btn btn-outline-secondary btn-sm"
+        variant="outline-secondary"
+        size="sm"
         onClick={onRetryChildren}
         disabled={childrenFetching}
       >
         {childrenFetching ? t('common.retrying') : t('common.tryAgain')}
-      </button>
+      </Button>
     </div>
   ) : null;
   if (today.length === 0) {
@@ -136,4 +138,4 @@ const OverviewContent = ({
   );
 };
 
-export default OverviewContent;
+export default OverviewDashboard;

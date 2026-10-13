@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useToast } from '../../../components/toast/toastContext';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 
 const STORAGE_KEY = 'babyweather:coords';
@@ -45,20 +45,18 @@ function readStoredCoords(): SelectedLocation {
 
 export function useSelectedCoords() {
   const { t } = useTranslation();
-  const { showError, dismiss } = useToast();
+
   const [coords, setCoords] = useState(readStoredCoords);
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(coords));
-      dismiss('location-storage');
+      toast.dismiss('location-storage');
     } catch {
-      showError({
+      toast.error(`${t('location.saveError')} ${t('location.saveHint')}`, {
         id: 'location-storage',
-        title: t('location.saveError'),
-        message: t('location.saveHint'),
       });
     }
-  }, [coords, showError, dismiss, t]);
-  useEffect(() => () => dismiss('location-storage'), [dismiss]);
+  }, [coords, t]);
+  useEffect(() => () => toast.dismiss('location-storage'), []);
   return { coords, setCoords };
 }

@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { translateWeatherDescription } from '../helpers/translateWeatherDescription';
+import { translateWeatherDescription } from '../../helpers/translateWeatherDescription';
 
 const icons: Record<string, LucideIcon> = {
   clear: Sun,

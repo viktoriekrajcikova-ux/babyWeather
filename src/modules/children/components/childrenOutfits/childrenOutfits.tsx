@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
-import { Row } from 'react-bootstrap';
-import { useToast } from '../../../components/toast/toastContext';
-import { getOutfit } from '../../../modules/clothing/clothesDeterminer';
-import { useDeleteChildMutation } from '../../../modules/children/hooks/useDeleteChildMutation';
-import { useChildrenQuery } from '../../../modules/children/hooks/useChildrenQuery';
-import Child from '../../../modules/children/components/child/child';
-import styles from '../home.module.scss';
+import { Button, Row } from 'react-bootstrap';
+import toast from 'react-hot-toast';
+import { getOutfit } from '../../../clothing/clothesDeterminer';
+import { useDeleteChildMutation } from '../../hooks/useDeleteChildMutation';
+import { useChildrenQuery } from '../../hooks/useChildrenQuery';
+import Child from '../child/child';
+import styles from './childrenOutfits.module.scss';
 import { useTranslation } from 'react-i18next';
 
 interface ChildrenOutfitsProps {
@@ -14,7 +14,7 @@ interface ChildrenOutfitsProps {
 
 export const ChildrenOutfits = ({ feelsLike }: ChildrenOutfitsProps) => {
   const { t } = useTranslation();
-  const { showError, dismiss } = useToast();
+
   const {
     data: kids = [],
     isError: childrenError,
@@ -28,34 +28,31 @@ export const ChildrenOutfits = ({ feelsLike }: ChildrenOutfitsProps) => {
 
   useEffect(() => {
     if (deleteError) {
-      showError({
+      toast.error(`${t('children.deleteError')} ${t('common.pleaseRetry')}`, {
         id: 'children-delete',
-        title: t('children.deleteError'),
-        message: t('common.pleaseRetry'),
       });
     } else {
-      dismiss('children-delete');
+      toast.dismiss('children-delete');
     }
-  }, [deleteError, submittedAt, showError, dismiss, t]);
+  }, [deleteError, submittedAt, t]);
 
   useEffect(() => {
     if (childrenError) {
-      showError({
-        id: 'children-load',
-        title: isLoadingError ? t('children.loadError') : t('children.refreshError'),
-        message: t('children.retryHint'),
-      });
+      toast.error(
+        `${isLoadingError ? t('children.loadError') : t('children.refreshError')} ${t('children.retryHint')}`,
+        { id: 'children-load' },
+      );
     } else if (isSuccess) {
-      dismiss('children-load');
+      toast.dismiss('children-load');
     }
-  }, [childrenError, isLoadingError, isSuccess, errorUpdatedAt, showError, dismiss, t]);
+  }, [childrenError, isLoadingError, isSuccess, errorUpdatedAt, t]);
 
   useEffect(
     () => () => {
-      dismiss('children-load');
-      dismiss('children-delete');
+      toast.dismiss('children-load');
+      toast.dismiss('children-delete');
     },
-    [dismiss],
+    [],
   );
 
   const childrenWithClothes = kids.map((child) => ({
@@ -68,16 +65,17 @@ export const ChildrenOutfits = ({ feelsLike }: ChildrenOutfitsProps) => {
       {childrenError && (
         <div className={styles.alert}>
           <p>{isLoadingError ? t('children.unavailable') : t('children.stale')}</p>
-          <button
+          <Button
             type="button"
-            className="btn btn-outline-secondary btn-sm"
+            variant="outline-secondary"
+            size="sm"
             onClick={() => {
               void refetch();
             }}
             disabled={isFetching}
           >
             {isFetching ? t('common.retrying') : t('common.tryAgain')}
-          </button>
+          </Button>
         </div>
       )}
 

@@ -50,13 +50,14 @@ requests, validate Open-Meteo data and cache forecasts in Upstash Redis.
 - `src/pages/`: route-level screens and their local components
 - `src/modules/`: auth, children, weather, location and clothing
 - `src/components/`: domain-independent UI
-- `src/lib/` and `src/api/`: shared client initialization and authenticated HTTP transport
+- `src/lib/`: shared client initialization
+- `src/modules/auth/api/`: authenticated HTTP transport shared by API clients
 - `src/types/`, `src/assets/` and `src/tests/`: database types, static assets and test setup
 - `api/`: Vercel entrypoints for `/api/weather` and `/api/geocoding`
 - `server/`: server-only handlers, provider adapters, schemas, infrastructure and tests
 
 Test suites live in `tests/` folders within their feature, page or server domain;
-shared HTTP transport tests live in `src/api/tests/`.
+shared HTTP transport tests live in `src/modules/auth/tests/`.
 
 ## Getting started
 

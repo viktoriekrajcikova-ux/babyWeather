@@ -28,27 +28,47 @@ h3 {
   line-height: $line-height-tight;
 }
 
-.current-weather {
-  display: flex;
-  gap: 0.625rem;
-  padding: 0.45rem 1rem;
-  max-width: 220px;
-  cursor: pointer;
-  align-items: center;
-  border: 1px solid $color-neutral-500;
-  border-radius: 1.25rem;
-  margin: auto auto 1rem;
-  font-size: $font-size-small;
-  font-weight: $font-weight-semibold;
-  background: none;
+// Shared Bootstrap theme; component modules own layout, not control states.
+.btn {
+  --bs-btn-border-radius: 1.25rem;
+  --bs-btn-font-weight: #{$font-weight-bold};
+}
+
+.btn-primary {
+  --bs-btn-bg: #{$color-primary-700};
+  --bs-btn-border-color: #{$color-primary-700};
+  --bs-btn-hover-bg: #{$color-neutral-900};
+  --bs-btn-hover-border-color: #{$color-neutral-900};
+  --bs-btn-active-bg: #{$color-neutral-900};
+  --bs-btn-active-border-color: #{$color-neutral-900};
+  --bs-btn-disabled-bg: #{$color-primary-700};
+  --bs-btn-disabled-border-color: #{$color-primary-700};
+  --bs-btn-focus-shadow-rgb: 44, 95, 148;
+}
+
+.btn-link {
+  --bs-btn-color: #{$color-primary-700};
+  --bs-btn-hover-color: #{$color-neutral-900};
+  --bs-btn-active-color: #{$color-neutral-900};
+}
+
+.form-control,
+.form-select {
+  border-radius: 0.75rem;
   font-family: inherit;
 
-  &:hover {
-    box-shadow: 0 10px 15px -3px $color-shadow;
+  &:focus {
+    border-color: $color-primary-700;
+    box-shadow: 0 0 0 0.25rem rgba($color-primary-700, 0.25);
   }
+}
 
-  &:focus-visible {
-    outline: 3px solid $color-primary-700;
-    outline-offset: 2px;
-  }
+.form-label {
+  font-size: $font-size-small;
+  font-weight: $font-weight-semibold;
+}
+
+.btn:focus-visible {
+  outline: 3px solid $color-primary-700;
+  outline-offset: 2px;
 }

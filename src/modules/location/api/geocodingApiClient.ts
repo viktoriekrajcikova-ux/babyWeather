@@ -1,4 +1,4 @@
-import { authenticatedGet } from '../../../api/authenticatedApi';
+import { authenticatedGet } from '../../auth/api/authenticatedApi';
 
 export type GeocodingResult = {
   name: string;

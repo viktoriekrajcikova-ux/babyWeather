@@ -1,20 +1,20 @@
-import { Container } from 'react-bootstrap';
+import { Button, Container } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { useEffect } from 'react';
-import { useToast } from '../../components/toast/toastContext';
+import toast from 'react-hot-toast';
 import Header from '../../app/layout/header';
-import DataAttribution from '../../modules/weather/components/dataAttribution';
+import DataAttribution from '../../modules/weather/components/dataAttribution/dataAttribution';
 import { useChildrenQuery } from '../../modules/children/hooks/useChildrenQuery';
 import { useWeatherQuery } from '../../modules/weather/hooks/useWeatherQuery';
 import styles from './overview.module.scss';
 import { useSelectedCoords } from '../../modules/location/hooks/useSelectedCoords';
 import OverviewSkeleton from './components/overviewSkeleton';
-import OverviewContent from './components/overviewContent';
+import OverviewDashboard from './components/overviewDashboard';
 import { useWeatherErrorToast } from '../../modules/weather/hooks/useWeatherErrorToast';
 
 const Overview = () => {
   const { t } = useTranslation();
-  const { showError, dismiss } = useToast();
+
   const { coords } = useSelectedCoords();
   const weatherQuery = useWeatherQuery(coords);
   useWeatherErrorToast(`overview-weather:${coords.lat}:${coords.lon}`, weatherQuery);
@@ -38,17 +38,16 @@ const Overview = () => {
 
   useEffect(() => {
     if (childrenError) {
-      showError({
-        id: 'overview-children',
-        title: isLoadingError ? t('children.loadError') : t('children.refreshError'),
-        message: t('overview.retryHint'),
-      });
+      toast.error(
+        `${isLoadingError ? t('children.loadError') : t('children.refreshError')} ${t('overview.retryHint')}`,
+        { id: 'overview-children' },
+      );
     } else if (childrenSuccess) {
-      dismiss('overview-children');
+      toast.dismiss('overview-children');
     }
-  }, [childrenError, isLoadingError, childrenSuccess, errorUpdatedAt, showError, dismiss, t]);
+  }, [childrenError, isLoadingError, childrenSuccess, errorUpdatedAt, t]);
 
-  useEffect(() => () => dismiss('overview-children'), [dismiss]);
+  useEffect(() => () => toast.dismiss('overview-children'), []);
 
   const locationLabel = coords.name
     ? [coords.name, coords.country].filter(Boolean).join(', ')
@@ -68,21 +67,22 @@ const Overview = () => {
         ) : weatherError || !weather ? (
           <div className={styles.alert}>
             <p>{t('weather.unavailable')}</p>
-            <button
+            <Button
               type="button"
-              className="btn btn-outline-secondary btn-sm"
+              variant="outline-secondary"
+              size="sm"
               disabled={isFetching}
               onClick={() => {
                 void refetch();
               }}
             >
               {isFetching ? t('common.retrying') : t('common.tryAgain')}
-            </button>
+            </Button>
           </div>
         ) : (
           <>
             <p>{t('weather.forLocation', { location: locationLabel })}</p>
-            <OverviewContent
+            <OverviewDashboard
               hourly={weather.hourly}
               timezone={weather.timezone}
               kids={children ?? []}

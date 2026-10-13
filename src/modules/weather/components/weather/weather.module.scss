@@ -1,4 +1,4 @@
-@use '../../../assets/scss/variables' as *;
+@use '../../../../assets/scss/variables' as *;
 
 .weather {
   max-width: 20rem;
@@ -39,23 +39,6 @@
   align-items: center;
   gap: 0.4rem;
   margin: 1rem auto 0;
-  padding: 0.45rem 1rem;
-  background: none;
-  border: 1px solid $color-neutral-500;
-  border-radius: 1.25rem;
-  font-family: inherit;
-  font-size: $font-size-small;
-  font-weight: $font-weight-semibold;
-  cursor: pointer;
-
-  &:hover {
-    box-shadow: 0 10px 15px -3px $color-shadow;
-  }
-
-  &:focus-visible {
-    outline: 3px solid $color-primary-700;
-    outline-offset: 2px;
-  }
 }
 
 .forecastTime {

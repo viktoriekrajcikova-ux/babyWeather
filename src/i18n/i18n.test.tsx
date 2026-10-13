@@ -9,10 +9,10 @@ import { CLOTHES } from '../modules/clothing/clothesCatalog';
 import { conditions } from '../../server/weather/weatherConditions';
 import { translateWeatherDescription } from '../modules/weather/helpers/translateWeatherDescription';
 import { addChildSchema } from '../modules/children/components/addChildForm/addChildForm.schema';
-import { ToastProvider } from '../components/toast/toastProvider';
+import { Toaster } from 'react-hot-toast';
 import SessionRecovery from '../modules/auth/components/sessionRecovery';
-import ChildPackingCard from '../pages/overview/components/childPackingCard';
-import DataAttribution from '../modules/weather/components/dataAttribution';
+import ChildPackingCard from '../modules/children/components/childPackingCard/childPackingCard';
+import DataAttribution from '../modules/weather/components/dataAttribution/dataAttribution';
 import AddChildForm from '../modules/children/components/addChildForm/addChildForm';
 
 const addChild = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
@@ -86,20 +86,21 @@ describe('translations', () => {
     const user = userEvent.setup();
     const retry = vi.fn();
     render(
-      <ToastProvider>
+      <>
+        <Toaster />
         <SessionRecovery onRetry={retry} />
-      </ToastProvider>,
+      </>,
     );
-    expect(await screen.findByRole('alert')).toHaveTextContent('Nepodařilo se obnovit přihlášení');
+    expect(await screen.findByRole('status')).toHaveTextContent('Nepodařilo se obnovit přihlášení');
     expect(screen.getByText('Přístup k účtu je momentálně nedostupný.')).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Zavřít' })).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Zavřít' })).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Zkusit znovu' }));
     expect(retry).toHaveBeenCalledTimes(1);
     await act(async () => {
       await i18n.changeLanguage('en');
     });
     expect(screen.getByRole('button', { name: 'Try again' })).toBeVisible();
-    expect(screen.getByRole('alert')).toHaveTextContent('Could not restore your session');
+    expect(screen.getByRole('status')).toHaveTextContent('Could not restore your session');
     expect(document.documentElement.lang).toBe('en');
   });
 
@@ -134,9 +135,8 @@ describe('translations', () => {
     const user = userEvent.setup();
     render(
       <MemoryRouter>
-        <ToastProvider>
-          <AddChildForm />
-        </ToastProvider>
+        <Toaster />
+        <AddChildForm />
       </MemoryRouter>,
     );
     await user.click(screen.getByRole('button', { name: 'Přidat dítě' }));
