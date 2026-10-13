@@ -45,6 +45,25 @@ describe('Login', () => {
     expect(screen.getByLabelText('Password')).toHaveAttribute('autocomplete', 'new-password');
   });
 
+  it('při přepnutí formuláře vymaže e-mail i heslo v obou směrech', async () => {
+    const user = userEvent.setup();
+    render(<Login />);
+
+    await user.type(screen.getByLabelText('Email'), 'a@b.cz');
+    await user.type(screen.getByLabelText('Password'), 'tajneheslo');
+    await user.click(screen.getByRole('button', { name: 'Create an account' }));
+    expect(screen.getByLabelText('Email')).toHaveValue('');
+    expect(screen.getByLabelText('Password')).toHaveValue('');
+
+    await user.type(screen.getByLabelText('Email'), 'new@b.cz');
+    await user.type(screen.getByLabelText('Password'), 'noveheslo');
+    await user.click(screen.getByRole('button', { name: 'Back to login' }));
+    expect(screen.getByLabelText('Email')).toHaveValue('');
+    expect(screen.getByLabelText('Password')).toHaveValue('');
+    expect(mockSignIn).not.toHaveBeenCalled();
+    expect(mockSignUp).not.toHaveBeenCalled();
+  });
+
   it('prázdný formulář neodešle přihlášení ani registraci', async () => {
     const user = userEvent.setup();
     render(<Login />);

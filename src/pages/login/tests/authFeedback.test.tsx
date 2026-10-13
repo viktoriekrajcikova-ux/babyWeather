@@ -29,6 +29,10 @@ describe('Authentication error toasts', () => {
     expect(screen.queryByText('private server detail')).not.toBeInTheDocument();
     expect(screen.getByLabelText('Email')).toHaveValue('test@example.com');
     await user.click(screen.getByRole('button', { name: 'Create an account' }));
+    expect(screen.getByLabelText('Email')).toHaveValue('');
+    expect(screen.getByLabelText('Password')).toHaveValue('');
+    await user.type(screen.getByLabelText('Email'), 'test@example.com');
+    await user.type(screen.getByLabelText('Password'), 'test-password');
     await waitFor(() => expect(screen.queryByRole('status')).not.toBeInTheDocument(), {
       timeout: 2000,
     });
