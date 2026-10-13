@@ -8,6 +8,7 @@ import { useWeatherQuery } from '../../modules/weather/hooks/useWeatherQuery';
 import LocationSearch from '../../modules/location/components/locationSearch';
 import styles from './home.module.scss';
 import { useSelectedCoords } from '../../modules/location/hooks/useSelectedCoords';
+import { formatLocationLabel } from '../../modules/location/helpers/formatLocationLabel';
 import { ChildrenOutfits } from '../../modules/children/components/childrenOutfits/childrenOutfits';
 import { WeatherPanel } from '../../modules/weather/components/weatherPanel/weatherPanel';
 import { kelvinToCelsius } from '../../modules/weather/helpers/temperature';
@@ -38,9 +39,7 @@ const Home = () => {
       ? Math.round(kelvinToCelsius(weather.hourly[selectedWeatherIndex].feels_like))
       : 0;
 
-  const locationLabel = coords.name
-    ? [coords.name, coords.country].filter(Boolean).join(', ')
-    : `${coords.lat}, ${coords.lon}`;
+  const locationLabel = formatLocationLabel(coords);
 
   return (
     <>

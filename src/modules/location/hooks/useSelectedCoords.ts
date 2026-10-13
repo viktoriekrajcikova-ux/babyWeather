@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 const STORAGE_KEY = 'babyweather:coords';
 const DEFAULT_COORDS = { lat: 49.3547, lon: 17.8694 };
 
-type SelectedLocation = {
+export type SelectedLocation = {
   lat: number;
   lon: number;
   name?: string;

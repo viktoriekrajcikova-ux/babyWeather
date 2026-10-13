@@ -8,6 +8,7 @@ import { useChildrenQuery } from '../../modules/children/hooks/useChildrenQuery'
 import { useWeatherQuery } from '../../modules/weather/hooks/useWeatherQuery';
 import styles from './overview.module.scss';
 import { useSelectedCoords } from '../../modules/location/hooks/useSelectedCoords';
+import { formatLocationLabel } from '../../modules/location/helpers/formatLocationLabel';
 import Loader from '../../components/loader/loader';
 import OverviewDashboard from './components/overviewDashboard';
 import { useWeatherErrorToast } from '../../modules/weather/hooks/useWeatherErrorToast';
@@ -49,9 +50,7 @@ const Overview = () => {
 
   useEffect(() => () => toast.dismiss('overview-children'), []);
 
-  const locationLabel = coords.name
-    ? [coords.name, coords.country].filter(Boolean).join(', ')
-    : `${coords.lat}, ${coords.lon}`;
+  const locationLabel = formatLocationLabel(coords);
 
   return (
     <>
