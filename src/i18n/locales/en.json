@@ -3,7 +3,6 @@
     "tryAgain": "Try again",
     "retrying": "Retrying…",
     "loading": "Loading…",
-    "close": "Close",
     "pleaseRetry": "Please try again.",
     "pleaseWait": "Please wait…",
     "saving": "Saving...",
@@ -67,8 +66,7 @@
       "Heavy snow showers": "Heavy snow showers",
       "Thunderstorm": "Thunderstorm",
       "Thunderstorm with slight hail": "Thunderstorm with slight hail",
-      "Thunderstorm with heavy hail": "Thunderstorm with heavy hail",
-      "Unknown weather": "Unknown weather"
+      "Thunderstorm with heavy hail": "Thunderstorm with heavy hail"
     },
     "feelsLike": "Feels like",
     "feelsLikeValue": "Feels like {{temperature}} °C",
@@ -155,7 +153,6 @@
   "overview": {
     "title": "Overview",
     "description": "Everything for today, at a glance.",
-    "loading": "Loading overview…",
     "packingUnavailable": "The children’s packing plan is currently unavailable.",
     "noForecast": "No forecast available for the rest of today.",
     "kids": "Kids",

@@ -48,7 +48,6 @@
   }
 }
 
-.alert,
 .status {
   padding: 0.75rem 1rem;
   border: 1px solid $color-neutral-200;
@@ -57,8 +56,4 @@
   background: $color-bg;
   font-size: $font-size-small;
   font-weight: $font-weight-semibold;
-}
-
-.alert {
-  border-left-color: $color-accent-500;
 }
