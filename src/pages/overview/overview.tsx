@@ -1,4 +1,4 @@
-import { Button, Container } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import Header from '../../app/layout/header';
 import DataAttribution from '../../modules/weather/components/dataAttribution/dataAttribution';
@@ -13,6 +13,8 @@ import ChildrenSummary from '../../modules/children/components/childrenSummary/c
 import ChildrenPacking from '../../modules/children/components/childrenPacking/childrenPacking';
 import TemperatureChart from '../../modules/weather/components/temperatureChart/temperatureChart';
 import { getTodayForecast } from '../../modules/weather/helpers/getTodayForecast';
+import PageHead from '../../components/pageHead/pageHead';
+import RetryAlert from '../../components/retryAlert/retryAlert';
 
 const Overview = () => {
   const { t } = useTranslation();
@@ -41,28 +43,16 @@ const Overview = () => {
     <>
       <Header />
       <Container>
-        <div className={styles.pageHead}>
-          <h1>{t('overview.title')}</h1>
-          <p>{t('overview.description')}</p>
-        </div>
+        <PageHead title={t('overview.title')} description={t('overview.description')} />
 
         {weatherLoading || childrenLoading ? (
           <Loader />
         ) : weatherError || !weather ? (
-          <div className={styles.alert}>
-            <p>{t('weather.unavailable')}</p>
-            <Button
-              type="button"
-              variant="outline-secondary"
-              size="sm"
-              disabled={isFetching}
-              onClick={() => {
-                void refetch();
-              }}
-            >
-              {isFetching ? t('common.retrying') : t('common.tryAgain')}
-            </Button>
-          </div>
+          <RetryAlert
+            message={t('weather.unavailable')}
+            onRetry={() => void refetch()}
+            isRetrying={isFetching}
+          />
         ) : (
           <>
             <p>{t('weather.forLocation', { location: locationLabel })}</p>

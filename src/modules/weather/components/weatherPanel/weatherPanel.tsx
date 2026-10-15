@@ -1,7 +1,7 @@
 import { Button, Row, Col } from 'react-bootstrap';
 import { ArrowLeft } from 'lucide-react';
 import type { WeatherData } from '../../weather.types';
-import { kelvinToCelsius } from '../../helpers/temperature';
+import { kelvinToRoundedCelsius } from '../../helpers/temperature';
 import WeatherForecast from '../weatherForecast/weatherForecast';
 import Weather from '../weather/weather';
 import { formatHour } from '../../helpers/formatHour';
@@ -23,7 +23,7 @@ export const WeatherPanel = ({
   onSelectForecast,
 }: WeatherPanelProps) => {
   const { t, i18n } = useTranslation();
-  const currentTemp = Math.round(kelvinToCelsius(weather.hourly[selectedWeatherIndex].temp));
+  const currentTemp = kelvinToRoundedCelsius(weather.hourly[selectedWeatherIndex].temp);
   const [weatherForecast, setWeatherForecast] = useState(false);
 
   const selectForecast = (index: number) => {

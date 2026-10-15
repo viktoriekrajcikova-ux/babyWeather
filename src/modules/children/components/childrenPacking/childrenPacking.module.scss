@@ -25,18 +25,6 @@ $breakpoint-md: 48rem;
   }
 }
 
-/* ---- States ---- */
-.alert {
-  padding: 0.75rem 1rem;
-  background: $color-surface;
-  border: 1px solid $color-accent-500;
-  border-left-width: 4px;
-  border-radius: 0.9rem;
-  box-shadow: 0 10px 15px -3px $color-shadow;
-  font-size: $font-size-small;
-  font-weight: $font-weight-semibold;
-}
-
 .empty {
   text-align: center;
 

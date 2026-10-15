@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { Button } from 'react-bootstrap';
 import { Baby } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { Child } from '../../children.types';
@@ -8,6 +7,7 @@ import { kelvinToRoundedCelsius } from '../../../weather/helpers/temperature';
 import { packForToday } from '../../../clothing/helpers/packForToday';
 import ChildPackingCard from '../childPackingCard/childPackingCard';
 import styles from './childrenPacking.module.scss';
+import RetryAlert from '../../../../components/retryAlert/retryAlert';
 
 interface ChildrenPackingProps {
   kids: Child[];
@@ -27,18 +27,7 @@ const ChildrenPacking = ({ kids, hourly, error, onRetry, isFetching }: ChildrenP
     <>
       {hourly.length > 0 && <h2 className={styles.sectionTitle}>{t('overview.packingTitle')}</h2>}
       {error ? (
-        <div className={styles.alert}>
-          <p>{error}</p>
-          <Button
-            type="button"
-            variant="outline-secondary"
-            size="sm"
-            onClick={onRetry}
-            disabled={isFetching}
-          >
-            {isFetching ? t('common.retrying') : t('common.tryAgain')}
-          </Button>
-        </div>
+        <RetryAlert message={error} onRetry={onRetry} isRetrying={isFetching} />
       ) : kids.length === 0 ? (
         <div className={`${styles.card} ${styles.empty}`}>
           <Baby className={styles.emptyIcon} size={40} strokeWidth={2} aria-hidden="true" />

@@ -1,4 +1,4 @@
-import { Button, Container } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Header from '../../app/layout/header';
@@ -6,12 +6,13 @@ import Loader from '../../components/loader/loader';
 import DataAttribution from '../../modules/weather/components/dataAttribution/dataAttribution';
 import { useWeatherQuery } from '../../modules/weather/hooks/useWeatherQuery';
 import LocationSearch from '../../modules/location/components/locationSearch';
-import styles from './home.module.scss';
 import { useSelectedCoords } from '../../modules/location/hooks/useSelectedCoords';
 import { formatLocationLabel } from '../../modules/location/helpers/formatLocationLabel';
 import { ChildrenOutfits } from '../../modules/children/components/childrenOutfits/childrenOutfits';
 import { WeatherPanel } from '../../modules/weather/components/weatherPanel/weatherPanel';
-import { kelvinToCelsius } from '../../modules/weather/helpers/temperature';
+import { kelvinToRoundedCelsius } from '../../modules/weather/helpers/temperature';
+import PageHead from '../../components/pageHead/pageHead';
+import RetryAlert from '../../components/retryAlert/retryAlert';
 
 const Home = () => {
   const { t } = useTranslation();
@@ -35,7 +36,7 @@ const Home = () => {
 
   const currentFeelsLike =
     showWeather && weather
-      ? Math.round(kelvinToCelsius(weather.hourly[selectedWeatherIndex].feels_like))
+      ? kelvinToRoundedCelsius(weather.hourly[selectedWeatherIndex].feels_like)
       : 0;
 
   const locationLabel = formatLocationLabel(coords);
@@ -44,28 +45,16 @@ const Home = () => {
     <>
       <Header />
       <Container>
-        <div className={styles.pageHead}>
-          <h1>{t('home.title')}</h1>
-          <p>{t('home.description')}</p>
-        </div>
+        <PageHead title={t('home.title')} description={t('home.description')} />
         <LocationSearch onLocationSelect={setCoords} />
         {weatherLoading ? (
           <Loader />
         ) : weatherError || !weather ? (
-          <div className={styles.alert}>
-            <p>{t('weather.unavailable')}</p>
-            <Button
-              type="button"
-              variant="outline-secondary"
-              size="sm"
-              disabled={isFetching}
-              onClick={() => {
-                void refetch();
-              }}
-            >
-              {isFetching ? t('common.retrying') : t('common.tryAgain')}
-            </Button>
-          </div>
+          <RetryAlert
+            message={t('weather.unavailable')}
+            onRetry={() => void refetch()}
+            isRetrying={isFetching}
+          />
         ) : (
           <>
             <p>{t('weather.forLocation', { location: locationLabel })}</p>
