@@ -15,8 +15,8 @@ const LocationSearch = ({ onLocationSelect }: LocationSearchProps) => {
   const [city, setCity] = useState('');
   const [searchedCity, setSearchedCity] = useState('');
   const locationQuery = useSearchCityQuery(searchedCity);
-  const searchLocation = (city: string) => {
-    const trimmedCity = city.trim();
+  const searchLocation = (input: string) => {
+    const trimmedCity = input.trim();
     if (!trimmedCity) return;
 
     if (trimmedCity === searchedCity) {

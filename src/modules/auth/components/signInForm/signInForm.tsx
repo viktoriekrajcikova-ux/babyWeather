@@ -45,7 +45,7 @@ const SignInForm = ({ onSignUp }: SignInFormProps) => {
         <Form.Label>{t('auth.password')}</Form.Label>
         <Form.Control
           required
-          autoComplete={'current-password'}
+          autoComplete="current-password"
           name="password"
           type="password"
           placeholder={t('auth.password')}

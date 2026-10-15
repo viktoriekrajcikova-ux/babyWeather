@@ -47,80 +47,78 @@ function AddChildForm() {
   };
 
   return (
-    <>
-      <Form onSubmit={handleSubmit} className={styles.form} noValidate>
-        <Row className="mb-3">
-          <Form.Group as={Col} controlId="childName">
-            <Form.Label>{t('children.firstName')}</Form.Label>
-            <Form.Control
-              required
-              type="text"
-              value={name}
-              onChange={(e) => {
-                setName(e.target.value);
-              }}
-              isInvalid={!!fieldErrors.name?.length}
-              aria-invalid={!!fieldErrors.name?.length}
-              aria-describedby={fieldErrors.name?.length ? 'childNameError' : undefined}
-            />
-            <Form.Control.Feedback type="invalid" id="childNameError">
-              {fieldErrors.name?.[0] && t(fieldErrors.name[0])}
-            </Form.Control.Feedback>
-          </Form.Group>
-        </Row>
-        <Row className="mb-3">
-          <Form.Group as={Col} controlId="childAge">
-            <Form.Label>{t('children.age')}</Form.Label>
-            <Form.Select
-              onChange={(e) => {
-                setAge(e.target.value);
-              }}
-              isInvalid={!!fieldErrors.age?.length}
-              value={age}
-              aria-invalid={!!fieldErrors.age?.length}
-              aria-describedby={fieldErrors.age?.length ? 'childAgeError' : undefined}
-            >
-              <option></option>
-              {optionsAge.map((optionAge, index) => (
-                <option key={index}>{optionAge}</option>
-              ))}
-            </Form.Select>
-            <Form.Control.Feedback type="invalid" id="childAgeError">
-              {fieldErrors.age?.[0] && t(fieldErrors.age[0])}
-            </Form.Control.Feedback>
-          </Form.Group>
-        </Row>
-        <Row className="mb-3">
-          <Form.Group as={Col} controlId="childSex">
-            <Form.Label>{t('children.sex')}</Form.Label>
-            <Form.Select
-              onChange={(e) => {
-                setSex(e.target.value);
-              }}
-              isInvalid={!!fieldErrors.sex?.length}
-              value={sex}
-              aria-invalid={!!fieldErrors.sex?.length}
-              aria-describedby={fieldErrors.sex?.length ? 'childSexError' : undefined}
-            >
-              <option></option>
-              {optionsSex.map((optionSex, index) => (
-                <option key={index} value={optionSex}>
-                  {t(`children.${optionSex}`)}
-                </option>
-              ))}
-            </Form.Select>
-            <Form.Control.Feedback type="invalid" id="childSexError">
-              {fieldErrors.sex?.[0] && t(fieldErrors.sex[0])}
-            </Form.Control.Feedback>
-          </Form.Group>
-        </Row>
-        <div className="mb-3 ">
-          <Button type="submit" variant="success" disabled={isPending}>
-            {isPending ? t('common.saving') : t('children.add')}
-          </Button>
-        </div>
-      </Form>
-    </>
+    <Form onSubmit={handleSubmit} className={styles.form} noValidate>
+      <Row className="mb-3">
+        <Form.Group as={Col} controlId="childName">
+          <Form.Label>{t('children.firstName')}</Form.Label>
+          <Form.Control
+            required
+            type="text"
+            value={name}
+            onChange={(e) => {
+              setName(e.target.value);
+            }}
+            isInvalid={!!fieldErrors.name?.length}
+            aria-invalid={!!fieldErrors.name?.length}
+            aria-describedby={fieldErrors.name?.length ? 'childNameError' : undefined}
+          />
+          <Form.Control.Feedback type="invalid" id="childNameError">
+            {fieldErrors.name?.[0] && t(fieldErrors.name[0])}
+          </Form.Control.Feedback>
+        </Form.Group>
+      </Row>
+      <Row className="mb-3">
+        <Form.Group as={Col} controlId="childAge">
+          <Form.Label>{t('children.age')}</Form.Label>
+          <Form.Select
+            onChange={(e) => {
+              setAge(e.target.value);
+            }}
+            isInvalid={!!fieldErrors.age?.length}
+            value={age}
+            aria-invalid={!!fieldErrors.age?.length}
+            aria-describedby={fieldErrors.age?.length ? 'childAgeError' : undefined}
+          >
+            <option></option>
+            {optionsAge.map((optionAge) => (
+              <option key={optionAge}>{optionAge}</option>
+            ))}
+          </Form.Select>
+          <Form.Control.Feedback type="invalid" id="childAgeError">
+            {fieldErrors.age?.[0] && t(fieldErrors.age[0])}
+          </Form.Control.Feedback>
+        </Form.Group>
+      </Row>
+      <Row className="mb-3">
+        <Form.Group as={Col} controlId="childSex">
+          <Form.Label>{t('children.sex')}</Form.Label>
+          <Form.Select
+            onChange={(e) => {
+              setSex(e.target.value);
+            }}
+            isInvalid={!!fieldErrors.sex?.length}
+            value={sex}
+            aria-invalid={!!fieldErrors.sex?.length}
+            aria-describedby={fieldErrors.sex?.length ? 'childSexError' : undefined}
+          >
+            <option></option>
+            {optionsSex.map((optionSex) => (
+              <option key={optionSex} value={optionSex}>
+                {t(`children.${optionSex}`)}
+              </option>
+            ))}
+          </Form.Select>
+          <Form.Control.Feedback type="invalid" id="childSexError">
+            {fieldErrors.sex?.[0] && t(fieldErrors.sex[0])}
+          </Form.Control.Feedback>
+        </Form.Group>
+      </Row>
+      <div className="mb-3">
+        <Button type="submit" variant="success" disabled={isPending}>
+          {isPending ? t('common.saving') : t('children.add')}
+        </Button>
+      </div>
+    </Form>
   );
 }
 

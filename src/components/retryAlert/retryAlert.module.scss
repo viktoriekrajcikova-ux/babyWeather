@@ -6,7 +6,7 @@
   border: 1px solid $color-accent-500;
   border-left-width: 4px;
   border-radius: 0.9rem;
-  box-shadow: 0 10px 15px -3px $color-shadow;
+  box-shadow: $shadow-card;
   font-size: $font-size-small;
   font-weight: $font-weight-semibold;
 }

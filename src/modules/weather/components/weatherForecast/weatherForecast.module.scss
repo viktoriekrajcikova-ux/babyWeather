@@ -25,11 +25,10 @@
   }
 
   button:hover {
-    box-shadow: 0 10px 15px -3px $color-shadow;
+    box-shadow: $shadow-card;
   }
 
   button:focus-visible {
-    outline: 3px solid $color-neutral-900;
-    outline-offset: 2px;
+    @include focus-ring($color-neutral-900);
   }
 }

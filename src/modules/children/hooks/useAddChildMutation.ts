@@ -10,7 +10,7 @@ export function useAddChildMutation() {
   const queryKey = ChildrenKeys.list();
 
   return useMutation({
-    onMutate: () => ({ queryKey: queryKey, authGeneration: getAuthGeneration() }),
+    onMutate: () => ({ queryKey, authGeneration: getAuthGeneration() }),
     mutationFn: (newChild: TablesInsert<'children'>) => childrenApi.addChild(newChild),
     onSettled: (_data, _error, _newChild, context) => {
       if (!context) return;

@@ -1,7 +1,5 @@
 @use '../../../../assets/scss/variables' as *;
 
-$breakpoint-md: 48rem;
-
 .sectionTitle {
   margin: 2.5rem 0 1rem;
 }
@@ -11,7 +9,7 @@ $breakpoint-md: 48rem;
   padding: 1.5rem;
   background: $color-surface;
   border-radius: 2rem;
-  box-shadow: 0 10px 15px -3px $color-shadow;
+  box-shadow: $shadow-card;
 }
 
 /* ---- What to pack today ---- */
@@ -51,11 +49,10 @@ $breakpoint-md: 48rem;
   text-decoration: none;
 
   &:hover {
-    box-shadow: 0 10px 15px -3px $color-shadow;
+    box-shadow: $shadow-card;
   }
 
   &:focus-visible {
-    outline: 3px solid $color-primary-700;
-    outline-offset: 2px;
+    @include focus-ring;
   }
 }

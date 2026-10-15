@@ -10,6 +10,17 @@ $color-neutral-200: #e1dfd7;
 
 $color-shadow: rgb(0 0 0 / 10%);
 
+// Effects
+$shadow-card: 0 10px 15px -3px $color-shadow;
+
+@mixin focus-ring($color: $color-primary-700) {
+  outline: 3px solid $color;
+  outline-offset: 2px;
+}
+
+// Breakpoints
+$breakpoint-md: 48rem;
+
 // Typography
 $font-family-base: ('Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
 
