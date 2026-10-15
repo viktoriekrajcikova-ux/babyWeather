@@ -5,6 +5,7 @@ interface QueryMeta extends Record<string, unknown> {
     load: string;
     refresh: string;
     hint: string;
+    id?: string;
   };
 }
 

@@ -3,7 +3,6 @@ import { Button, Form } from 'react-bootstrap';
 import styles from './locationSearch.module.scss';
 import type { GeocodingResult } from '../api/geocodingApiClient';
 import { useSearchCityQuery } from '../hooks/useSearchCityQuery';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 
 type LocationSearchProps = {
@@ -16,24 +15,9 @@ const LocationSearch = ({ onLocationSelect }: LocationSearchProps) => {
   const [city, setCity] = useState('');
   const [searchedCity, setSearchedCity] = useState('');
   const locationQuery = useSearchCityQuery(searchedCity);
-  const { isError, isSuccess, errorUpdatedAt } = locationQuery;
-
-  useEffect(() => {
-    if (isError) {
-      toast.error(`${t('location.searchError')} ${t('location.searchHint')}`, {
-        id: 'location-search',
-      });
-    } else if (isSuccess) {
-      toast.dismiss('location-search');
-    }
-  }, [isError, isSuccess, errorUpdatedAt, t]);
-
-  useEffect(() => () => toast.dismiss('location-search'), []);
-
   const searchLocation = (city: string) => {
     const trimmedCity = city.trim();
     if (!trimmedCity) return;
-    toast.dismiss('location-search');
 
     if (trimmedCity === searchedCity) {
       void locationQuery.refetch();

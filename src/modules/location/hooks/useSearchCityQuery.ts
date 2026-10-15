@@ -6,5 +6,13 @@ export function useSearchCityQuery(searchedCity: string) {
     queryKey: ['geocoding', searchedCity],
     queryFn: () => geocodingApi.geocode(searchedCity),
     enabled: searchedCity.length > 0,
+    meta: {
+      errorToast: {
+        load: 'location.searchError',
+        refresh: 'location.searchError',
+        hint: 'location.searchHint',
+        id: 'location-search',
+      },
+    },
   });
 }

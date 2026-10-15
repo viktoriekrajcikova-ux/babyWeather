@@ -12,12 +12,16 @@ export function createQueryClient(defaultOptions?: DefaultOptions) {
         if (!messages) return;
 
         const isRefresh = query.state.data !== undefined;
-        toast.error(`${i18n.t(isRefresh ? messages.refresh : messages.load)} ${i18n.t(messages.hint)}`, {
-          id: query.queryHash,
-        });
+        toast.error(
+          `${i18n.t(isRefresh ? messages.refresh : messages.load)} ${i18n.t(messages.hint)}`,
+          {
+            id: messages.id ?? query.queryHash,
+          },
+        );
       },
       onSuccess: (_data, query) => {
-        if (query.meta?.errorToast) toast.dismiss(query.queryHash);
+        const messages = query.meta?.errorToast;
+        if (messages) toast.dismiss(messages.id ?? query.queryHash);
       },
     }),
   });
