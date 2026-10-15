@@ -24,7 +24,7 @@ it.each([
         temperature={20}
         feelsLike={19}
         icon={icon}
-        describe="Weather description"
+        description="Weather description"
         onClickWeatherForecast={vi.fn()}
         forecastOpen={false}
         timeForecast={false}

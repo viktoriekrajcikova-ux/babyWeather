@@ -8,7 +8,7 @@ interface WeatherProps {
   temperature: number;
   feelsLike: number;
   icon: string;
-  describe: string;
+  description: string;
   onClickWeatherForecast: () => void;
   forecastOpen: boolean;
   timeForecast: string | false;
@@ -18,7 +18,7 @@ const Weather = ({
   temperature,
   feelsLike,
   icon,
-  describe,
+  description,
   onClickWeatherForecast,
   forecastOpen,
   timeForecast,
@@ -27,13 +27,13 @@ const Weather = ({
   return (
     <div className={styles.weather}>
       <p className={styles.forecastTime}>{timeForecast}</p>
-      <WeatherIcon icon={icon} description={describe} size={96} />
+      <WeatherIcon icon={icon} description={description} size={96} />
       <p className={styles.temp}>{temperature} °C</p>
       <div>
         <div className={styles.feels}>
           {t('weather.feelsLikeValue', { temperature: feelsLike })}
         </div>
-        <div className={styles.desc}>{translateWeatherDescription(describe, t)}</div>
+        <div className={styles.desc}>{translateWeatherDescription(description, t)}</div>
       </div>
       <Button
         type="button"

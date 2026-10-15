@@ -23,18 +23,19 @@ export const WeatherPanel = ({
   onSelectForecast,
 }: WeatherPanelProps) => {
   const { t, i18n } = useTranslation();
-  const currentTemp = kelvinToRoundedCelsius(weather.hourly[selectedWeatherIndex].temp);
-  const [weatherForecast, setWeatherForecast] = useState(false);
+  const selectedHour = weather.hourly[selectedWeatherIndex];
+  const currentTemp = kelvinToRoundedCelsius(selectedHour.temp);
+  const [isForecastOpen, setIsForecastOpen] = useState(false);
 
   const selectForecast = (index: number) => {
     onSelectForecast(index);
-    setWeatherForecast(false);
+    setIsForecastOpen(false);
   };
 
   return (
     <Row>
       <Col xs={12}>
-        {weatherForecast && (
+        {isForecastOpen && (
           <WeatherForecast
             weatherForecastHourly={weather.hourly.slice(0, 13)}
             timezone={weather.timezone}
@@ -42,22 +43,18 @@ export const WeatherPanel = ({
           />
         )}
         <Weather
-          onClickWeatherForecast={() => setWeatherForecast((open) => !open)}
-          forecastOpen={weatherForecast}
+          onClickWeatherForecast={() => setIsForecastOpen((open) => !open)}
+          forecastOpen={isForecastOpen}
           temperature={currentTemp}
-          describe={weather.hourly[selectedWeatherIndex].weather[0].description}
+          description={selectedHour.weather[0].description}
           feelsLike={feelsLike}
           timeForecast={
             selectedWeatherIndex > 0 &&
             t('weather.forecastFor', {
-              time: formatHour(
-                weather.hourly[selectedWeatherIndex].dt,
-                weather.timezone,
-                i18n.resolvedLanguage,
-              ),
+              time: formatHour(selectedHour.dt, weather.timezone, i18n.resolvedLanguage),
             })
           }
-          icon={weather.hourly[selectedWeatherIndex].weather[0].icon}
+          icon={selectedHour.weather[0].icon}
         />
         {selectedWeatherIndex > 0 && (
           <Button
