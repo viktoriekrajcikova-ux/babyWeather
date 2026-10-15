@@ -1,6 +1,4 @@
-import { useEffect } from 'react';
 import { Button, Row } from 'react-bootstrap';
-import toast from 'react-hot-toast';
 import { getOutfit } from '../../../clothing/clothesDeterminer';
 import { useDeleteChildMutation } from '../../hooks/useDeleteChildMutation';
 import { useChildrenQuery } from '../../hooks/useChildrenQuery';
@@ -22,19 +20,7 @@ export const ChildrenOutfits = ({ feelsLike }: ChildrenOutfitsProps) => {
     isFetching,
     isLoadingError,
   } = useChildrenQuery();
-  const { mutate: onDeleteChild, isError: deleteError, submittedAt } = useDeleteChildMutation();
-
-  useEffect(() => {
-    if (deleteError) {
-      toast.error(`${t('children.deleteError')} ${t('common.pleaseRetry')}`, {
-        id: 'children-delete',
-      });
-    } else {
-      toast.dismiss('children-delete');
-    }
-  }, [deleteError, submittedAt, t]);
-
-  useEffect(() => () => toast.dismiss('children-delete'), []);
+  const { mutate: onDeleteChild } = useDeleteChildMutation();
 
   const childrenWithClothes = kids.map((child) => ({
     ...child,

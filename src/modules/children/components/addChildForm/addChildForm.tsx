@@ -1,6 +1,5 @@
 import type { FormEvent } from 'react';
-import { useState, useEffect } from 'react';
-import toast from 'react-hot-toast';
+import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
@@ -24,21 +23,18 @@ const optionsAge = [0, 1, 2, 3, 4, 5];
 
 function AddChildForm() {
   const { t } = useTranslation();
-  useEffect(() => () => toast.dismiss('children-add'), []);
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
   const [sex, setSex] = useState('');
 
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
-  const { mutateAsync: addChild, isPending } = useAddChildMutation();
+  const { mutate: addChild, isPending } = useAddChildMutation();
   const navigate = useNavigate();
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     event.stopPropagation();
     if (isPending) return;
-
-    toast.dismiss('children-add');
     setFieldErrors({});
     const result = addChildSchema.safeParse({ name, age, sex });
 
@@ -47,12 +43,7 @@ function AddChildForm() {
       return;
     }
 
-    try {
-      await addChild(result.data);
-      navigate('/');
-    } catch {
-      toast.error(`${t('children.addError')} ${t('children.addHint')}`, { id: 'children-add' });
-    }
+    addChild(result.data, { onSuccess: () => navigate('/') });
   };
 
   return (

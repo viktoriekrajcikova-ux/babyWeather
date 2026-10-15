@@ -17,5 +17,12 @@ export function useAddChildMutation() {
       if (context.authGeneration !== getAuthGeneration()) return;
       queryClient.invalidateQueries({ queryKey: context.queryKey });
     },
+    meta: {
+      errorToast: {
+        message: 'children.addError',
+        hint: 'children.addHint',
+        id: 'children-add',
+      },
+    },
   });
 }

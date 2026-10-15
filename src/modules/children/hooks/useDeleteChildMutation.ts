@@ -44,5 +44,12 @@ export function useDeleteChildMutation() {
       if (currentQuery !== context.originalQuery) return;
       queryClient.invalidateQueries({ queryKey: context.queryKey });
     },
+    meta: {
+      errorToast: {
+        message: 'children.deleteError',
+        hint: 'common.pleaseRetry',
+        id: 'children-delete',
+      },
+    },
   });
 }

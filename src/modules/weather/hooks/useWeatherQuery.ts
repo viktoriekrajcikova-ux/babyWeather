@@ -15,4 +15,3 @@ export function useWeatherQuery(coords: { lat: number; lon: number }) {
     },
   });
 }
-

@@ -9,8 +9,17 @@ interface QueryMeta extends Record<string, unknown> {
   };
 }
 
+interface MutationMeta extends Record<string, unknown> {
+  errorToast?: {
+    message: string;
+    hint: string;
+    id: string;
+  };
+}
+
 declare module '@tanstack/react-query' {
   interface Register {
     queryMeta: QueryMeta;
+    mutationMeta: MutationMeta;
   }
 }

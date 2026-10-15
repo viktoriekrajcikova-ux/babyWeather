@@ -15,9 +15,9 @@ import ChildPackingCard from '../modules/children/components/childPackingCard/ch
 import DataAttribution from '../modules/weather/components/dataAttribution/dataAttribution';
 import AddChildForm from '../modules/children/components/addChildForm/addChildForm';
 
-const addChild = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
+const addChild = vi.hoisted(() => vi.fn());
 vi.mock('../modules/children/hooks/useAddChildMutation', () => ({
-  useAddChildMutation: () => ({ mutateAsync: addChild, isPending: false }),
+  useAddChildMutation: () => ({ mutate: addChild, isPending: false }),
 }));
 
 function keys(value: object, prefix = ''): string[] {
@@ -149,6 +149,9 @@ describe('translations', () => {
       screen.getByRole('option', { name: 'Dívka' }),
     );
     await user.click(screen.getByRole('button', { name: 'Přidat dítě' }));
-    expect(addChild).toHaveBeenCalledWith({ name: 'Ema', age: 2, sex: 'female' });
+    expect(addChild).toHaveBeenCalledWith(
+      { name: 'Ema', age: 2, sex: 'female' },
+      expect.objectContaining({ onSuccess: expect.any(Function) }),
+    );
   });
 });

@@ -17,7 +17,7 @@ const Home = () => {
   const { t } = useTranslation();
   const { coords, setCoords } = useSelectedCoords();
   const weatherQuery = useWeatherQuery(coords);
-  
+
   const {
     data: weather,
     isPending: weatherLoading,
