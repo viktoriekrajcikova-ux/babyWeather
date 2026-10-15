@@ -1,7 +1,7 @@
 import type { Child } from '../../children.types';
 import { formatNames } from '../../helpers/formatNames';
 import { useTranslation } from 'react-i18next';
-import styles from './childrenSummary.module.scss';
+import StatTile from '../../../../components/statTile/statTile';
 
 interface ChildrenSummaryProps {
   kids: Child[];
@@ -11,13 +11,11 @@ interface ChildrenSummaryProps {
 const ChildrenSummary = ({ kids, isError }: ChildrenSummaryProps) => {
   const { t } = useTranslation();
   return (
-    <div className={styles.tile}>
-      <span className={styles.label}>{t('overview.kids')}</span>
-      <span className={styles.value}>{isError ? '-' : kids.length}</span>
-      <span className={styles.sub}>
-        {isError ? t('common.unavailable') : formatNames(kids) || t('overview.noChildren')}
-      </span>
-    </div>
+    <StatTile
+      label={t('overview.kids')}
+      value={isError ? '-' : kids.length}
+      sub={isError ? t('common.unavailable') : formatNames(kids) || t('overview.noChildren')}
+    />
   );
 };
 
