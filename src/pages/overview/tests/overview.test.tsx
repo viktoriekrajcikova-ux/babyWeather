@@ -3,8 +3,10 @@ import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import toast, { Toaster } from 'react-hot-toast';
 import { MemoryRouter } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { hashKey, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
+import { createQueryClient } from '../../../app/queryClient';
+import { ChildrenKeys } from '../../../modules/children/childrenQueryKeys';
 import type { Child } from '../../../modules/children/children.types';
 import type { WeatherData } from '../../../modules/weather/weather.types';
 import { AuthContext, type AuthContextValue } from '../../../modules/auth/authContext';
@@ -67,11 +69,9 @@ function createWrapper() {
     signOut: vi.fn(),
     getAuthGeneration: () => 0,
   };
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: { retry: false },
-      mutations: { retry: false },
-    },
+  const queryClient = createQueryClient({
+    queries: { retry: false },
+    mutations: { retry: false },
   });
   const Wrapper = ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={queryClient}>
@@ -168,13 +168,11 @@ describe('Overview (integrační test)', () => {
     render(<Overview />, { wrapper: createWrapper() });
 
     expect(await screen.findByText(/could not load weather/i)).toHaveAttribute('role', 'status');
-    act(() => toast.dismiss('overview-weather:49.3547:17.8694'));
+    act(() => toast.dismiss(hashKey(['weather', 49.3547, 17.8694])));
     await waitFor(() => expect(screen.queryByRole('status')).not.toBeInTheDocument(), {
       timeout: 2000,
     });
     expect(screen.getByText('Weather is currently unavailable.')).toBeVisible();
-    // This suite freezes Date; give the next failure its own query timestamp.
-    vi.setSystemTime(new Date('2026-01-15T00:15:01+01:00'));
     await user.click(screen.getByRole('button', { name: 'Try again' }));
     expect(await screen.findByRole('status')).toHaveTextContent(/could not load weather/i);
     vi.mocked(weatherApi.getData).mockResolvedValue(makeWeather());
@@ -197,7 +195,8 @@ describe('Overview (integrační test)', () => {
       expect(await screen.findByText(/Could not load children/)).toBeVisible();
       expect(screen.queryByText('No children yet')).not.toBeInTheDocument();
       expect(screen.queryByRole('link', { name: 'Add child' })).not.toBeInTheDocument();
-      act(() => toast.dismiss('overview-children'));
+      // The global QueryCache handler uses the query hash as the toast id.
+      act(() => toast.dismiss(hashKey(ChildrenKeys.list())));
       await waitFor(
         () => expect(screen.queryByText(/Could not load children/)).not.toBeInTheDocument(),
         { timeout: 2000 },

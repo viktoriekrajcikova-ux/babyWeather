@@ -1,3 +1,26 @@
-import { QueryClient } from '@tanstack/react-query';
+import { type DefaultOptions, QueryCache, QueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
+import i18n from '../i18n/i18n';
 
-export const queryClient = new QueryClient();
+// Factory so tests get the same global error handling with their own defaults (e.g. retry: false).
+export function createQueryClient(defaultOptions?: DefaultOptions) {
+  return new QueryClient({
+    defaultOptions,
+    queryCache: new QueryCache({
+      onError: (_error, query) => {
+        const messages = query.meta?.errorToast;
+        if (!messages) return;
+
+        const isRefresh = query.state.data !== undefined;
+        toast.error(`${i18n.t(isRefresh ? messages.refresh : messages.load)} ${i18n.t(messages.hint)}`, {
+          id: query.queryHash,
+        });
+      },
+      onSuccess: (_data, query) => {
+        if (query.meta?.errorToast) toast.dismiss(query.queryHash);
+      },
+    }),
+  });
+}
+
+export const queryClient = createQueryClient();

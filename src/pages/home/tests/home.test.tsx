@@ -1,9 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { hashKey, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
+import { createQueryClient } from '../../../app/queryClient';
+import { ChildrenKeys } from '../../../modules/children/childrenQueryKeys';
 import type { Child } from '../../../modules/children/children.types';
 import type { WeatherData } from '../../../modules/weather/weather.types';
 import { AuthContext, type AuthContextValue } from '../../../modules/auth/authContext';
@@ -61,11 +63,9 @@ function createWrapper() {
     signOut: vi.fn(),
     getAuthGeneration: () => 0,
   };
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: { retry: false },
-      mutations: { retry: false },
-    },
+  const queryClient = createQueryClient({
+    queries: { retry: false },
+    mutations: { retry: false },
   });
   const Wrapper = ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={queryClient}>
@@ -154,7 +154,8 @@ describe('Home (integrační test)', () => {
     render(<Home />, { wrapper: createWrapper() });
 
     expect(await screen.findByText(/Could not load children/)).toBeVisible();
-    act(() => toast.dismiss('children-load'));
+    // The global QueryCache handler uses the query hash as the toast id.
+    act(() => toast.dismiss(hashKey(ChildrenKeys.list())));
     await waitFor(
       () => expect(screen.queryByText(/Could not load children/)).not.toBeInTheDocument(),
       { timeout: 2000 },

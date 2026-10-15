@@ -21,8 +21,6 @@ export const ChildrenOutfits = ({ feelsLike }: ChildrenOutfitsProps) => {
     refetch,
     isFetching,
     isLoadingError,
-    isSuccess,
-    errorUpdatedAt,
   } = useChildrenQuery();
   const { mutate: onDeleteChild, isError: deleteError, submittedAt } = useDeleteChildMutation();
 
@@ -36,24 +34,7 @@ export const ChildrenOutfits = ({ feelsLike }: ChildrenOutfitsProps) => {
     }
   }, [deleteError, submittedAt, t]);
 
-  useEffect(() => {
-    if (childrenError) {
-      toast.error(
-        `${isLoadingError ? t('children.loadError') : t('children.refreshError')} ${t('children.retryHint')}`,
-        { id: 'children-load' },
-      );
-    } else if (isSuccess) {
-      toast.dismiss('children-load');
-    }
-  }, [childrenError, isLoadingError, isSuccess, errorUpdatedAt, t]);
-
-  useEffect(
-    () => () => {
-      toast.dismiss('children-load');
-      toast.dismiss('children-delete');
-    },
-    [],
-  );
+  useEffect(() => () => toast.dismiss('children-delete'), []);
 
   const childrenWithClothes = kids.map((child) => ({
     ...child,

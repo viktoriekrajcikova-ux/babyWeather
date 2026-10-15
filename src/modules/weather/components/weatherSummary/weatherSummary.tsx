@@ -26,7 +26,7 @@ const WeatherSummary = ({ hourly, timezone }: WeatherSummaryProps) => {
     hourly[0],
   );
   const feelsLikeColdest = kelvinToRoundedCelsius(coldest.feels_like);
-
+  // kazde zvlast jako komponenta?, playbook komponent
   return (
     <>
       <div className={styles.tile}>

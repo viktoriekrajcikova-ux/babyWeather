@@ -6,5 +6,13 @@ export function useWeatherQuery(coords: { lat: number; lon: number }) {
     queryKey: ['weather', coords.lat, coords.lon],
     queryFn: () => weatherApi.getData(coords.lat, coords.lon),
     staleTime: 5 * 60 * 1000,
+    meta: {
+      errorToast: {
+        load: 'weather.errors.load',
+        refresh: 'weather.errors.refresh',
+        hint: 'weather.errors.retryHint',
+      },
+    },
   });
 }
+

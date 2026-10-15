@@ -12,13 +12,12 @@ import { formatLocationLabel } from '../../modules/location/helpers/formatLocati
 import { ChildrenOutfits } from '../../modules/children/components/childrenOutfits/childrenOutfits';
 import { WeatherPanel } from '../../modules/weather/components/weatherPanel/weatherPanel';
 import { kelvinToCelsius } from '../../modules/weather/helpers/temperature';
-import { useWeatherErrorToast } from '../../modules/weather/hooks/useWeatherErrorToast';
 
 const Home = () => {
   const { t } = useTranslation();
   const { coords, setCoords } = useSelectedCoords();
   const weatherQuery = useWeatherQuery(coords);
-  useWeatherErrorToast(`home-weather:${coords.lat}:${coords.lon}`, weatherQuery);
+  
   const {
     data: weather,
     isPending: weatherLoading,
