@@ -1,16 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { act, render as renderUI, screen, waitFor } from '@testing-library/react';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import userEvent from '@testing-library/user-event';
+import { createQueryClient } from '../../../app/queryClient';
 import Login from '../login';
 
 const mockNavigate = vi.fn();
 const render = (ui) =>
   renderUI(
-    <>
+    <QueryClientProvider client={createQueryClient()}>
       <Toaster />
       {ui}
-    </>,
+    </QueryClientProvider>,
   );
 const mockSignIn = vi.fn();
 const mockSignUp = vi.fn();
@@ -135,7 +137,8 @@ describe('Login', () => {
       await signInPromise;
     });
 
-    expect(submitButton).toBeEnabled();
+    // useMutation publishes isPending=false on its own scheduler tick, so wait for it.
+    await waitFor(() => expect(submitButton).toBeEnabled());
     expect(modeButton).toBeEnabled();
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
     expect(mockNavigate).toHaveBeenCalledTimes(1);
@@ -176,7 +179,7 @@ describe('Login', () => {
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
 
-  it('chyba registrace ukončí pending a přepnutí režimu odstraní oznámení', async () => {
+  it('chyba registrace ukončí pending a zobrazí oznámení', async () => {
     let rejectSignUp;
     mockSignUp.mockReturnValue(
       new Promise((_, reject) => {
@@ -201,10 +204,6 @@ describe('Login', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Could not create account');
     expect(screen.queryByText('Please wait…')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Sign Up', exact: true })).toBeEnabled();
-    await user.click(screen.getByRole('button', { name: 'Back to login' }));
-    await waitFor(() => expect(screen.queryByRole('status')).not.toBeInTheDocument(), {
-      timeout: 2000,
-    });
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 

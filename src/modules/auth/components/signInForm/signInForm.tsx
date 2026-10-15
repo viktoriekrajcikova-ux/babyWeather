@@ -1,9 +1,8 @@
 import type { FormEvent } from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
-import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
+import { useSignInMutation } from '../../hooks/useSignInMutation';
 import styles from '../authForm.module.scss';
 import { useTranslation } from 'react-i18next';
 
@@ -13,27 +12,15 @@ type SignInFormProps = {
 
 const SignInForm = ({ onSignUp }: SignInFormProps) => {
   const { t } = useTranslation();
-  useEffect(() => () => toast.dismiss('auth-submit'), []);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
-  const [isPending, setIsPending] = useState(false);
-  const { signIn } = useAuth();
   const navigate = useNavigate();
+  const { mutate: signIn, isPending } = useSignInMutation();
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isPending) return;
-    toast.dismiss('auth-submit');
-    setIsPending(true);
-    try {
-      await signIn(email, password);
-      navigate('/');
-    } catch {
-      toast.error(`${t('auth.signInError')} ${t('auth.retryHint')}`, { id: 'auth-submit' });
-    } finally {
-      setIsPending(false);
-    }
+    signIn({ email, password }, { onSuccess: () => navigate('/') });
   };
 
   return (

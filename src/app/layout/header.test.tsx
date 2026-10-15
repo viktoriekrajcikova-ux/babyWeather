@@ -2,10 +2,12 @@ import { expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import Header from './header';
 import { Toaster } from 'react-hot-toast';
 import i18n from '../../i18n/i18n';
+import { createQueryClient } from '../queryClient';
 
 vi.mock('../../modules/auth/hooks/useAuth', () => ({
   useAuth: () => ({ signOut: vi.fn() }),
@@ -20,11 +22,13 @@ it('switches both ways and updates navigation, page text and document language',
   await i18n.changeLanguage('cs');
   const user = userEvent.setup();
   render(
-    <MemoryRouter>
-      <Toaster />
-      <Header />
-      <PageLabel />
-    </MemoryRouter>,
+    <QueryClientProvider client={createQueryClient()}>
+      <MemoryRouter>
+        <Toaster />
+        <Header />
+        <PageLabel />
+      </MemoryRouter>
+    </QueryClientProvider>,
   );
   const select = screen.getByRole('combobox', { name: 'Jazyk aplikace' });
   expect(select).toHaveValue('cs');

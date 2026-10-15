@@ -176,6 +176,23 @@ describe('Home (integrační test)', () => {
     expect(screen.queryByRole('button', { name: 'Try again' })).not.toBeInTheDocument();
   });
 
+  it('při chybě mazání vrátí dítě zpět a zobrazí globální toast', async () => {
+    const user = userEvent.setup();
+    vi.mocked(weatherApi.getData).mockResolvedValue(weatherAt20C);
+    vi.mocked(childrenApi.getChildren).mockResolvedValue([
+      row({ id: 1, name: 'Ema', age: 2, sex: 'female' }),
+    ]);
+    vi.mocked(childrenApi.deleteChild).mockRejectedValue(new Error('delete failed'));
+
+    render(<Home />, { wrapper: createWrapper() });
+
+    await user.click(await screen.findByRole('button', { name: 'Remove Ema' }));
+    expect(await screen.findByRole('status')).toHaveTextContent('Could not delete child');
+    expect(childrenApi.deleteChild).toHaveBeenCalledWith(1);
+    // Local onError rolls back the optimistic removal; the global one only shows the toast.
+    expect(await screen.findByText('Ema')).toBeVisible();
+  });
+
   it('při chybě počasí zobrazí chybu a nerenderuje děti', async () => {
     const user = userEvent.setup();
     vi.mocked(weatherApi.getData).mockRejectedValue(new Error('500'));

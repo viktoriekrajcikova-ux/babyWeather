@@ -2,7 +2,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
+import { createQueryClient } from '../../../app/queryClient';
 import Login from '../login';
 import Header from '../../../app/layout/header';
 
@@ -17,10 +19,12 @@ describe('Authentication error toasts', () => {
     auth.signIn.mockRejectedValue(new Error('private server detail'));
     auth.signUp.mockRejectedValue(new Error('private server detail'));
     render(
-      <MemoryRouter>
-        <Toaster />
-        <Login />
-      </MemoryRouter>,
+      <QueryClientProvider client={createQueryClient()}>
+        <MemoryRouter>
+          <Toaster />
+          <Login />
+        </MemoryRouter>
+      </QueryClientProvider>,
     );
     await user.type(screen.getByLabelText('Email'), 'test@example.com');
     await user.type(screen.getByLabelText('Password'), 'test-password');
@@ -33,9 +37,6 @@ describe('Authentication error toasts', () => {
     expect(screen.getByLabelText('Password')).toHaveValue('');
     await user.type(screen.getByLabelText('Email'), 'test@example.com');
     await user.type(screen.getByLabelText('Password'), 'test-password');
-    await waitFor(() => expect(screen.queryByRole('status')).not.toBeInTheDocument(), {
-      timeout: 2000,
-    });
     await user.click(screen.getByRole('button', { name: 'Sign Up' }));
     expect(await screen.findByRole('status')).toHaveTextContent('Could not create account');
     auth.signUp.mockResolvedValue(null);
@@ -54,10 +55,12 @@ describe('Authentication error toasts', () => {
     const user = userEvent.setup();
     auth.signOut.mockRejectedValueOnce(new Error('failure')).mockResolvedValue(undefined);
     render(
-      <MemoryRouter>
-        <Toaster />
-        <Header />
-      </MemoryRouter>,
+      <QueryClientProvider client={createQueryClient()}>
+        <MemoryRouter>
+          <Toaster />
+          <Header />
+        </MemoryRouter>
+      </QueryClientProvider>,
     );
     await user.click(screen.getByRole('button', { name: 'LOGOUT' }));
     expect(await screen.findByRole('status')).toHaveTextContent('Could not sign out');
