@@ -143,7 +143,6 @@
     "deleteError": "Could not delete child",
     "loadError": "Could not load children",
     "refreshError": "Could not refresh children",
-    "retryHint": "Use Try again in the children section to retry.",
     "unavailable": "Children are currently unavailable.",
     "stale": "Showing previously loaded children.",
     "validation": {
@@ -158,7 +157,6 @@
     "description": "Everything for today, at a glance.",
     "loading": "Loading overview…",
     "packingUnavailable": "The children’s packing plan is currently unavailable.",
-    "retryHint": "Use Try again in the packing section to retry.",
     "noForecast": "No forecast available for the rest of today.",
     "kids": "Kids",
     "noChildren": "No children yet",
