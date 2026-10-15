@@ -2,9 +2,7 @@ import type { Child } from '../../children.types';
 import type { ClothesItem } from '../../../clothing/clothing.types';
 import styles from './childPackingCard.module.scss';
 import { useTranslation } from 'react-i18next';
-
-const boyAvatar = 'assets/img/boy.png';
-const girlAvatar = 'assets/img/girl.png';
+import { getChildAvatar } from '../../helpers/getChildAvatar';
 
 type ChildPackingCardProps = {
   child: Child;
@@ -13,12 +11,12 @@ type ChildPackingCardProps = {
 
 export default function ChildPackingCard({ child, clothes }: ChildPackingCardProps) {
   const { t } = useTranslation();
-  const avatar = child.sex === 'male' ? boyAvatar : child.sex === 'female' ? girlAvatar : '';
+  const urlAvatar = getChildAvatar(child.sex);
 
   return (
     <article className={styles.childCard}>
       <div className={styles.childHead}>
-        <img className={styles.avatar} src={avatar} alt="" />
+        <img className={styles.avatar} src={urlAvatar} alt="" />
         <div>
           <h3>{child.name}</h3>
           <div className={styles.meta}>{t('children.ageYears', { count: child.age })}</div>

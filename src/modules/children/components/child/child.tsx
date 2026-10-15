@@ -6,9 +6,7 @@ import styles from './child.module.scss';
 import { X } from 'lucide-react';
 import type { ClothesItem } from '../../../clothing/clothing.types';
 import { useTranslation } from 'react-i18next';
-
-const imgUrlGirl = 'assets/img/girl.png';
-const imgUrlBoy = 'assets/img/boy.png';
+import { getChildAvatar } from '../../helpers/getChildAvatar';
 
 interface ChildProps {
   name: string;
@@ -20,32 +18,30 @@ interface ChildProps {
 
 const Child = ({ name, sex, allClothes, id, onClickDelete }: ChildProps) => {
   const { t } = useTranslation();
-  const urlAvatar = sex === 'male' ? imgUrlBoy : sex === 'female' ? imgUrlGirl : '';
+  const urlAvatar = getChildAvatar(sex);
 
   return (
-    <>
-      <Col xs={12} md={6} className={styles.child} id={String(id)}>
-        <Button
-          type="button"
-          variant="outline-danger"
-          className={styles.delete}
-          aria-label={t('children.remove', { name })}
-          onClick={() => onClickDelete(id)}
-        >
-          <X size={20} strokeWidth={2} />
-        </Button>
-        {urlAvatar && <Image className={styles.img} src={urlAvatar} alt="" roundedCircle />}
-        <h2 className={styles.name}>{name}</h2>
-        <ul className={styles.clothes}>
-          {allClothes.map((clothes, key) => (
-            <li key={key}>
-              <img src={clothes.imageUrl} alt="" />
-              <p>{t(`clothing.${clothes.name}`, { defaultValue: clothes.name })}</p>
-            </li>
-          ))}
-        </ul>
-      </Col>
-    </>
+    <Col xs={12} md={6} className={styles.child} id={String(id)}>
+      <Button
+        type="button"
+        variant="outline-danger"
+        className={styles.delete}
+        aria-label={t('children.remove', { name })}
+        onClick={() => onClickDelete(id)}
+      >
+        <X size={20} strokeWidth={2} />
+      </Button>
+      {urlAvatar && <Image className={styles.img} src={urlAvatar} alt="" roundedCircle />}
+      <h2 className={styles.name}>{name}</h2>
+      <ul className={styles.clothes}>
+        {allClothes.map((clothes, key) => (
+          <li key={key}>
+            <img src={clothes.imageUrl} alt="" />
+            <p>{t(`clothing.${clothes.name}`, { defaultValue: clothes.name })}</p>
+          </li>
+        ))}
+      </ul>
+    </Col>
   );
 };
 
