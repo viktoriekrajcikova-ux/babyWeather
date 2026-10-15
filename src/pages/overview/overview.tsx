@@ -1,7 +1,5 @@
 import { Button, Container } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
-import { useEffect } from 'react';
-import toast from 'react-hot-toast';
 import Header from '../../app/layout/header';
 import DataAttribution from '../../modules/weather/components/dataAttribution/dataAttribution';
 import { useChildrenQuery } from '../../modules/children/hooks/useChildrenQuery';
@@ -15,14 +13,12 @@ import ChildrenSummary from '../../modules/children/components/childrenSummary/c
 import ChildrenPacking from '../../modules/children/components/childrenPacking/childrenPacking';
 import TemperatureChart from '../../modules/weather/components/temperatureChart/temperatureChart';
 import { getTodayForecast } from '../../modules/weather/helpers/getTodayForecast';
-import { useWeatherErrorToast } from '../../modules/weather/hooks/useWeatherErrorToast';
 
 const Overview = () => {
   const { t } = useTranslation();
 
   const { coords } = useSelectedCoords();
   const weatherQuery = useWeatherQuery(coords);
-  useWeatherErrorToast(`overview-weather:${coords.lat}:${coords.lon}`, weatherQuery);
   const {
     data: weather,
     isPending: weatherLoading,
@@ -34,25 +30,9 @@ const Overview = () => {
     data: children,
     isPending: childrenLoading,
     isError: childrenError,
-    isLoadingError,
-    isSuccess: childrenSuccess,
-    errorUpdatedAt,
     refetch: refetchChildren,
     isFetching: childrenFetching,
   } = useChildrenQuery();
-
-  useEffect(() => {
-    if (childrenError) {
-      toast.error(
-        `${isLoadingError ? t('children.loadError') : t('children.refreshError')} ${t('overview.retryHint')}`,
-        { id: 'overview-children' },
-      );
-    } else if (childrenSuccess) {
-      toast.dismiss('overview-children');
-    }
-  }, [childrenError, isLoadingError, childrenSuccess, errorUpdatedAt, t]);
-
-  useEffect(() => () => toast.dismiss('overview-children'), []);
 
   const locationLabel = formatLocationLabel(coords);
   const today = weather ? getTodayForecast(weather.hourly, weather.timezone, new Date()) : [];
