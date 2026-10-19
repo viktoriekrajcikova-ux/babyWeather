@@ -1,6 +1,6 @@
 import type { Sex } from '../children/children.types';
-import type { ClothesItem } from './clothing.types';
 import { CLOTHES } from './clothesCatalog';
+import type { ClothesItem } from './clothing.types';
 
 function matches(item: ClothesItem, feelsLike: number, age: number, sex: Sex | null): boolean {
   return (

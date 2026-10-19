@@ -1,7 +1,8 @@
 import { Fragment, type ReactNode } from 'react';
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
 import { useTranslation } from 'react-i18next';
+import { Navigate } from 'react-router-dom';
+
+import { useAuth } from '../hooks/useAuth';
 
 const ProtectedRoute = ({ children }: { children: ReactNode }) => {
   const { t } = useTranslation();

@@ -1,8 +1,9 @@
-import type { HourlyWeather } from '../../weather.types';
-import { kelvinToRoundedCelsius } from '../../helpers/temperature';
-import styles from './temperatureChart.module.scss';
-import { formatHour } from '../../helpers/formatHour';
 import { useTranslation } from 'react-i18next';
+
+import { formatHour } from '../../helpers/formatHour';
+import { kelvinToRoundedCelsius } from '../../helpers/temperature';
+import type { HourlyWeather } from '../../weather.types';
+import styles from './temperatureChart.module.scss';
 
 type TemperatureChartProps = {
   hourly: HourlyWeather[];

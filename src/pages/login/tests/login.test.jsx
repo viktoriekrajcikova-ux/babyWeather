@@ -1,8 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { act, render as renderUI, screen, waitFor } from '@testing-library/react';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { Toaster } from 'react-hot-toast';
+import { act, render as renderUI, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { Toaster } from 'react-hot-toast';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { createQueryClient } from '../../../app/queryClient';
 import Login from '../login';
 

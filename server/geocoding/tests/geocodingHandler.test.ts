@@ -1,5 +1,6 @@
 // @vitest-environment node
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import geocoding from '../geocodingHandler';
 const { getUser, getGeocoding, limit } = vi.hoisted(() => ({
   getUser: vi.fn(),

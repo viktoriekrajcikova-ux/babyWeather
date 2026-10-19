@@ -1,9 +1,10 @@
-import { describe, it, expect, vi } from 'vitest';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter } from 'react-router-dom';
-import { QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
+import { MemoryRouter } from 'react-router-dom';
+import { describe, expect, it, vi } from 'vitest';
+
 import { createQueryClient } from '../../../app/queryClient';
 import { AuthContext, type AuthContextValue } from '../../auth/authContext';
 
@@ -11,8 +12,8 @@ vi.mock('../api/childrenApi', () => ({
   childrenApi: { getChildren: vi.fn(), addChild: vi.fn(), deleteChild: vi.fn() },
 }));
 
-import AddChildForm from '../components/addChildForm/addChildForm';
 import { childrenApi } from '../api/childrenApi';
+import AddChildForm from '../components/addChildForm/addChildForm';
 
 const auth: AuthContextValue = {
   session: null,

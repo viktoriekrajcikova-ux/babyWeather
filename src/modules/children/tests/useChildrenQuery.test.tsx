@@ -1,14 +1,15 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, waitFor, act } from '@testing-library/react';
+import type { Session } from '@supabase/supabase-js';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import { useChildrenQuery } from '../hooks/useChildrenQuery';
-import { useDeleteChildMutation } from '../hooks/useDeleteChildMutation';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { useAuth } from '../../auth/hooks/useAuth';
 import { childrenApi } from '../api/childrenApi';
 import type { Child } from '../children.types';
-import { useAuth } from '../../auth/hooks/useAuth';
-import type { Session } from '@supabase/supabase-js';
 import { ChildrenKeys } from '../childrenQueryKeys';
+import { useChildrenQuery } from '../hooks/useChildrenQuery';
+import { useDeleteChildMutation } from '../hooks/useDeleteChildMutation';
 
 function row(overrides: Partial<Child>): Child {
   return { id: 0, name: '', age: 0, sex: null, ...overrides };

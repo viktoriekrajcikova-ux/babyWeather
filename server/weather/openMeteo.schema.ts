@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 import { timezoneSchema } from './timezone.schema.js';
 import { conditions } from './weatherConditions.js';
 

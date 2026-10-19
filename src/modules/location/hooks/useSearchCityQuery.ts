@@ -1,5 +1,6 @@
-import { geocodingApi } from '../api/geocodingApiClient';
 import { useQuery } from '@tanstack/react-query';
+
+import { geocodingApi } from '../api/geocodingApiClient';
 
 export function useSearchCityQuery(searchedCity: string) {
   return useQuery({

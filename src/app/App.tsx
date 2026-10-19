@@ -1,9 +1,10 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+
+import ProtectedRoute from '../modules/auth/components/protectedRoute';
 import Home from '../pages/home/home';
+import Login from '../pages/login/login';
 import Overview from '../pages/overview/overview';
 import Settings from '../pages/settings/settings';
-import Login from '../pages/login/login';
-import ProtectedRoute from '../modules/auth/components/protectedRoute';
 
 const App = () => {
   return (

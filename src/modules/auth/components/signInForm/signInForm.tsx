@@ -1,10 +1,11 @@
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+
 import { useSignInMutation } from '../../hooks/useSignInMutation';
 import styles from '../authForm.module.scss';
-import { useTranslation } from 'react-i18next';
 
 type SignInFormProps = {
   onSignUp: () => void;

@@ -1,5 +1,6 @@
-import { expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { expect, it, vi } from 'vitest';
+
 import Weather from '../components/weather/weather';
 import WeatherForecast from '../components/weatherForecast/weatherForecast';
 

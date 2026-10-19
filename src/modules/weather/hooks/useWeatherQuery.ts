@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+
 import { weatherApi } from '../api/weatherApiClient';
 
 export function useWeatherQuery(coords: { lat: number; lon: number }) {

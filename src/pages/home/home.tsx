@@ -1,22 +1,23 @@
-import { Container } from 'react-bootstrap';
 import { useEffect, useState } from 'react';
+import { Container } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
+
 import Header from '../../app/layout/header';
 import Loader from '../../components/loader/loader';
-import DataAttribution from '../../modules/weather/components/dataAttribution/dataAttribution';
-import { useWeatherQuery } from '../../modules/weather/hooks/useWeatherQuery';
-import LocationSearch from '../../modules/location/components/locationSearch';
-import { useSelectedCoords } from '../../modules/location/hooks/useSelectedCoords';
-import { formatLocationLabel } from '../../modules/location/helpers/formatLocationLabel';
-import { ChildrenOutfits } from '../../modules/children/components/childrenOutfits/childrenOutfits';
-import { WeatherPanel } from '../../modules/weather/components/weatherPanel/weatherPanel';
-import { kelvinToRoundedCelsius } from '../../modules/weather/helpers/temperature';
 import PageHead from '../../components/pageHead/pageHead';
 import RetryAlert from '../../components/retryAlert/retryAlert';
+import { ChildrenOutfits } from '../../modules/children/components/childrenOutfits/childrenOutfits';
+import LocationSearch from '../../modules/location/components/locationSearch';
+import { formatLocationLabel } from '../../modules/location/helpers/formatLocationLabel';
+import { useSelectedCoords } from '../../modules/location/hooks/useSelectedCoords';
+import DataAttribution from '../../modules/weather/components/dataAttribution/dataAttribution';
+import { WeatherPanel } from '../../modules/weather/components/weatherPanel/weatherPanel';
+import { kelvinToRoundedCelsius } from '../../modules/weather/helpers/temperature';
+import { useWeatherQuery } from '../../modules/weather/hooks/useWeatherQuery';
 
 const Home = () => {
   const { t } = useTranslation();
-  const { coords, setCoords } = useSelectedCoords();
+  const { coords, setCoords } = useSelectedCoords(); // Local search najde mesto, pak zavola setCoords, tim se zmeni Coords v Home a nacre se pocasi pro mesto
   const weatherQuery = useWeatherQuery(coords);
 
   const {
@@ -39,8 +40,6 @@ const Home = () => {
       ? kelvinToRoundedCelsius(weather.hourly[selectedWeatherIndex].feels_like)
       : 0;
 
-  const locationLabel = formatLocationLabel(coords);
-
   return (
     <>
       <Header />
@@ -57,7 +56,7 @@ const Home = () => {
           />
         ) : (
           <>
-            <p>{t('weather.forLocation', { location: locationLabel })}</p>
+            <p>{t('weather.forLocation', { location: formatLocationLabel(coords) })}</p>
             <WeatherPanel
               weather={weather}
               selectedWeatherIndex={selectedWeatherIndex}

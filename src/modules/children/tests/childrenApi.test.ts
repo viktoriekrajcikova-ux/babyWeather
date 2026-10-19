@@ -1,4 +1,5 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+
 import type { Tables } from '../../../types/database';
 
 const { select, from } = vi.hoisted(() => {

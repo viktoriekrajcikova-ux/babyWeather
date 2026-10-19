@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 import { redis } from '../lib/redis.js';
 
 const resultSchema = z.object({

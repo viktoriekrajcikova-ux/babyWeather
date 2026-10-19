@@ -4,13 +4,13 @@ import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
-import { useAddChildMutation } from '../../hooks/useAddChildMutation';
-
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { z } from 'zod';
+
+import { useAddChildMutation } from '../../hooks/useAddChildMutation';
 import styles from './addChildForm.module.scss';
 import { addChildSchema } from './addChildForm.schema';
-import { z } from 'zod';
-import { useTranslation } from 'react-i18next';
 
 type FieldErrors = {
   name?: string[];
@@ -23,10 +23,6 @@ const optionsAge = [0, 1, 2, 3, 4, 5];
 
 function AddChildForm() {
   const { t } = useTranslation();
-  const [name, setName] = useState('');
-  const [age, setAge] = useState('');
-  const [sex, setSex] = useState('');
-
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const { mutate: addChild, isPending } = useAddChildMutation();
   const navigate = useNavigate();
@@ -36,7 +32,12 @@ function AddChildForm() {
     event.stopPropagation();
     if (isPending) return;
     setFieldErrors({});
-    const result = addChildSchema.safeParse({ name, age, sex });
+    const formData = new FormData(event.currentTarget);
+    const result = addChildSchema.safeParse({
+      name: formData.get('name'),
+      age: formData.get('age'),
+      sex: formData.get('sex'),
+    });
 
     if (!result.success) {
       setFieldErrors(z.flattenError(result.error).fieldErrors);
@@ -52,12 +53,9 @@ function AddChildForm() {
         <Form.Group as={Col} controlId="childName">
           <Form.Label>{t('children.firstName')}</Form.Label>
           <Form.Control
+            name="name"
             required
             type="text"
-            value={name}
-            onChange={(e) => {
-              setName(e.target.value);
-            }}
             isInvalid={!!fieldErrors.name?.length}
             aria-invalid={!!fieldErrors.name?.length}
             aria-describedby={fieldErrors.name?.length ? 'childNameError' : undefined}
@@ -71,11 +69,8 @@ function AddChildForm() {
         <Form.Group as={Col} controlId="childAge">
           <Form.Label>{t('children.age')}</Form.Label>
           <Form.Select
-            onChange={(e) => {
-              setAge(e.target.value);
-            }}
+            name="age"
             isInvalid={!!fieldErrors.age?.length}
-            value={age}
             aria-invalid={!!fieldErrors.age?.length}
             aria-describedby={fieldErrors.age?.length ? 'childAgeError' : undefined}
           >
@@ -93,11 +88,8 @@ function AddChildForm() {
         <Form.Group as={Col} controlId="childSex">
           <Form.Label>{t('children.sex')}</Form.Label>
           <Form.Select
-            onChange={(e) => {
-              setSex(e.target.value);
-            }}
+            name="sex"
             isInvalid={!!fieldErrors.sex?.length}
-            value={sex}
             aria-invalid={!!fieldErrors.sex?.length}
             aria-describedby={fieldErrors.sex?.length ? 'childSexError' : undefined}
           >

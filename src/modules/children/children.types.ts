@@ -1,4 +1,3 @@
-// TODO: enum
 export type Sex = 'male' | 'female';
 
 export interface Child {

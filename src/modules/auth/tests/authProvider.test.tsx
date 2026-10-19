@@ -1,19 +1,20 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, waitFor, act, screen, fireEvent, cleanup } from '@testing-library/react';
+import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { StrictMode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
-import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
-import { AuthProvider } from '../authProvider';
-import { useAuth } from '../hooks/useAuth';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { supabase } from '../../../lib/supabase';
 import { childrenApi } from '../../children/api/childrenApi';
-import { useChildrenQuery } from '../../children/hooks/useChildrenQuery';
-import { useAddChildMutation } from '../../children/hooks/useAddChildMutation';
-import { useDeleteChildMutation } from '../../children/hooks/useDeleteChildMutation';
-import { ChildrenKeys } from '../../children/childrenQueryKeys';
-import ProtectedRoute from '../components/protectedRoute';
 import type { Child } from '../../children/children.types';
+import { ChildrenKeys } from '../../children/childrenQueryKeys';
+import { useAddChildMutation } from '../../children/hooks/useAddChildMutation';
+import { useChildrenQuery } from '../../children/hooks/useChildrenQuery';
+import { useDeleteChildMutation } from '../../children/hooks/useDeleteChildMutation';
+import { AuthProvider } from '../authProvider';
+import ProtectedRoute from '../components/protectedRoute';
+import { useAuth } from '../hooks/useAuth';
 
 vi.mock('../../children/api/childrenApi', () => ({
   childrenApi: { getChildren: vi.fn(), deleteChild: vi.fn(), addChild: vi.fn() },

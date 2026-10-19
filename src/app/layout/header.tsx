@@ -1,9 +1,10 @@
-import { Button, Container, Row, Col, Form } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import styles from './header.module.scss';
-import { House, ChartColumn, Settings, LogOut } from 'lucide-react';
+import { ChartColumn, House, LogOut, Settings } from 'lucide-react';
+import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+
 import { useSignOutMutation } from '../../modules/auth/hooks/useSignOutMutation';
+import styles from './header.module.scss';
 
 const Header = () => {
   const { t, i18n } = useTranslation();

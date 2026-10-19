@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 import SignInForm from '../../modules/auth/components/signInForm/signInForm';
 import SignUpForm from '../../modules/auth/components/signUpForm/signUpForm';
 import styles from './login.module.scss';
@@ -8,9 +9,7 @@ const Login = () => {
 
   return (
     <main className={styles.page}>
-      <p className={styles.brand}>
-        BabyWeather<span aria-hidden="true">.</span>
-      </p>
+      <p className={styles.brand}>BabyWeather</p>
       {mode === 'signIn' ? (
         <SignInForm onSignUp={() => setMode('signUp')} />
       ) : (

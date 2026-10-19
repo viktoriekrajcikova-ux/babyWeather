@@ -1,24 +1,23 @@
 import { Container } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
+
 import Header from '../../app/layout/header';
-import DataAttribution from '../../modules/weather/components/dataAttribution/dataAttribution';
-import { useChildrenQuery } from '../../modules/children/hooks/useChildrenQuery';
-import { useWeatherQuery } from '../../modules/weather/hooks/useWeatherQuery';
-import styles from './overview.module.scss';
-import { useSelectedCoords } from '../../modules/location/hooks/useSelectedCoords';
-import { formatLocationLabel } from '../../modules/location/helpers/formatLocationLabel';
 import Loader from '../../components/loader/loader';
-import WeatherSummary from '../../modules/weather/components/weatherSummary/weatherSummary';
-import ChildrenSummary from '../../modules/children/components/childrenSummary/childrenSummary';
-import ChildrenPacking from '../../modules/children/components/childrenPacking/childrenPacking';
-import TemperatureChart from '../../modules/weather/components/temperatureChart/temperatureChart';
-import { getTodayForecast } from '../../modules/weather/helpers/getTodayForecast';
 import PageHead from '../../components/pageHead/pageHead';
 import RetryAlert from '../../components/retryAlert/retryAlert';
+import ChildrenPacking from '../../modules/children/components/childrenPacking/childrenPacking';
+import ChildrenSummary from '../../modules/children/components/childrenSummary/childrenSummary';
+import { formatLocationLabel } from '../../modules/location/helpers/formatLocationLabel';
+import { useSelectedCoords } from '../../modules/location/hooks/useSelectedCoords';
+import DataAttribution from '../../modules/weather/components/dataAttribution/dataAttribution';
+import TemperatureChart from '../../modules/weather/components/temperatureChart/temperatureChart';
+import WeatherSummary from '../../modules/weather/components/weatherSummary/weatherSummary';
+import { getTodayForecast } from '../../modules/weather/helpers/getTodayForecast';
+import { useWeatherQuery } from '../../modules/weather/hooks/useWeatherQuery';
+import styles from './overview.module.scss';
 
 const Overview = () => {
   const { t } = useTranslation();
-
   const { coords } = useSelectedCoords();
   const weatherQuery = useWeatherQuery(coords);
   const {
@@ -28,16 +27,10 @@ const Overview = () => {
     refetch,
     isFetching,
   } = weatherQuery;
-  const {
-    data: children,
-    isPending: childrenLoading,
-    isError: childrenError,
-    refetch: refetchChildren,
-    isFetching: childrenFetching,
-  } = useChildrenQuery();
 
   const locationLabel = formatLocationLabel(coords);
-  const today = weather ? getTodayForecast(weather.hourly, weather.timezone, new Date()) : [];
+  // getTodayForecast urcujue dnesni datum v casovem pasmu mesta, vyrazuje skoncene hodiny
+  const todayForecast = getTodayForecast(weather, new Date());
 
   return (
     <>
@@ -45,7 +38,7 @@ const Overview = () => {
       <Container>
         <PageHead title={t('overview.title')} description={t('overview.description')} />
 
-        {weatherLoading || childrenLoading ? (
+        {weatherLoading ? (
           <Loader />
         ) : weatherError || !weather ? (
           <RetryAlert
@@ -56,25 +49,17 @@ const Overview = () => {
         ) : (
           <>
             <p>{t('weather.forLocation', { location: locationLabel })}</p>
-            {today.length > 0 && (
+            {todayForecast.length > 0 && (
               <>
                 <section className={styles.tiles}>
-                  <ChildrenSummary kids={children ?? []} isError={childrenError} />
-                  <WeatherSummary hourly={today} timezone={weather.timezone} />
+                  <ChildrenSummary />
+                  <WeatherSummary hourly={todayForecast} timezone={weather.timezone} />
                 </section>
-                <TemperatureChart hourly={today} timezone={weather.timezone} />
+                <TemperatureChart hourly={todayForecast} timezone={weather.timezone} />
               </>
             )}
-            <ChildrenPacking
-              hourly={today}
-              kids={children ?? []}
-              error={childrenError ? t('overview.packingUnavailable') : null}
-              onRetry={() => {
-                void refetchChildren();
-              }}
-              isFetching={childrenFetching}
-            />
-            {today.length === 0 && <p role="status">{t('overview.noForecast')}</p>}
+            <ChildrenPacking hourly={todayForecast} />
+            {todayForecast.length === 0 && <p role="status">{t('overview.noForecast')}</p>}
           </>
         )}
         <DataAttribution />

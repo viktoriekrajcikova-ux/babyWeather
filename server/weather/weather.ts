@@ -1,7 +1,8 @@
 import { z } from 'zod';
+
 import { redis } from '../lib/redis.js';
-import { mapOpenMeteoWeather } from './weatherMapping.js';
 import { timezoneSchema } from './timezone.schema.js';
+import { mapOpenMeteoWeather } from './weatherMapping.js';
 
 const weatherSchema = z.object({
   timezone: timezoneSchema,

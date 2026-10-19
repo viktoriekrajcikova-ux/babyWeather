@@ -1,14 +1,15 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { hashKey, QueryClientProvider } from '@tanstack/react-query';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { hashKey, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { createQueryClient } from '../../../app/queryClient';
-import { ChildrenKeys } from '../../../modules/children/childrenQueryKeys';
-import type { Child } from '../../../modules/children/children.types';
-import type { WeatherData } from '../../../modules/weather/weather.types';
 import { AuthContext, type AuthContextValue } from '../../../modules/auth/authContext';
+import type { Child } from '../../../modules/children/children.types';
+import { ChildrenKeys } from '../../../modules/children/childrenQueryKeys';
+import type { WeatherData } from '../../../modules/weather/weather.types';
 
 vi.mock('../../../modules/weather/api/weatherApiClient', () => ({
   weatherApi: { getData: vi.fn() },
@@ -22,9 +23,9 @@ vi.mock('../../../modules/location/api/geocodingApiClient', () => ({
 // Header = auth + router
 vi.mock('../../../app/layout/header', () => ({ default: () => null }));
 
-import Home from '../home';
-import { weatherApi } from '../../../modules/weather/api/weatherApiClient';
 import { childrenApi } from '../../../modules/children/api/childrenApi';
+import { weatherApi } from '../../../modules/weather/api/weatherApiClient';
+import Home from '../home';
 
 function row(overrides: Partial<Child>): Child {
   return { id: 0, name: '', age: 0, sex: null, ...overrides };

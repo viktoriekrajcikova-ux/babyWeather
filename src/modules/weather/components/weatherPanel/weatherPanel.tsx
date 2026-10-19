@@ -1,12 +1,13 @@
-import { Button, Row, Col } from 'react-bootstrap';
 import { ArrowLeft } from 'lucide-react';
-import type { WeatherData } from '../../weather.types';
-import { kelvinToRoundedCelsius } from '../../helpers/temperature';
-import WeatherForecast from '../weatherForecast/weatherForecast';
-import Weather from '../weather/weather';
-import { formatHour } from '../../helpers/formatHour';
 import { useState } from 'react';
+import { Button, Col, Row } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
+
+import { formatHour } from '../../helpers/formatHour';
+import { kelvinToRoundedCelsius } from '../../helpers/temperature';
+import type { WeatherData } from '../../weather.types';
+import Weather from '../weather/weather';
+import WeatherForecast from '../weatherForecast/weatherForecast';
 import styles from './weatherPanel.module.scss';
 
 interface WeatherPanelProps {

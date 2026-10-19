@@ -1,6 +1,6 @@
+import type { Child } from '../../children/children.types';
 import { getOutfit } from '../clothesDeterminer';
 import type { ClothesItem } from '../clothing.types';
-import type { Child } from '../../children/children.types';
 
 // Spojí oblečení pro všechny zbývající dnešní hodiny bez duplicit.
 export function packForToday(child: Child, feels: number[]): ClothesItem[] {

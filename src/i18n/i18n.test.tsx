@@ -1,19 +1,20 @@
-import { describe, expect, it, vi } from 'vitest';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { Toaster } from 'react-hot-toast';
 import { MemoryRouter } from 'react-router-dom';
+import { describe, expect, it, vi } from 'vitest';
+
+import { conditions } from '../../server/weather/weatherConditions';
+import SessionRecovery from '../modules/auth/components/sessionRecovery';
+import AddChildForm from '../modules/children/components/addChildForm/addChildForm';
+import { addChildSchema } from '../modules/children/components/addChildForm/addChildForm.schema';
+import ChildPackingCard from '../modules/children/components/childPackingCard/childPackingCard';
+import { CLOTHES } from '../modules/clothing/clothesCatalog';
+import DataAttribution from '../modules/weather/components/dataAttribution/dataAttribution';
+import { translateWeatherDescription } from '../modules/weather/helpers/translateWeatherDescription';
 import i18n from './i18n';
 import cs from './locales/cs.json';
 import en from './locales/en.json';
-import { CLOTHES } from '../modules/clothing/clothesCatalog';
-import { conditions } from '../../server/weather/weatherConditions';
-import { translateWeatherDescription } from '../modules/weather/helpers/translateWeatherDescription';
-import { addChildSchema } from '../modules/children/components/addChildForm/addChildForm.schema';
-import { Toaster } from 'react-hot-toast';
-import SessionRecovery from '../modules/auth/components/sessionRecovery';
-import ChildPackingCard from '../modules/children/components/childPackingCard/childPackingCard';
-import DataAttribution from '../modules/weather/components/dataAttribution/dataAttribution';
-import AddChildForm from '../modules/children/components/addChildForm/addChildForm';
 
 const addChild = vi.hoisted(() => vi.fn());
 vi.mock('../modules/children/hooks/useAddChildMutation', () => ({

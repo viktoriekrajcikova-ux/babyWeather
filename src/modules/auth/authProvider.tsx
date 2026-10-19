@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef } from 'react';
-import type { ReactNode } from 'react';
 import type { Session } from '@supabase/supabase-js';
-import { supabase } from '../../lib/supabase';
 import { useQueryClient } from '@tanstack/react-query';
-import { AuthContext } from './authContext';
+import type { ReactNode } from 'react';
+import { useEffect, useRef, useState } from 'react';
+
+import { supabase } from '../../lib/supabase';
 import { ChildrenKeys } from '../children/childrenQueryKeys';
+import { AuthContext } from './authContext';
 import SessionRecovery from './components/sessionRecovery';
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {

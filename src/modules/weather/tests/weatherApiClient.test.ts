@@ -1,4 +1,4 @@
-import { beforeEach, afterEach, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 
 vi.mock('../../../lib/supabase', () => ({ supabase: { auth: { getSession: vi.fn() } } }));
 import { supabase } from '../../../lib/supabase';

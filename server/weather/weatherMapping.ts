@@ -1,5 +1,5 @@
-import { conditions } from './weatherConditions.js';
 import { openMeteoSchema } from './openMeteo.schema.js';
+import { conditions } from './weatherConditions.js';
 
 export function mapOpenMeteoWeather(body: unknown) {
   const { hourly, timezone } = openMeteoSchema.parse(body);

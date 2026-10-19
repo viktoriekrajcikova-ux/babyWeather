@@ -1,16 +1,16 @@
-import type { Child } from '../../children.types';
-import { formatNames } from '../../helpers/formatNames';
 import { useTranslation } from 'react-i18next';
+
+import Loader from '../../../../components/loader/loader';
 import StatTile from '../../../../components/statTile/statTile';
+import { formatNames } from '../../helpers/formatNames';
+import { useChildrenQuery } from '../../hooks/useChildrenQuery';
 
-interface ChildrenSummaryProps {
-  kids: Child[];
-  isError: boolean;
-}
-
-const ChildrenSummary = ({ kids, isError }: ChildrenSummaryProps) => {
+const ChildrenSummary = () => {
   const { t } = useTranslation();
-  return (
+  const { data: kids = [], isError, isPending } = useChildrenQuery();
+  return isPending ? (
+    <Loader />
+  ) : (
     <StatTile
       label={t('overview.kids')}
       value={isError ? '-' : kids.length}

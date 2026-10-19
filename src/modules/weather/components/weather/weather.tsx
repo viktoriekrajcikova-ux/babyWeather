@@ -1,8 +1,9 @@
-import styles from './weather.module.scss';
 import { Button } from 'react-bootstrap';
-import WeatherIcon from '../weatherIcon/weatherIcon';
 import { useTranslation } from 'react-i18next';
+
 import { translateWeatherDescription } from '../../helpers/translateWeatherDescription';
+import WeatherIcon from '../weatherIcon/weatherIcon';
+import styles from './weather.module.scss';
 
 interface WeatherProps {
   temperature: number;

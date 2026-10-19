@@ -1,11 +1,12 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { QueryClientProvider } from '@tanstack/react-query';
 import toast, { Toaster } from 'react-hot-toast';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { createQueryClient } from '../../../app/queryClient';
-import LocationSearch from '../components/locationSearch';
 import { geocodingApi } from '../api/geocodingApiClient';
+import LocationSearch from '../components/locationSearch';
 
 vi.mock('../api/geocodingApiClient', () => ({ geocodingApi: { geocode: vi.fn() } }));
 

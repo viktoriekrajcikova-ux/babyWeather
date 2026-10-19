@@ -1,8 +1,9 @@
-import type { Child } from '../../children.types';
-import type { ClothesItem } from '../../../clothing/clothing.types';
-import styles from './childPackingCard.module.scss';
 import { useTranslation } from 'react-i18next';
+
+import type { ClothesItem } from '../../../clothing/clothing.types';
+import type { Child } from '../../children.types';
 import { getChildAvatar } from '../../helpers/getChildAvatar';
+import styles from './childPackingCard.module.scss';
 
 type ChildPackingCardProps = {
   child: Child;

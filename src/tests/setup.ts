@@ -1,8 +1,10 @@
-import { afterEach, beforeEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
+
 import { cleanup } from '@testing-library/react';
-import i18n from '../i18n/i18n';
 import toast from 'react-hot-toast';
+import { afterEach, beforeEach } from 'vitest';
+
+import i18n from '../i18n/i18n';
 
 // This setup also runs in the server suites' Node environment.
 if (typeof window !== 'undefined') {

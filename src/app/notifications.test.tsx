@@ -1,9 +1,10 @@
-import { StrictMode } from 'react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { StrictMode } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
-import SessionRecovery from '../modules/auth/components/sessionRecovery';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
 import i18n from '../i18n/i18n';
+import SessionRecovery from '../modules/auth/components/sessionRecovery';
 
 describe('Application notifications', () => {
   beforeEach(() => vi.useFakeTimers());

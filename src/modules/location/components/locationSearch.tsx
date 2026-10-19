@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
-import styles from './locationSearch.module.scss';
+import { useTranslation } from 'react-i18next';
+
 import type { GeocodingResult } from '../api/geocodingApiClient';
 import { useSearchCityQuery } from '../hooks/useSearchCityQuery';
-import { useTranslation } from 'react-i18next';
+import styles from './locationSearch.module.scss';
 
 type LocationSearchProps = {
   onLocationSelect: (location: GeocodingResult) => void;

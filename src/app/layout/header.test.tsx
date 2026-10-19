@@ -1,13 +1,14 @@
-import { expect, it, vi } from 'vitest';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter } from 'react-router-dom';
-import { QueryClientProvider } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
-import Header from './header';
 import { Toaster } from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import { MemoryRouter } from 'react-router-dom';
+import { expect, it, vi } from 'vitest';
+
 import i18n from '../../i18n/i18n';
 import { createQueryClient } from '../queryClient';
+import Header from './header';
 
 vi.mock('../../modules/auth/hooks/useAuth', () => ({
   useAuth: () => ({ signOut: vi.fn() }),

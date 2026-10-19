@@ -1,9 +1,10 @@
-import type { HourlyWeather } from '../../weather.types';
-import { kelvinToRoundedCelsius } from '../../helpers/temperature';
-import { formatHour } from '../../helpers/formatHour';
-import { translateWeatherDescription } from '../../helpers/translateWeatherDescription';
 import { useTranslation } from 'react-i18next';
+
 import StatTile from '../../../../components/statTile/statTile';
+import { formatHour } from '../../helpers/formatHour';
+import { kelvinToRoundedCelsius } from '../../helpers/temperature';
+import { translateWeatherDescription } from '../../helpers/translateWeatherDescription';
+import type { HourlyWeather } from '../../weather.types';
 
 interface WeatherSummaryProps {
   hourly: HourlyWeather[];

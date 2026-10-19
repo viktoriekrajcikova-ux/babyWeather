@@ -1,6 +1,7 @@
-import { describe, it, expect } from 'vitest';
-import { getOutfit } from '../clothesDeterminer';
+import { describe, expect, it } from 'vitest';
+
 import { CLOTHES } from '../clothesCatalog';
+import { getOutfit } from '../clothesDeterminer';
 import type { ClothesItem } from '../clothing.types';
 
 describe('getOutfit', () => {

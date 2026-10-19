@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Button } from 'react-bootstrap';
-import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 export default function SessionRecovery({ onRetry }: { onRetry: () => void }) {
   const { t } = useTranslation();

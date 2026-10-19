@@ -1,10 +1,11 @@
 import { Row } from 'react-bootstrap';
-import { getOutfit } from '../../../clothing/clothesDeterminer';
-import { useDeleteChildMutation } from '../../hooks/useDeleteChildMutation';
-import { useChildrenQuery } from '../../hooks/useChildrenQuery';
-import Child from '../child/child';
 import { useTranslation } from 'react-i18next';
+
 import RetryAlert from '../../../../components/retryAlert/retryAlert';
+import { getOutfit } from '../../../clothing/clothesDeterminer';
+import { useChildrenQuery } from '../../hooks/useChildrenQuery';
+import { useDeleteChildMutation } from '../../hooks/useDeleteChildMutation';
+import Child from '../child/child';
 
 interface ChildrenOutfitsProps {
   feelsLike: number;
@@ -40,11 +41,9 @@ export const ChildrenOutfits = ({ feelsLike }: ChildrenOutfitsProps) => {
       <Row className="g-3">
         {childrenWithClothes.map((child) => (
           <Child
-            id={child.id}
+            childData={child}
             key={child.id}
-            name={child.name}
             onClickDelete={onDeleteChild}
-            sex={child.sex}
             allClothes={child.clothes}
           />
         ))}

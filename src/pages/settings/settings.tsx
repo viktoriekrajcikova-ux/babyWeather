@@ -1,7 +1,8 @@
-import AddChildForm from '../../modules/children/components/addChildForm/addChildForm';
-import Header from '../../app/layout/header';
 import { Container } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
+
+import Header from '../../app/layout/header';
+import AddChildForm from '../../modules/children/components/addChildForm/addChildForm';
 
 const SettingsScreen = () => {
   const { t } = useTranslation();

@@ -1,5 +1,6 @@
 import { Button } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
+
 import styles from './retryAlert.module.scss';
 
 interface RetryAlertProps {
