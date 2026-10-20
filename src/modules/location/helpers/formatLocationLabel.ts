@@ -1,4 +1,4 @@
-import type { SelectedLocation } from '../hooks/useSelectedCoords';
+import type { SelectedLocation } from '../types';
 
 export function formatLocationLabel(coords: SelectedLocation): string {
   return coords.name

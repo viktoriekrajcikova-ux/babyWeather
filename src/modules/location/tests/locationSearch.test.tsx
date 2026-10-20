@@ -1,39 +1,45 @@
 import { QueryClientProvider } from '@tanstack/react-query';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { createStore, Provider as JotaiProvider } from 'jotai';
 import toast, { Toaster } from 'react-hot-toast';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createQueryClient } from '../../../app/queryClient';
 import { geocodingApi } from '../api/geocodingApiClient';
+import { selectedLocationAtom } from '../atoms/selectedLocationAtom';
 import LocationSearch from '../components/locationSearch';
 
 vi.mock('../api/geocodingApiClient', () => ({ geocodingApi: { geocode: vi.fn() } }));
 
 function setup() {
-  const onLocationSelect = vi.fn();
+  const store = createStore();
+  const initialLocation = { lat: 49.3547, lon: 17.8694 };
+  store.set(selectedLocationAtom, initialLocation);
   const queryClient = createQueryClient({ queries: { retry: false } });
   render(
-    <QueryClientProvider client={queryClient}>
-      <Toaster />
-      <LocationSearch onLocationSelect={onLocationSelect} />
-    </QueryClientProvider>,
+    <JotaiProvider store={store}>
+      <QueryClientProvider client={queryClient}>
+        <Toaster />
+        <LocationSearch />
+      </QueryClientProvider>
+    </JotaiProvider>,
   );
-  return { onLocationSelect };
+  return { store, initialLocation };
 }
 
 describe('LocationSearch errors', () => {
   beforeEach(() => vi.resetAllMocks());
 
-  it('repeats a failed search after dismissal and forwards only a successful result', async () => {
+  it('repeats a failed search after dismissal and stores only a successful result', async () => {
     const user = userEvent.setup();
     vi.mocked(geocodingApi.geocode).mockRejectedValue(new Error('unavailable'));
-    const { onLocationSelect } = setup();
+    const { store, initialLocation } = setup();
     await user.type(screen.getByRole('textbox', { name: 'City' }), ' Prague ');
     await user.click(screen.getByRole('button', { name: 'Search' }));
     expect(await screen.findByRole('status')).toHaveTextContent('Could not find that location');
     expect(geocodingApi.geocode).toHaveBeenCalledWith('Prague');
-    expect(onLocationSelect).not.toHaveBeenCalled();
+    expect(store.get(selectedLocationAtom)).toEqual(initialLocation);
     act(() => toast.dismiss('location-search'));
     await waitFor(() => expect(screen.queryByRole('status')).not.toBeInTheDocument(), {
       timeout: 2000,
@@ -41,10 +47,11 @@ describe('LocationSearch errors', () => {
     await user.click(screen.getByRole('button', { name: 'Search' }));
     expect(await screen.findByRole('status')).toBeVisible();
     expect(screen.getAllByRole('status')).toHaveLength(1);
+    expect(store.get(selectedLocationAtom)).toEqual(initialLocation);
     const location = { name: 'Prague', country: 'CZ', lat: 50, lon: 14 };
     vi.mocked(geocodingApi.geocode).mockResolvedValue(location);
     await user.click(screen.getByRole('button', { name: 'Search' }));
-    await waitFor(() => expect(onLocationSelect).toHaveBeenCalledWith(location));
+    await waitFor(() => expect(store.get(selectedLocationAtom)).toEqual(location));
     await waitFor(() => expect(screen.queryByRole('status')).not.toBeInTheDocument(), {
       timeout: 2000,
     });

@@ -39,7 +39,9 @@ Today's forecast and clothing packing list.
 
 ## Tech stack
 
-React, TypeScript, Vite, React Router, TanStack Query, SCSS Modules and React Bootstrap.
+React, TypeScript, Vite, React Router, TanStack Query, Jotai, SCSS Modules and React Bootstrap.
+Jotai shares the selected location across screens, with validated localStorage
+persistence. TanStack Query manages server data such as weather and child profiles.
 Supabase provides authentication and PostgreSQL; access to child records relies on
 database Row Level Security. Vercel functions authenticate and rate-limit weather
 requests, validate Open-Meteo data and cache forecasts in Upstash Redis.
@@ -102,6 +104,7 @@ npm run format
 
 To check formatting without changing files, run `npm run format:check`.
 `npm run lint` and `npm run lint:css` report lint issues without modifying files.
+`npm run lint:fix` applies automatic ESLint fixes, including import sorting.
 
 ## Checks
 

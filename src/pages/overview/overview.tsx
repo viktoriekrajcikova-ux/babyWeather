@@ -1,20 +1,19 @@
 import { Container } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
-
 import Header from '../../app/layout/header';
-import Loader from '../../components/loader/loader';
-import PageHead from '../../components/pageHead/pageHead';
-import RetryAlert from '../../components/retryAlert/retryAlert';
-import ChildrenPacking from '../../modules/children/components/childrenPacking/childrenPacking';
-import ChildrenSummary from '../../modules/children/components/childrenSummary/childrenSummary';
-import { formatLocationLabel } from '../../modules/location/helpers/formatLocationLabel';
-import { useSelectedCoords } from '../../modules/location/hooks/useSelectedCoords';
 import DataAttribution from '../../modules/weather/components/dataAttribution/dataAttribution';
-import TemperatureChart from '../../modules/weather/components/temperatureChart/temperatureChart';
-import WeatherSummary from '../../modules/weather/components/weatherSummary/weatherSummary';
-import { getTodayForecast } from '../../modules/weather/helpers/getTodayForecast';
 import { useWeatherQuery } from '../../modules/weather/hooks/useWeatherQuery';
 import styles from './overview.module.scss';
+import { useSelectedCoords } from '../../modules/location/hooks/useSelectedCoords';
+import { formatLocationLabel } from '../../modules/location/helpers/formatLocationLabel';
+import Loader from '../../components/loader/loader';
+import WeatherSummary from '../../modules/weather/components/weatherSummary/weatherSummary';
+import ChildrenSummary from '../../modules/children/components/childrenSummary/childrenSummary';
+import ChildrenPacking from '../../modules/children/components/childrenPacking/childrenPacking';
+import TemperatureChart from '../../modules/weather/components/temperatureChart/temperatureChart';
+import { getTodayForecast } from '../../modules/weather/helpers/getTodayForecast';
+import PageHead from '../../components/pageHead/pageHead';
+import RetryAlert from '../../components/retryAlert/retryAlert';
 
 const Overview = () => {
   const { t } = useTranslation();

@@ -17,7 +17,7 @@ import { useWeatherQuery } from '../../modules/weather/hooks/useWeatherQuery';
 
 const Home = () => {
   const { t } = useTranslation();
-  const { coords, setCoords } = useSelectedCoords(); // Local search najde mesto, pak zavola setCoords, tim se zmeni Coords v Home a nacre se pocasi pro mesto
+  const { coords } = useSelectedCoords();
   const weatherQuery = useWeatherQuery(coords);
 
   const {
@@ -45,7 +45,7 @@ const Home = () => {
       <Header />
       <Container>
         <PageHead title={t('home.title')} description={t('home.description')} />
-        <LocationSearch onLocationSelect={setCoords} />
+        <LocationSearch />
         {weatherLoading ? (
           <Loader />
         ) : weatherError || !weather ? (

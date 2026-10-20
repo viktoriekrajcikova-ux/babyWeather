@@ -24,6 +24,7 @@
     "@upstash/redis": "^1.39.0",
     "bootstrap": "^5.3.3",
     "i18next": "^26.4.2",
+    "jotai": "^3.0.1",
     "lucide-react": "^1.14.0",
     "react": "^18.2.0",
     "react-bootstrap": "^2.10.1",

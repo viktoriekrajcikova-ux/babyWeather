@@ -1,18 +1,15 @@
+import { useSetAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 
-import type { GeocodingResult } from '../api/geocodingApiClient';
+import { selectedLocationAtom } from '../atoms/selectedLocationAtom';
 import { useSearchCityQuery } from '../hooks/useSearchCityQuery';
 import styles from './locationSearch.module.scss';
 
-type LocationSearchProps = {
-  onLocationSelect: (location: GeocodingResult) => void;
-};
-
-const LocationSearch = ({ onLocationSelect }: LocationSearchProps) => {
+const LocationSearch = () => {
   const { t } = useTranslation();
-
+  const setCoords = useSetAtom(selectedLocationAtom);
   const [city, setCity] = useState('');
   const [searchedCity, setSearchedCity] = useState('');
   const locationQuery = useSearchCityQuery(searchedCity);
@@ -31,8 +28,8 @@ const LocationSearch = ({ onLocationSelect }: LocationSearchProps) => {
   useEffect(() => {
     if (!locationQuery.data) return;
 
-    onLocationSelect(locationQuery.data);
-  }, [locationQuery.data, onLocationSelect]);
+    setCoords(locationQuery.data);
+  }, [locationQuery.data, setCoords]);
 
   return (
     <Form
